@@ -1,0 +1,1 @@
+INSERT INTO Categories (c_id, c_name, c_user_id) VALUES (1, N'Mock category', 1)

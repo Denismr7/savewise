@@ -1,0 +1,14 @@
+version: '3.6'
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER : savew
+      POSTGRES_DB: savew
+      POSTGRES_PASSWORD: savew
+    container_name: savew-pg
+    volumes:
+      - ${PWD}/pg-scripts:/docker-entrypoint-initdb.d/
+    ports:
+      - 5432:5432

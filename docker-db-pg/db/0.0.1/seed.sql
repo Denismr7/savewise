@@ -1,0 +1,1 @@
+INSERT INTO Users (u_id, u_login, u_name, u_lastname, u_password) VALUES (1, N'Admin', N'Administrator', N'Savewise', N'2911')

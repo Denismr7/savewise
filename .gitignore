@@ -1,0 +1,5 @@
+docker-db-pg/pg-scripts
+.vs
+.vscode
+SavewiseAPI/bin
+SavewiseAPI/obj
