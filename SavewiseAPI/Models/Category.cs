@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Savewise.Models
@@ -11,6 +12,7 @@ namespace Savewise.Models
         public int cUsrId { get; set; }
 
         public virtual User userNavigation { get; set; }
+        public List<Transaction> transactions { get; set; }
     }
 
     public class CategoryConfig : IEntityTypeConfiguration<Category>

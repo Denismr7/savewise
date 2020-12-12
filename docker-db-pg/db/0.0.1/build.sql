@@ -27,6 +27,7 @@ CREATE TABLE Transactions(
     t_category_id int NOT NULL,
     t_amount int NOT NULL,
     t_date DATETIME NOT NULL,
+    t_description varchar(85) NULL,
     t_transaction_type_id int NOT NULL,
     CONSTRAINT PK_Transactions PRIMARY KEY (t_id),
     CONSTRAINT FK_Transactions_UserID FOREIGN KEY (t_user_id) REFERENCES Users (u_id) ON DELETE CASCADE,
