@@ -6,7 +6,7 @@ namespace Savewise.Models
 {
     public class Category
     {
-        public int cId { get; set; }
+        public int? cId { get; set; }
         public string cName { get; set; }
         public int cUsrId { get; set; }
 
