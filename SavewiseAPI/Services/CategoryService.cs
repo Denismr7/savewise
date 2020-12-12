@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Savewise.Controllers
+namespace Savewise.Services
 {
     [Route("api/categories")]
     public class CategoryService : BaseService
