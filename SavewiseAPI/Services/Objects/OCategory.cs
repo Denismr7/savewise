@@ -5,7 +5,7 @@ namespace Savewise.Services.Objects
         /// <summary>
         /// Category ID
         /// </summary>
-        public int id { get; set; }
+        public int? id { get; set; }
 
         /// <summary>
         /// Category name
