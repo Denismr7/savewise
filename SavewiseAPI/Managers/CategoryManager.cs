@@ -27,11 +27,15 @@ namespace Savewise.Managers
             return category;
         }
 
-        public List<OCategory> getAll()
+        /// <summary>
+        /// Returns all categories related to a specific user
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        public List<OCategory> getAll(int userId)
         {
             List<Category> categoriesModel = new List<Category>();
             List<OCategory> categories = new List<OCategory>();
-            categoriesModel = context.Categories.AsNoTracking().ToList();
+            categoriesModel = context.Categories.AsNoTracking().Where(c => c.cUsrId == userId).ToList();
 
             foreach (Category cat in categoriesModel)
             {

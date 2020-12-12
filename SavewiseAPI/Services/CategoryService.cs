@@ -27,9 +27,9 @@ namespace Savewise.Services
 
         }
 
-        // GET api/categories/
-        [HttpGet()]
-        public IActionResult GetAll()
+        // GET api/categories/user/:id
+        [HttpGet("user/:id")]
+        public IActionResult GetAll(int id)
         {
             CategoriesResponse response = new CategoriesResponse();
             response.status = new Status();
@@ -37,7 +37,7 @@ namespace Savewise.Services
             try
             {
                 CategoryManager manager = new CategoryManager(context);
-                response.categories = manager.getAll();
+                response.categories = manager.getAll(id);
                 response.status.success = true;
             }
             catch (Exception exception)
