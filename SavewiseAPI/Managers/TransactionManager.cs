@@ -39,9 +39,15 @@ namespace Savewise.Managers
         /// <param name="userId">User ID</param>
         /// <param name="startDate">Start date</param>
         /// <param name="endDate">End date</param>
-        public List<OTransaction> getAllByDates(int userId, DateTime startDate, DateTime endDate)
+        public List<OTransaction> getAllByDates(int userId, string startDate, string endDate)
         {
-            if (endDate < startDate)
+            DateTime fromDate;
+            DateTime toDate;
+            if (!DateTime.TryParse(startDate, out fromDate) || !DateTime.TryParse(endDate, out toDate))
+            {
+                throw new Exception("ERROR: Invalid dates");
+            }
+            if (toDate < fromDate)
             {
                 throw new Exception("ERROR: Incorrect dates");
             }
@@ -54,7 +60,7 @@ namespace Savewise.Managers
             List<OTransaction> transactions = new List<OTransaction>();
             transactionsModel = context.Transactions.AsNoTracking()
                                                     .Where(t => t.tUserId == userId)
-                                                    .Where(t => t.tDate >= startDate && t.tDate <= endDate)
+                                                    .Where(t => t.tDate >= fromDate && t.tDate <= toDate)
                                                     .OrderBy(t => t.tDate)
                                                     .ToList();
 
