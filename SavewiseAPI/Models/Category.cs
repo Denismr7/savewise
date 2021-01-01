@@ -21,6 +21,9 @@ namespace Savewise.Models
         {
             builder.ToTable("categories");
 
+            builder.HasKey(c => c.cId)
+                   .HasName("PK_Categories");
+
             builder.Property(c => c.cId)
                    .HasColumnName("c_id")
                    .HasColumnType("int")
@@ -36,9 +39,6 @@ namespace Savewise.Models
             builder.Property(c => c.cUsrId)
                    .HasColumnName("c_user_id")
                    .HasColumnType("int");
-
-            builder.HasKey(c => c.cId)
-                   .HasName("PK_Categories");
 
             builder.HasOne(c => c.userNavigation)
                    .WithMany(u => u.categories)

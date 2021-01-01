@@ -15,6 +15,6 @@ namespace Savewise.Services.Objects
         /// <summary>
         /// User ID
         /// </summary>
-        public int userID { get; set; }
+        public int? userID { get; set; }
     }
 }

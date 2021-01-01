@@ -18,6 +18,10 @@ namespace Savewise.Services
         {
             public List<OTransaction> transactions { get; set; }
         }
+        public class TransactionResponse : ServiceResponse
+        {
+            public OTransaction transaction { get; set; }
+        }
         public TransactionService(SavewiseContext context): base(context)
         {
 
@@ -43,9 +47,29 @@ namespace Savewise.Services
             return Json(response);
         }
 
-        // DELETE api/categories/:id
+        // POST api/transactions/
+        [HttpPost]
+        public IActionResult SaveTransaction([FromBody] OTransaction transaction)
+        {
+            TransactionResponse response = new TransactionResponse();
+            response.status = new Status();
+            response.status.success = false;
+            try
+            {
+                TransactionManager manager = new TransactionManager(context);
+                response.transaction = manager.saveTransaction(transaction);
+                response.status.success = true;
+            }
+            catch (Exception exception)
+            {
+                response.status.errorMessage = exception.Message;
+            }
+            return Json(response);
+        }
+
+        // DELETE api/transactions/:id
         [HttpDelete(":id")]
-        public IActionResult DeleteCategory(int id)
+        public IActionResult DeleteTransaction(int id)
         {
             Status response = new Status();
             response.success = false;

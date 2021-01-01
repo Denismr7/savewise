@@ -24,6 +24,9 @@ namespace Savewise.Models
         {
             builder.ToTable("transactions");
 
+            builder.HasKey(t => t.tId)
+                   .HasName("PK_Transactions");
+
             builder.Property(t => t.tId)
                    .HasColumnName("t_id")
                    .HasColumnType("int")
@@ -45,6 +48,11 @@ namespace Savewise.Models
                    .HasColumnName("t_user_id")
                    .HasColumnType("int")
                    .IsRequired();
+
+            builder.Property(t => t.tDate)
+                   .HasColumnName("t_date")
+                   .HasColumnType("timestamp")
+                   .IsRequired();
             
             builder.Property(t => t.tCategoryId)
                    .HasColumnName("t_category_id")
@@ -58,12 +66,14 @@ namespace Savewise.Models
 
             builder.HasOne(t => t.CategoryNavigation)
                    .WithMany(c => c.transactions)
-                   .HasForeignKey(b => b.tCategoryId)
+                   .HasForeignKey(t => t.tCategoryId)
+                   .HasPrincipalKey(c => c.cId)
                    .HasConstraintName("FK_Transactions_CategoryID");
             
             builder.HasOne(t => t.TransactionTypeNavigation)
                    .WithMany(tt => tt.Transactions)
-                   .HasForeignKey(b => b.tTypeId)
+                   .HasForeignKey(t => t.tTypeId)
+                   .HasPrincipalKey(tt => tt.ttId)
                    .HasConstraintName("FK_Transactions_TransactionTypeID");
         }
     }

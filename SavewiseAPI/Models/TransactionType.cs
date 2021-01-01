@@ -19,6 +19,9 @@ namespace Savewise.Models
         {
             builder.ToTable("transactiontypes");
 
+            builder.HasKey(tt => tt.ttId)
+                   .HasName("PK_TransactionTypes");
+
             builder.Property(tt => tt.ttId)
                    .HasColumnName("tt_id")
                    .HasColumnType("int")

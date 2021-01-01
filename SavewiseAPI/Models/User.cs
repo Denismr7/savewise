@@ -22,6 +22,9 @@ namespace Savewise.Models
         {
             builder.ToTable("users");
 
+            builder.HasKey(u => u.uId)
+                   .HasName("PK_Users");
+
             builder.Property(u => u.uId)
                    .HasColumnName("u_id")
                    .HasColumnType("int")
@@ -51,9 +54,6 @@ namespace Savewise.Models
                     .HasColumnType("varchar")
                     .HasMaxLength(150)
                     .IsRequired();
-
-            builder.HasKey(u => u.uId)
-                   .HasName("PK_Users");
         }
     }
 }

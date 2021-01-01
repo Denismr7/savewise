@@ -64,7 +64,7 @@ namespace Savewise.Managers
             {
                 throw new Exception("ERROR: Category null");
             }
-            User user = context.Users.AsNoTracking().FirstOrDefault(u => u.uId == category.userID);
+            User user = context.Users.AsNoTracking().FirstOrDefault(u => u.uId == category.userID.Value);
             if (user == null)
             {
                 throw new Exception($"ERROR: CATEGORY USER ID [{category.userID}] NOT FOUND. NO SUCH USER");
@@ -79,7 +79,7 @@ namespace Savewise.Managers
                 model = new Category();
             }
             model.cName = category.name;
-            model.cUsrId = category.userID;
+            model.cUsrId = category.userID.Value;
 
             // Update if it's a current category or Add if is a new one
             if (category.id.HasValue) {
