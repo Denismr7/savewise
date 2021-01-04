@@ -11,5 +11,5 @@ export interface CategoryResponse extends BasicResponse {
 }
 
 export interface CategoriesResponse extends BasicResponse {
-    category: Category[];
+    categories: Category[];
 }

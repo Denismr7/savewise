@@ -27,8 +27,8 @@ namespace Savewise.Services
 
         }
 
-        // GET api/categories/user/:id
-        [HttpGet("user/:id")]
+        // GET api/categories/user/{id}
+        [HttpGet("user/{id}")]
         public IActionResult GetAll(int id)
         {
             CategoriesResponse response = new CategoriesResponse();
@@ -47,8 +47,8 @@ namespace Savewise.Services
             return Json(response);
         }
 
-        // GET api/categories/id
-        [HttpGet("id")]
+        // GET api/categories/{id}
+        [HttpGet("{id}")]
         public IActionResult GetCategory(int id)
         {
             CategoryResponse response = new CategoryResponse();
@@ -92,8 +92,8 @@ namespace Savewise.Services
             return Json(response);
         }
 
-        // PATCH api/categories/:id
-        [HttpPatch(":id")]
+        // PATCH api/categories/{id}
+        [HttpPatch("{id}")]
         public IActionResult EditCategory([FromBody] OCategory category)
         {
             CategoryResponse response = new CategoryResponse();
@@ -117,8 +117,8 @@ namespace Savewise.Services
             return Json(response);
         }
 
-        // DELETE api/categories/:id
-        [HttpDelete(":id")]
+        // DELETE api/categories/{id}
+        [HttpDelete("{id}")]
         public IActionResult DeleteCategory(int id)
         {
             Status response = new Status();

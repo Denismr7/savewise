@@ -28,7 +28,7 @@ namespace Savewise.Services
         }
 
         // GET api/transactions/user/:id?startDate=startDate?endDate=endDate
-        [HttpGet("user/:id")]
+        [HttpGet("user/{id}")]
         public IActionResult GetAllByDates(int id, [FromQuery] string startDate, [FromQuery] string endDate)
         {
             TransactionsByDateResponse response = new TransactionsByDateResponse();
@@ -67,8 +67,8 @@ namespace Savewise.Services
             return Json(response);
         }
 
-        // DELETE api/transactions/:id
-        [HttpDelete(":id")]
+        // DELETE api/transactions/{id}
+        [HttpDelete("{id}")]
         public IActionResult DeleteTransaction(int id)
         {
             Status response = new Status();
