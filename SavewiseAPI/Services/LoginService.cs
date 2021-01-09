@@ -22,7 +22,7 @@ namespace Savewise.Services
 
         public class LoginResponse : ServiceResponse
         {
-            public User loginResponse { get; set; }
+            public User login { get; set; }
         }
         public LoginService(SavewiseContext context): base(context)
         {
@@ -39,7 +39,7 @@ namespace Savewise.Services
             try
             {
                 LoginManager manager = new LoginManager(context);
-                response.loginResponse = manager.checkLogin(input.userName, input.password);
+                response.login = manager.checkLogin(input.userName, input.password);
                 response.status.success = true;
             }
             catch (Exception exception)

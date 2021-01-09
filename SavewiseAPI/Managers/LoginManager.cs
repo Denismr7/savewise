@@ -28,11 +28,11 @@ namespace Savewise.Managers
             PasswordHasher hasher = new PasswordHasher(options);
             User user = context.Users.AsNoTracking()
                                     .FirstOrDefault(u => u.uLogin == username);
-            var check = hasher.Check(user.uPassword, password);
             if (user == null)
             {
                 throw new Exception("User not found");
             }
+            var check = hasher.Check(user.uPassword, password);
             if (!check.Verified)
             {
                 throw new Exception("Incorrect password");
