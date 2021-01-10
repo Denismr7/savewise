@@ -22,7 +22,7 @@ namespace Savewise.Services
 
         public class LoginResponse : ServiceResponse
         {
-            public User login { get; set; }
+            public OUser login { get; set; }
         }
         public LoginService(SavewiseContext context): base(context)
         {

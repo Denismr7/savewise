@@ -19,9 +19,9 @@ namespace Savewise.Managers
         /// <summary>
         /// Check login
         /// </summary>
-        public User checkLogin(string username, string password)
+        public OUser checkLogin(string username, string password)
         {
-            User login = null;
+            OUser login = null;
             HashingOptions hashingOptions = new HashingOptions();
             hashingOptions.Iterations = 1000;
             IOptions<HashingOptions> options = Options.Create(hashingOptions);
@@ -38,11 +38,8 @@ namespace Savewise.Managers
                 throw new Exception("Incorrect password");
             }
             else {
-                login = new User();
-                login.uId = user.uId;
-                login.uLogin = user.uLogin;
-                login.uName = user.uName;
-                login.uLastName = user.uLastName;
+                UserManager userManager = new UserManager(context);
+                login = userManager.convert(user);
             }
 
             return login;

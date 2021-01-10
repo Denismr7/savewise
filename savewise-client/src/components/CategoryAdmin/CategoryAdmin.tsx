@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Category } from '../../services/objects/categories';
 import { CategoryService } from "../../services";
+import { LoginContext } from '../../common/context/LoginContext';
 
 export function CategoryAdmin() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const {login} = useContext(LoginContext);
+  
   useEffect(() => {
-    CategoryService.getCategories(1).then(rsp => {
+    const id: number = login.login?.id as number;
+    CategoryService.getCategories(id).then(rsp => {
       if (rsp.status.success) {
         setCategories(rsp.categories);
         setLoading(false);
@@ -20,7 +23,7 @@ export function CategoryAdmin() {
     return () => {
       setCategories([]);
     }
-  }, []);
+  }, [login]);
 
   const showCategories = (categories: Category[]) => {
     return categories.map(category => {
