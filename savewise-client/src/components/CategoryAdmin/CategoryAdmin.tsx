@@ -14,6 +14,8 @@ export function CategoryAdmin() {
       } else {
         console.log(`Error: ${rsp.status.errorMessage}`);
       }
+    }).catch(e => {
+      console.log(`ERROR: ${e}`);
     })
     return () => {
       setCategories([]);
