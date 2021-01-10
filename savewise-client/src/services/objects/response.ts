@@ -1,6 +1,6 @@
 export interface Status {
     success: boolean;
-    errorMessage: string;
+    errorMessage?: string;
 }
 
 export interface BasicResponse {

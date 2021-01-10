@@ -7,5 +7,5 @@ export interface LoginData {
 }
 
 export interface LoginResponse extends BasicResponse {
-    login: User;
+    login?: User;
 }
