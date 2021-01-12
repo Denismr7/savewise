@@ -9,6 +9,7 @@ import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import { LoginContext } from '../../common/context/LoginContext';
 import { Redirect, useHistory } from 'react-router-dom';
+import Typography from '@material-ui/core/Typography';
 
 interface LoginError {
     hasErrors: boolean,
@@ -64,12 +65,18 @@ export default function Login(): ReactElement {
                     spacing={2}
                     >
                     <Grid item md={12}>
+                        <Typography variant="h4" component="h1" gutterBottom>
+                            Login
+                        </Typography>
+                    </Grid>
+                    <Grid item md={12}>
                         <TextField 
                             id="filled-basic"
                             onChange={handleInputChange} 
                             label="Username" 
                             variant="filled" 
-                            name="userName" 
+                            name="userName"
+                            fullWidth
                             required
                             />
                     </Grid>
@@ -81,12 +88,13 @@ export default function Login(): ReactElement {
                             variant="filled" 
                             name="password" 
                             type="password"
+                            fullWidth
                             required
                             />
                     </Grid>
                     <Grid item md={12}>
-                        <Button variant="contained" color="primary" type="submit" fullWidth>
-                            Submit
+                        <Button variant="contained" color="primary" type="submit">
+                            Login
                         </Button>
                     </Grid>
                 </Grid>
