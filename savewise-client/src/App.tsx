@@ -11,6 +11,7 @@ import 'fontsource-roboto';
 import { CategoryAdmin } from './components';
 import PrivateRoute from './common/wrappers/PrivateRoute';
 import { LoginContext } from './common/context/LoginContext';
+import Dashboard from './components/Dashboard/Dashboard';
 
 function App() {
   const {login} = useContext(LoginContext);
