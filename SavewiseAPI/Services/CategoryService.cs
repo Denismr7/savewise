@@ -37,7 +37,27 @@ namespace Savewise.Services
             try
             {
                 CategoryManager manager = new CategoryManager(context);
-                response.categories = manager.getAll(id);
+                response.categories = manager.getAll(id, false, null, null);
+                response.status.success = true;
+            }
+            catch (Exception exception)
+            {
+                response.status.errorMessage = exception.Message;
+            }
+            return Json(response);
+        }
+
+        // GET api/categories/user/{id}/spendings
+        [HttpPost("user/{id}/spendings")]
+        public IActionResult GetAllWithSpending(int id, [FromBody] string fromDate, string toDate)
+        {
+            CategoriesResponse response = new CategoriesResponse();
+            response.status = new Status();
+            response.status.success = false;
+            try
+            {
+                CategoryManager manager = new CategoryManager(context);
+                response.categories = manager.getAll(id, true, fromDate, toDate);
                 response.status.success = true;
             }
             catch (Exception exception)

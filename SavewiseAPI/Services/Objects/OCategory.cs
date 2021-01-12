@@ -16,5 +16,10 @@ namespace Savewise.Services.Objects
         /// User ID
         /// </summary>
         public int? userID { get; set; }
+
+        /// <summary>
+        /// Quantity spended between two given dates in the category
+        /// </summary>
+        public int? amount { get; set; }
     }
 }

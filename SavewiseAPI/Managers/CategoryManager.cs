@@ -31,7 +31,10 @@ namespace Savewise.Managers
         /// Returns all categories related to a specific user
         /// </summary>
         /// <param name="userId">User ID</param>
-        public List<OCategory> getAll(int userId)
+        /// <param name="includeAmounts">Whether or not include spendings in each category</param>
+        /// <param name="fromDate">If includeAmounts it should have a starting date</param>
+        /// <param name="toDate">If includeAmounts it should have an ending date</param>
+        public List<OCategory> getAll(int userId, bool includeAmounts, string fromDate, string toDate)
         {
             List<Category> categoriesModel = new List<Category>();
             List<OCategory> categories = new List<OCategory>();
@@ -39,10 +42,31 @@ namespace Savewise.Managers
 
             foreach (Category cat in categoriesModel)
             {
-                categories.Add(convert(cat));
+                OCategory categoryObject = convert(cat);
+                if (includeAmounts)
+                {
+                    categoryObject.amount = getAmount(userId, cat.cId.Value, fromDate, toDate);
+                }
+                categories.Add(categoryObject);
             }
 
             return categories;
+        }
+
+        /// <summary>
+        /// Returns the expense incurred in a particular category between two dates
+        /// </summary>
+        public int getAmount(int userId, int categoryId , string fromDate, string toDate) {
+            int result = 0;
+            TransactionManager transactionManager = new TransactionManager(context);
+            List<OTransaction> transactions = transactionManager.getAllByDates(userId, fromDate, toDate);
+            List<OTransaction> categoryTransactions = transactions.Where(t => t.category.id == categoryId).ToList();
+            foreach (OTransaction transaction in categoryTransactions)
+            {
+                result = result + transaction.amount;
+            }
+
+            return result;
         }
 
         public OCategory getById(int id)
