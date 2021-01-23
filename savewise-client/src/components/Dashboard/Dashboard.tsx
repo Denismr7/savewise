@@ -5,6 +5,7 @@ import { Typography } from '@material-ui/core';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
+import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
     return (
@@ -37,7 +38,9 @@ export default function Dashboard() {
                             <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
                                 Categories
                             <IconButton color='primary'>
-                                <AddBoxIcon></AddBoxIcon>
+                                <Link to="/categories">
+                                    <AddBoxIcon></AddBoxIcon>
+                                </Link>
                             </IconButton>
                             </Typography>
                             <Grid container

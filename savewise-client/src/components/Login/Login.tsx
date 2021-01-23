@@ -10,15 +10,11 @@ import Snackbar from '@material-ui/core/Snackbar';
 import { LoginContext } from '../../common/context/LoginContext';
 import { Redirect, useHistory } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
-
-interface LoginError {
-    hasErrors: boolean,
-    message?: string
-}
+import { SnackbarError } from '../../common/SnackbarHelpers';
 
 export default function Login(): ReactElement {
     const [loginForm, setLoginForm] = useState<LoginData>({ userName: '', password: '' });
-    const [error, setError] = React.useState<LoginError>({ hasErrors: false });
+    const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
     const {login, setLogin} = useContext(LoginContext);
     const history = useHistory();
 
@@ -34,7 +30,7 @@ export default function Login(): ReactElement {
         const { status, login } = await LoginService.login(loginForm);
         if (status.success) {
             setLogin({ isLogged: true, login });
-            history.push("/categories");
+            history.push("/dashboard");
         } else {
             setError({ hasErrors: !status.success, message: status.errorMessage });
         }
@@ -50,7 +46,7 @@ export default function Login(): ReactElement {
 
   if (login.isLogged) {
      return (
-         <Redirect to="/categories" />
+         <Redirect to="/dashboard" />
          )
   }
 

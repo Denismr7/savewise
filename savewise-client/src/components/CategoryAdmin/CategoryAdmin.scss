@@ -1,0 +1,30 @@
+.componentBg {
+    margin: 10% auto 0 auto;
+    width: 70%;
+    height: 70vh;
+    background-color:  rgba(172, 167, 203, 0.9);
+    border-radius: 5px;
+}
+.titleButton {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.modalBg {
+    border-radius: 5px;
+    padding-left: 10px;
+    min-height: 400px;
+    width: 400px;
+    background-color:  rgba(172, 167, 203, 1);
+    margin: 20px auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#add-category {
+    align-self: flex-start;
+    justify-self: flex-start;
+}
+.buttonGroup {
+    margin-top: 20px;
+}
