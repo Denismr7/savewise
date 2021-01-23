@@ -6,17 +6,21 @@ import Button from '@material-ui/core/Button';
 import "./CategoryAdmin.scss";
 import Modal from '@material-ui/core/Modal';
 import TextField from '@material-ui/core/TextField';
-import { saveCategory } from '../../services/category-service';
+import { editCategory, saveCategory } from '../../services/category-service';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import { SnackbarError, SnackbarSuccess } from '../../common/SnackbarHelpers';
-
-
+import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { Link } from 'react-router-dom';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 
 export function CategoryAdmin() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [newCategoryName, setNewCategoryName] = useState<string>('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined);
   const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
   const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({ success: false });
   const [loading, setLoading] = useState(true);
@@ -41,11 +45,30 @@ export function CategoryAdmin() {
 
   const showCategories = (categories: Category[]) => {
     return categories.map(category => {
-      return <p className={`category${category.id}`} key={category.id}>{ category.name }</p>
+      return (
+        <div className="categoryItem" key={category.id}>
+          <p className="categoryName">{ category.name }</p>
+          <div className="categoryItemButtons">
+            <IconButton onClick={() => handleToggleModal(category.id, category.name)}>
+              <EditIcon />
+            </IconButton>
+            <IconButton>
+              <DeleteIcon />
+            </IconButton>
+          </div>
+        </div>
+        )
     })
   }
 
-  const handleToggleModal = () => {
+  const handleToggleModal = (selectedCategoryId?: number, categoryName?: string) => {
+    if (selectedCategoryId) {
+      setSelectedCategoryId(selectedCategoryId);
+      if (categoryName) setNewCategoryName(categoryName);
+    } else {
+      setSelectedCategoryId(undefined);
+      setNewCategoryName('');
+    }
     setOpenModal(!openModal);
   }
 
@@ -62,35 +85,54 @@ export function CategoryAdmin() {
     }
   };
 
-  const submitCategory = (categoryName: string) => {
+  const submitCategory = (categoryName: string, categoryId?: number) => {
     const category: Category = {
       name: categoryName,
-      userId: login.login?.id
+      userId: login.login?.id,
+      id: categoryId
     }
 
-    saveCategory(category).then((rsp: CategoryResponse) => {
-      if (rsp.status.success) {
-        handleToggleModal();
-        setCategories([ ...categories, rsp.category ])
-        setSaveSuccess({ success: true, message: `Category ${rsp.category.name} saved succesfully!` });
-      } else {
-        setError({ hasErrors: true, message: rsp.status.errorMessage });
-      }
-    })
+    if (!categoryId) {
+      saveCategory(category).then((rsp: CategoryResponse) => {
+        if (rsp.status.success) {
+          handleToggleModal();
+          setCategories([ ...categories, rsp.category ])
+          setSaveSuccess({ success: true, message: `Category ${rsp.category.name} saved succesfully!` });
+        } else {
+          setError({ hasErrors: true, message: rsp.status.errorMessage });
+        }
+      })
+    } else {
+      editCategory(category).then((rsp: CategoryResponse) => {
+        if (rsp.status.success) {
+          handleToggleModal();
+          setCategories(categories.map(cat => cat.id === category.id ? category : cat));
+          setSaveSuccess({ success: true, message: `Category ${rsp.category.name} edited succesfully!` });
+        } else {
+          setError({ hasErrors: true, message: rsp.status.errorMessage });
+        }
+      })
+    }
+    
   }
 
   const modalBody = (
     <div className="modalBg">
-      <h1 id="add-category">Create category</h1>
+      { selectedCategoryId ? 
+        (<h1 id="add-category">Edit category</h1>) 
+        : 
+        (<h1 id="add-category">Create category</h1>) 
+      }
       <TextField 
                 id="filled-basic"
                 onChange={handleNewCategoryName} 
                 label="Category Name" 
                 variant="filled" 
                 name="categoryName"
+                value={newCategoryName}
                 />
         <div className="buttonGroup">
-          <Button variant="contained" color="primary" type="submit" onClick={() => submitCategory(newCategoryName)}>
+          <Button variant="contained" color="primary" type="submit" onClick={() => submitCategory(newCategoryName, selectedCategoryId)}>
             Save
           </Button>
         </div>
@@ -105,15 +147,22 @@ export function CategoryAdmin() {
   return (
     <div className="componentBg">
       <div className="titleButton">
+        <Button variant="contained" startIcon={<ArrowBackIosIcon />}>
+          <Link to="/dashboard" color="inherit" style={{ textDecoration: 'none' }}>
+            Dashboard
+          </Link>
+        </Button>
         <h1>Your categories</h1>
-        <Button variant="contained" color="primary" type="submit" onClick={handleToggleModal}>
+        <Button variant="contained" color="primary" type="submit" onClick={() => handleToggleModal()}>
           Add new
         </Button>
       </div>
-      { loading ? "Loading" : showCategories(categories) }
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        { loading ? "Loading" : showCategories(categories) }
+      </div>
       <Modal
         open={openModal}
-        onClose={handleToggleModal}
+        onClose={() => handleToggleModal()}
         aria-labelledby="add-category"
       >
         {modalBody}

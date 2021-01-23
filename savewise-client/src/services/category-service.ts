@@ -33,6 +33,10 @@ export function editCategory(category: Category): Promise<CategoryResponse> {
   const body = JSON.stringify(category);
   const options: RequestInit = {
     method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',    
+      'Access-Control-Allow-Origin':'*',
+    },
     body
   };
   return fetch(url, options).then(r => r.json());
