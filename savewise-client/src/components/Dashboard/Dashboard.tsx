@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import "./Dashboard.scss"
 import { Typography } from '@material-ui/core';
@@ -6,8 +6,66 @@ import AddBoxIcon from '@material-ui/icons/AddBox';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
+import { LoginContext } from '../../common/context/LoginContext';
+import { CategoryService } from '../../services/';
+import { CategoriesResponse, Category } from '../../services/objects/categories';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { SnackbarError } from '../../common/SnackbarHelpers';
+import Alert from '@material-ui/lab/Alert';
+import Snackbar from '@material-ui/core/Snackbar';
 
 export default function Dashboard() {
+    const {login} = useContext(LoginContext);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
+
+    useEffect(() => {
+        getCategories(login.login?.id);
+        return () => {
+            
+        }
+    }, [login]);
+
+    const getCategories = (userId?: number) => {
+        setLoading(true);
+        if (userId) {
+            CategoryService.getCategories(userId).then((rsp: CategoriesResponse) => {
+                if (rsp.status.success) {
+                    setCategories(rsp.categories);
+                    setLoading(false);
+                } else {
+                    setError({ hasErrors: true, message: rsp.status.errorMessage });
+                    setLoading(false);
+                }
+            }).catch(e => {
+                setError({ hasErrors: true, message: e });
+                setLoading(false);
+            })
+        }
+    }
+    
+    const renderCategories = (categories: Category[]) => {
+        if (categories.length) {
+            return categories.map(category => (
+                <Grid item
+                container
+                direction="row"
+                justify="space-between"
+                spacing={1}
+                key={category.id}
+                >
+                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{ category.name }</Typography>
+                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginRight: '15px' }}>{ category.amount ? category.amount : 0 } €</Typography>
+                </Grid>
+            ))
+        } else (<Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No categories to show</Typography>);
+    };
+
+    const handleCloseErrorModal = () => {
+        setError({ hasErrors: false });
+    }
+
     return (
         <Grid 
             container
@@ -17,8 +75,8 @@ export default function Dashboard() {
             spacing={1}
             >
             <Grid item>
-                <Typography variant="h2" component="h1">
-                    Welcome back
+                <Typography variant="h2" component="h1" style={{ marginTop: '5%' }}>
+                    Welcome back, { login.login?.name }
                 </Typography>
             </Grid>
             <Grid container
@@ -47,34 +105,8 @@ export default function Dashboard() {
                             direction="column"
                             style={{ height: '70%' }}
                             spacing={3}
-                            >       
-                                <Grid item
-                                container
-                                direction="row"
-                                justify="space-between"
-                                spacing={1}
-                                >
-                                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>Cat 1</Typography>
-                                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginRight: '15px' }}>100 €</Typography>
-                                </Grid>
-                                <Grid item
-                                container
-                                direction="row"
-                                justify="space-between"
-                                spacing={1}
-                                >
-                                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>Cat 2</Typography>
-                                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginRight: '15px' }}>95 €</Typography>
-                                </Grid>
-                                <Grid item
-                                container
-                                direction="row"
-                                justify="space-between"
-                                spacing={1}
-                                >
-                                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>Cat 3</Typography>
-                                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginRight: '15px' }}>60 €</Typography>
-                                </Grid>
+                            >
+                                { loading ? (<CircularProgress color="secondary" />) : renderCategories(categories) }
                             </Grid>
                             <Button variant="contained" color="primary">
                                 View all
@@ -93,6 +125,11 @@ export default function Dashboard() {
                     </div>
                 </Grid>
             </Grid>
+            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={handleCloseErrorModal}>
+                <Alert onClose={handleCloseErrorModal} severity="error">
+                    { error.message }
+                </Alert>
+            </Snackbar>
         </Grid>
     )
 }

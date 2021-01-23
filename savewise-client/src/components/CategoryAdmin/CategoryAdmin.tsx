@@ -6,7 +6,6 @@ import Button from '@material-ui/core/Button';
 import "./CategoryAdmin.scss";
 import Modal from '@material-ui/core/Modal';
 import TextField from '@material-ui/core/TextField';
-import { deleteCategory, editCategory, saveCategory } from '../../services/category-service';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import { SnackbarError, SnackbarSuccess } from '../../common/SnackbarHelpers';
@@ -106,7 +105,7 @@ export function CategoryAdmin() {
     }
 
     if (!categoryId) {
-      saveCategory(category).then((rsp: CategoryResponse) => {
+      CategoryService.saveCategory(category).then((rsp: CategoryResponse) => {
         if (rsp.status.success) {
           handleToggleModal();
           setCategories([ ...categories, rsp.category ])
@@ -116,7 +115,7 @@ export function CategoryAdmin() {
         }
       })
     } else {
-      editCategory(category).then((rsp: CategoryResponse) => {
+      CategoryService.editCategory(category).then((rsp: CategoryResponse) => {
         if (rsp.status.success) {
           handleToggleModal();
           setCategories(categories.map(cat => cat.id === category.id ? category : cat));
@@ -131,7 +130,7 @@ export function CategoryAdmin() {
 
   const handleDeleteCategory = (categoryId?: number) => {
     if (categoryId) {
-      deleteCategory(categoryId).then((rsp: Status) => {
+      CategoryService.deleteCategory(categoryId).then((rsp: Status) => {
         if (rsp.success) {
           handleToggleDeleteModal();
           setCategories(categories.filter(cat => cat.id !== categoryId));

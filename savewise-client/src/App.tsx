@@ -24,11 +24,7 @@ function App() {
                 <Login />
               </div>
             </Route>
-            <Route path="/dashboard" exact>
-              <div style={{ marginTop: '5%' }}>
-                <Dashboard />
-              </div>
-            </Route>
+            <PrivateRoute component={Dashboard} path="/dashboard" exact conditionToRender={login.isLogged} />
             <PrivateRoute component={CategoryAdmin} path="/categories" exact conditionToRender={login.isLogged} />
             <Redirect from="/" to="/login" exact/>
           </Switch>

@@ -4,6 +4,7 @@ export interface Category {
     id?: number;
     name: string;
     userId?: number;
+    amount?: number;
 }
 
 export interface CategoryResponse extends BasicResponse {
