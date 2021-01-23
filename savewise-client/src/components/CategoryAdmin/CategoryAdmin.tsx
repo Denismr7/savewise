@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import "./CategoryAdmin.scss";
 import Modal from '@material-ui/core/Modal';
 import TextField from '@material-ui/core/TextField';
-import { editCategory, saveCategory } from '../../services/category-service';
+import { deleteCategory, editCategory, saveCategory } from '../../services/category-service';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import { SnackbarError, SnackbarSuccess } from '../../common/SnackbarHelpers';
@@ -15,10 +15,12 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Link } from 'react-router-dom';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import { Status } from '../../services/objects/response';
 
 export function CategoryAdmin() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
   const [newCategoryName, setNewCategoryName] = useState<string>('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined);
   const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
@@ -52,7 +54,7 @@ export function CategoryAdmin() {
             <IconButton onClick={() => handleToggleModal(category.id, category.name)}>
               <EditIcon />
             </IconButton>
-            <IconButton>
+            <IconButton onClick={() => handleToggleDeleteModal(category.id, category.name)}>
               <DeleteIcon />
             </IconButton>
           </div>
@@ -70,6 +72,17 @@ export function CategoryAdmin() {
       setNewCategoryName('');
     }
     setOpenModal(!openModal);
+  }
+
+  const handleToggleDeleteModal = (selectedCategoryId?: number, categoryName?: string) => {
+    if (selectedCategoryId) {
+      setSelectedCategoryId(selectedCategoryId);
+      if (categoryName) setNewCategoryName(categoryName);
+    } else {
+      setSelectedCategoryId(undefined);
+      setNewCategoryName('');
+    }
+    setOpenConfirmDelete(!openConfirmDelete);
   }
 
   const handleNewCategoryName = (event: ChangeEvent<HTMLInputElement>) => {
@@ -116,6 +129,20 @@ export function CategoryAdmin() {
     
   }
 
+  const handleDeleteCategory = (categoryId?: number) => {
+    if (categoryId) {
+      deleteCategory(categoryId).then((rsp: Status) => {
+        if (rsp.success) {
+          handleToggleDeleteModal();
+          setCategories(categories.filter(cat => cat.id !== categoryId));
+          setSaveSuccess({ success: true, message: `Category ${newCategoryName} deleted succesfully!` });
+        } else {
+          setError({ hasErrors: true, message: rsp.errorMessage });
+        }
+      })
+    }
+  }
+
   const modalBody = (
     <div className="modalBg">
       { selectedCategoryId ? 
@@ -144,6 +171,16 @@ export function CategoryAdmin() {
     </div>
   );
 
+  const confirmDeleteBody = (
+    <div className="modalBg">
+      <h1>Delete category { newCategoryName }</h1>
+      <p>This is irreversible. All transactions will be lost</p>
+      <Button variant="contained" color="secondary" type="submit" onClick={() => handleDeleteCategory(selectedCategoryId)}>
+          Confirm
+      </Button>
+    </div>
+  );
+
   return (
     <div className="componentBg">
       <div className="titleButton">
@@ -166,6 +203,13 @@ export function CategoryAdmin() {
         aria-labelledby="add-category"
       >
         {modalBody}
+      </Modal>
+      <Modal
+        open={openConfirmDelete}
+        onClose={() => handleToggleDeleteModal()}
+        aria-labelledby="delete-category"
+      >
+        {confirmDeleteBody}
       </Modal>
       <Snackbar open={saveSuccess.success} autoHideDuration={6000} onClose={() => handleSnackbarClose('success')}>
         <Alert onClose={() => handleSnackbarClose('success')} severity="success">

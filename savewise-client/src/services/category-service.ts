@@ -1,4 +1,5 @@
 import { CategoriesResponse, Category, CategoryResponse } from "./objects/categories";
+import { Status } from "./objects/response";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/categories`;
@@ -38,6 +39,19 @@ export function editCategory(category: Category): Promise<CategoryResponse> {
       'Access-Control-Allow-Origin':'*',
     },
     body
+  };
+  return fetch(url, options).then(r => r.json());
+}
+
+export function deleteCategory(categoryId: number): Promise<Status> {
+  if (!categoryId) return Promise.reject("Category id null");
+  const url = `${baseUrl}/${categoryId}`;
+  const options: RequestInit = {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',    
+      'Access-Control-Allow-Origin':'*',
+    }
   };
   return fetch(url, options).then(r => r.json());
 }
