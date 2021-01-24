@@ -1,3 +1,4 @@
+import { Status } from "./objects/response";
 import { Transaction, TransactionsResponse } from "./objects/transactions";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -31,3 +32,16 @@ export function SaveTransaction(transaction: Transaction) {
 
     return fetch(url, options).then(r => r.json());
 }
+
+export function deleteTransaction(transactionId: number): Promise<Status> {
+    if (!transactionId) return Promise.reject("Transaction id null");
+    const url = `${baseUrl}/${transactionId}`;
+    const options: RequestInit = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',    
+        'Access-Control-Allow-Origin':'*',
+      }
+    };
+    return fetch(url, options).then(r => r.json());
+  }
