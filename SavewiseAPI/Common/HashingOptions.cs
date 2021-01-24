@@ -2,7 +2,7 @@ namespace Savewise.Common
 {
     public sealed class HashingOptions
     {
-    public int Iterations { get; set; } = 10000;
+        public int Iterations { get; set; } = 10000;
     }
     
 }
