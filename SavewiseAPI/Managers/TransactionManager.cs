@@ -56,13 +56,39 @@ namespace Savewise.Managers
                 throw new Exception($"ERROR: No such user. User ID: [{userId}]");
             }
 
-            List<Transaction> transactionsModel = new List<Transaction>();
-            List<OTransaction> transactions = new List<OTransaction>();
-            transactionsModel = context.Transactions.AsNoTracking()
+            List<Transaction> transactionsModel = context.Transactions.AsNoTracking()
                                                     .Where(t => t.tUserId == userId)
                                                     .Where(t => t.tDate >= fromDate && t.tDate <= toDate)
                                                     .OrderBy(t => t.tDate)
+                                                    .ToList();;
+            List<OTransaction> transactions = new List<OTransaction>();
+
+            foreach (Transaction transaction in transactionsModel)
+            {
+                transactions.Add(convert(transaction));
+            }
+
+            return transactions;
+        }
+
+        
+        /// <summary>
+        /// Returns the last user's transactions 
+        /// </summary>
+        /// <param name="userId">User ID</param>
+        /// <param name="limit">The maximum number of transactions to be recovered</param>
+        public List<OTransaction> getTransactions(int userId, int limit = 5)
+        {
+            if (!userExists(userId))
+            {
+                throw new Exception($"ERROR: No such user. User ID: [{userId}]");
+            }
+            List<Transaction> transactionsModel = context.Transactions.AsNoTracking()
+                                                    .Where(t => t.tUserId == userId)
+                                                    .OrderBy(t => t.tDate)
+                                                    .Take(limit)
                                                     .ToList();
+            List<OTransaction> transactions = new List<OTransaction>();
 
             foreach (Transaction transaction in transactionsModel)
             {
