@@ -26,8 +26,6 @@ namespace Savewise.Managers
             transaction.category.id = model.tCategoryId;
             transaction.date = model.tDate;
             transaction.description = model.tDescription;
-            transaction.transactionType = new OTransactionType();
-            transaction.transactionType.id = model.tTypeId;
             transaction.userId = model.tUserId;
 
             return transaction;
@@ -133,7 +131,6 @@ namespace Savewise.Managers
             model.tCategoryId = transaction.category.id.Value;
             model.tDate = transaction.date;
             model.tDescription = transaction.description;
-            model.tTypeId = transaction.transactionType.id;
             model.tUserId = transaction.userId;
 
             // Update or Add if is a new one

@@ -1,6 +1,6 @@
 namespace Savewise.Services.Objects
 {
-    public class OTransactionType
+    public class OCategoryType
     {
         /// <summary>
         /// ID

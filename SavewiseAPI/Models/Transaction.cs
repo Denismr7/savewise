@@ -13,9 +13,7 @@ namespace Savewise.Models
         public int tAmount { get; set; }
         public DateTime tDate { get; set; }
         public string tDescription { get; set; }
-        public int tTypeId { get; set; }
         public virtual Category CategoryNavigation { get; set; }
-        public virtual TransactionType TransactionTypeNavigation { get; set; }
     }
 
     public class TransactionConfig : IEntityTypeConfiguration<Transaction>
@@ -58,23 +56,12 @@ namespace Savewise.Models
                    .HasColumnName("t_category_id")
                    .HasColumnType("int")
                    .IsRequired();
-            
-            builder.Property(t => t.tTypeId)
-                   .HasColumnName("t_transaction_type_id")
-                   .HasColumnType("int")
-                   .IsRequired();
 
             builder.HasOne(t => t.CategoryNavigation)
                    .WithMany(c => c.transactions)
                    .HasForeignKey(t => t.tCategoryId)
                    .HasPrincipalKey(c => c.cId)
                    .HasConstraintName("FK_Transactions_CategoryID");
-            
-            builder.HasOne(t => t.TransactionTypeNavigation)
-                   .WithMany(tt => tt.Transactions)
-                   .HasForeignKey(t => t.tTypeId)
-                   .HasPrincipalKey(tt => tt.ttId)
-                   .HasConstraintName("FK_Transactions_TransactionTypeID");
         }
     }
 }

@@ -23,6 +23,12 @@ namespace Savewise.Managers
             category.id = model.cId;
             category.name = model.cName;
             category.userID = model.cUsrId;
+            category.categoryType = new OCategoryType();
+            category.categoryType.id = model.cTypeId;
+            if (model.categoryTypeNavigation != null)
+            {
+                category.categoryType.name = model.categoryTypeNavigation.ctName;
+            }
 
             return category;
         }

@@ -33,10 +33,5 @@ namespace Savewise.Services.Objects
         /// Transaction description
         /// </summary>
         public string description { get; set; }
-
-        /// <summary>
-        /// Transaction type
-        /// </summary>
-        public OTransactionType transactionType { get; set; }
     }
 }
