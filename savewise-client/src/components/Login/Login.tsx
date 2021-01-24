@@ -4,7 +4,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { LoginData } from '../../common/login';
-import { LoginService } from "../../services";
+import { LoginService, SessionService } from "../../services";
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import { LoginContext } from '../../common/context/LoginContext';
@@ -30,6 +30,7 @@ export default function Login(): ReactElement {
         const { status, login } = await LoginService.login(loginForm);
         if (status.success) {
             setLogin({ isLogged: true, login });
+            SessionService.setLogin(login);
             history.push("/dashboard");
         } else {
             setError({ hasErrors: !status.success, message: status.errorMessage });

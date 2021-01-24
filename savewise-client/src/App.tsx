@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   HashRouter as Router,
   Switch,
@@ -12,9 +12,21 @@ import { CategoryAdmin } from './components';
 import PrivateRoute from './common/wrappers/PrivateRoute';
 import { LoginContext } from './common/context/LoginContext';
 import Dashboard from './components/Dashboard/Dashboard';
+import { SessionService } from './services';
+import { User } from './common/user';
 
 function App() {
-  const {login} = useContext(LoginContext);
+  const {login, setLogin} = useContext(LoginContext);
+  useEffect(() => {
+    const user: User | null = SessionService.getLogin();
+    if (user) {
+      setLogin({ isLogged: true, login: user });
+    }
+    return () => {
+      
+    }
+  }, [setLogin])
+
   return (
       <Router>
         <div className="App">
