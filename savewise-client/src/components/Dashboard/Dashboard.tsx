@@ -2,8 +2,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import "./Dashboard.scss"
 import { Typography } from '@material-ui/core';
-import AddBoxIcon from '@material-ui/icons/AddBox';
-import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
 import { LoginContext } from '../../common/context/LoginContext';
@@ -94,12 +92,7 @@ export default function Dashboard() {
                         style={{ height: '95%' }}
                         >
                             <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
-                                Categories
-                            <IconButton color='primary'>
-                                <Link to="/categories">
-                                    <AddBoxIcon></AddBoxIcon>
-                                </Link>
-                            </IconButton>
+                                Top Categories
                             </Typography>
                             <Grid container
                             direction="column"
@@ -108,15 +101,39 @@ export default function Dashboard() {
                             >
                                 { loading ? (<CircularProgress color="secondary" />) : renderCategories(categories) }
                             </Grid>
-                            <Button variant="contained" color="primary">
-                                View all
-                            </Button>
+                            <Link to="/categories">
+                                <Button variant="contained" color="primary">
+                                    Manage
+                                </Button>
+                            </Link>
                         </Grid>
                     </div>
                 </Grid>
                 <Grid item>
                     <div className="panel">
-
+                        <Grid container
+                        direction="column"
+                        alignItems="center"
+                        justify='space-between'
+                        style={{ height: '95%' }}
+                        >
+                            <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
+                                Last transactions
+                            </Typography>
+                            {/* TODO: TRANSACTION MANAGER, RENDER TRANSACTIONS AND ADD TRANSACTIONS WITH MODAL */}
+                            <Grid container
+                            direction="column"
+                            style={{ height: '70%' }}
+                            spacing={3}
+                            >
+                                { loading ? (<CircularProgress color="secondary" />) : renderCategories(categories) }
+                            </Grid>
+                            <Link to="/categories">
+                                <Button variant="contained" color="primary">
+                                    Manage
+                                </Button>
+                            </Link>
+                        </Grid>
                     </div>
                 </Grid>
                 <Grid item>
