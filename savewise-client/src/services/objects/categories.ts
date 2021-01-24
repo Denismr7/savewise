@@ -1,3 +1,4 @@
+import { Entity } from "../../common/Entity";
 import { BasicResponse } from "./response";
 
 export interface Category {
@@ -5,6 +6,7 @@ export interface Category {
     name: string;
     userId?: number;
     amount?: number;
+    categoryType: Entity;
 }
 
 export interface CategoryResponse extends BasicResponse {

@@ -1,4 +1,3 @@
-import { Entity } from "../../common/Entity";
 import { Category } from "./categories";
 import { BasicResponse } from "./response";
 
@@ -9,7 +8,6 @@ export interface Transaction {
     amount: number;
     date: Date;
     description: string;
-    transactionType: Entity;
 }
 
 export interface TransactionResponse extends BasicResponse {
