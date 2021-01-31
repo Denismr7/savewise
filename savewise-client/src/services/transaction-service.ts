@@ -1,5 +1,5 @@
 import { Status } from "./objects/response";
-import { Transaction, TransactionsResponse } from "./objects/transactions";
+import { Transaction, TransactionResponse, TransactionsResponse } from "./objects/transactions";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/transactions`;
@@ -17,9 +17,9 @@ export function GetTransactions(userId: number, startDate?: string, endDate?: st
     return fetch(urlWithQuery).then(rsp => rsp.json());
 }
 
-export function SaveTransaction(transaction: Transaction) {
+export function SaveTransaction(transaction: Transaction): Promise<TransactionResponse> {
     const url = baseUrl;
-    const body = JSON.stringify(transaction);
+    const body = JSON.stringify({...transaction, date: new Date(transaction.date)});
     const options: RequestInit = {
         method: 'POST',
         mode: 'cors',

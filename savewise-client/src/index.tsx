@@ -4,11 +4,15 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { LoginProvider } from './common/context/LoginContext';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
 ReactDOM.render(
   <React.StrictMode>
     <LoginProvider>
-      <App />
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <App />
+      </MuiPickersUtilsProvider>
     </LoginProvider>
   </React.StrictMode>,
   document.getElementById('root')

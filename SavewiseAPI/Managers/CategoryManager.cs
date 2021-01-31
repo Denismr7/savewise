@@ -43,7 +43,9 @@ namespace Savewise.Managers
         /// <param name="categoryTypeId">Type of category id</param>
         public List<OCategory> getAll(int userId, bool includeAmounts, string fromDate, string toDate, int? categoryTypeId)
         {
-            IQueryable<Category> categoriesModel = context.Categories.AsNoTracking().Where(c => c.cUsrId == userId);
+            IQueryable<Category> categoriesModel = context.Categories.AsNoTracking()
+                                                                    .Include(cat => cat.categoryTypeNavigation)
+                                                                    .Where(c => c.cUsrId == userId);
             List<OCategory> categories = new List<OCategory>();
             if (categoryTypeId.HasValue)
             {

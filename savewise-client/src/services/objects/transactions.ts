@@ -6,7 +6,7 @@ export interface Transaction {
     userId: number;
     category: Category;
     amount: number;
-    date: Date;
+    date: string;
     description: string;
 }
 

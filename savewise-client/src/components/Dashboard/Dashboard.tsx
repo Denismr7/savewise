@@ -12,6 +12,7 @@ import { SnackbarError } from '../../common/SnackbarHelpers';
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import { GetCategoriesInput } from '../../services/category-service';
+import { CategoryTypesId } from '../../common/CategoryTypesId';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -49,7 +50,7 @@ export default function Dashboard() {
         }
     }
     
-    const renderCategories = (categories: Category[]) => {
+    const renderExpenses = (categories: Category[]) => {
         if (categories.length) {
             return categories.map(category => (
                 <Grid item
@@ -98,14 +99,17 @@ export default function Dashboard() {
                         style={{ height: '95%' }}
                         >
                             <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
-                                Top Categories
+                                Month expenses
                             </Typography>
                             <Grid container
                             direction="column"
                             style={{ height: '70%' }}
                             spacing={3}
                             >
-                                { loading ? (<CircularProgress color="secondary" />) : renderCategories(categories) }
+                                { loading ? 
+                                    (<CircularProgress color="secondary" />) 
+                                    : renderExpenses(categories.filter(c => c.categoryType.id === CategoryTypesId.Expenses))
+                                }
                             </Grid>
                             <Link to="/categories">
                                 <Button variant="contained" color="primary">
@@ -124,15 +128,17 @@ export default function Dashboard() {
                         style={{ height: '95%' }}
                         >
                             <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
-                                Last transactions
+                                Month incomes
                             </Typography>
-                            {/* TODO: TRANSACTION MANAGER, RENDER TRANSACTIONS AND ADD TRANSACTIONS WITH MODAL */}
                             <Grid container
                             direction="column"
                             style={{ height: '70%' }}
                             spacing={3}
                             >
-                                { loading ? (<CircularProgress color="secondary" />) : renderCategories(categories) }
+                                { loading ? 
+                                    (<CircularProgress color="secondary" />) 
+                                    : renderExpenses(categories.filter(c => c.categoryType.id === CategoryTypesId.Incomes)) 
+                                }
                             </Grid>
                             <Link to="/categories">
                                 <Button variant="contained" color="primary">
@@ -144,7 +150,28 @@ export default function Dashboard() {
                 </Grid>
                 <Grid item>
                     <div className="panel">
-
+                        <Grid container
+                            direction="column"
+                            alignItems="center"
+                            justify='space-between'
+                            style={{ height: '95%' }}
+                            >
+                                <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
+                                    Last transactions
+                                </Typography>
+                                <Grid container
+                                direction="column"
+                                style={{ height: '70%' }}
+                                spacing={3}
+                                >
+                                    TODO: Transactions
+                                </Grid>
+                                <Link to="/transactions">
+                                    <Button variant="contained" color="primary">
+                                        Manage
+                                    </Button>
+                                </Link>
+                            </Grid>
                     </div>
                 </Grid>
             </Grid>
