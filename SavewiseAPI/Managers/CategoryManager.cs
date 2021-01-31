@@ -40,13 +40,17 @@ namespace Savewise.Managers
         /// <param name="includeAmounts">Whether or not include spendings in each category</param>
         /// <param name="fromDate">If includeAmounts it should have a starting date</param>
         /// <param name="toDate">If includeAmounts it should have an ending date</param>
-        public List<OCategory> getAll(int userId, bool includeAmounts, string fromDate, string toDate)
+        /// <param name="categoryTypeId">Type of category id</param>
+        public List<OCategory> getAll(int userId, bool includeAmounts, string fromDate, string toDate, int? categoryTypeId)
         {
-            List<Category> categoriesModel = new List<Category>();
+            IQueryable<Category> categoriesModel = context.Categories.AsNoTracking().Where(c => c.cUsrId == userId);
             List<OCategory> categories = new List<OCategory>();
-            categoriesModel = context.Categories.AsNoTracking().Where(c => c.cUsrId == userId).ToList();
+            if (categoryTypeId.HasValue)
+            {
+                categoriesModel.Where(c => c.cTypeId == categoryTypeId.Value);
+            }
 
-            foreach (Category cat in categoriesModel)
+            foreach (Category cat in categoriesModel.ToList())
             {
                 OCategory categoryObject = convert(cat);
                 if (includeAmounts)
@@ -110,6 +114,7 @@ namespace Savewise.Managers
             }
             model.cName = category.name;
             model.cUsrId = category.userID.Value;
+            model.cTypeId = category.categoryType.id;
 
             // Update if it's a current category or Add if is a new one
             if (category.id.HasValue) {
@@ -135,6 +140,23 @@ namespace Savewise.Managers
 
             deleted = true;
             return deleted;
+        }
+
+        /// <summary>
+        /// Returns all categories types
+        /// </summary>
+        public List<OCategoryType> GetCategoryTypes()
+        {
+            List<CategoryType> modelList = context.CategoryTypes.AsNoTracking().ToList();
+            List<OCategoryType> categoryTypes = new List<OCategoryType>();
+            foreach (CategoryType categoryModel in modelList)
+            {
+                OCategoryType categoryType = new OCategoryType();
+                categoryType.id = categoryModel.ctId.Value;
+                categoryType.name = categoryModel.ctName;
+                categoryTypes.Add(categoryType);
+            }
+            return categoryTypes;
         }
     }
 }

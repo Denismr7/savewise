@@ -16,3 +16,7 @@ export interface CategoryResponse extends BasicResponse {
 export interface CategoriesResponse extends BasicResponse {
     categories: Category[];
 }
+
+export interface CategoryTypesResponse extends BasicResponse{
+    categoryTypes: Entity[];
+}

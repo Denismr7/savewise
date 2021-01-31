@@ -15,30 +15,53 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { Link } from 'react-router-dom';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import { Status } from '../../services/objects/response';
+import { GetCategoriesInput } from '../../services/category-service';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import { Entity } from '../../common/Entity';
+
+interface categoryForm {
+  categoryName: string,
+  categoryType: number | undefined
+}
 
 export function CategoryAdmin() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
-  const [newCategoryName, setNewCategoryName] = useState<string>('');
+  const [categoryForm, setCategoryForm] = useState<categoryForm>({ categoryName: '', categoryType: 0 });
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined);
   const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
   const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({ success: false });
   const [loading, setLoading] = useState(true);
+  const [categoryTypesList, setCategoryTypesList] = useState<Entity[]>([]);
   const {login} = useContext(LoginContext);
   
   useEffect(() => {
     const id: number = login.login?.id as number;
-    CategoryService.getCategories(id).then(rsp => {
+    const categoriesOptions: GetCategoriesInput = {
+      includeAmounts: false,
+      startDate: '',
+      endDate: ''
+    }
+    CategoryService.getCategories(id, categoriesOptions).then(rsp => {
       if (rsp.status.success) {
         setCategories(rsp.categories);
         setLoading(false);
       } else {
         console.log(`Error: ${rsp.status.errorMessage}`);
       }
-    }).catch(e => {
-      console.log(`ERROR: ${e}`);
-    })
+    }).catch(e => console.log(`ERROR: ${e}`));
+    
+    CategoryService.getCategoryTypes().then(rsp => {
+      if (rsp.status.success) {
+        setCategoryTypesList(rsp.categoryTypes);
+      } else {
+        console.log(`ERROR: ${rsp.status.errorMessage}`);
+      }
+    }).catch(e => console.log(`ERROR: ${e}`));
     return () => {
       setCategories([]);
     }
@@ -50,10 +73,10 @@ export function CategoryAdmin() {
         <div className="categoryItem" key={category.id}>
           <p className="categoryName">{ category.name }</p>
           <div className="categoryItemButtons">
-            <IconButton onClick={() => handleToggleModal(category.id, category.name)}>
+            <IconButton onClick={() => handleToggleModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
               <EditIcon />
             </IconButton>
-            <IconButton onClick={() => handleToggleDeleteModal(category.id, category.name)}>
+            <IconButton onClick={() => handleToggleDeleteModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
               <DeleteIcon />
             </IconButton>
           </div>
@@ -62,30 +85,34 @@ export function CategoryAdmin() {
     })
   }
 
-  const handleToggleModal = (selectedCategoryId?: number, categoryName?: string) => {
+  const handleToggleModal = (selectedCategoryId?: number, categoryForm?: categoryForm) => {
     if (selectedCategoryId) {
       setSelectedCategoryId(selectedCategoryId);
-      if (categoryName) setNewCategoryName(categoryName);
+      if (categoryForm) setCategoryForm(categoryForm);
     } else {
       setSelectedCategoryId(undefined);
-      setNewCategoryName('');
+      setCategoryForm({ categoryName: '', categoryType: undefined });
     }
     setOpenModal(!openModal);
   }
 
-  const handleToggleDeleteModal = (selectedCategoryId?: number, categoryName?: string) => {
+  const handleToggleDeleteModal = (selectedCategoryId?: number, categoryForm?: categoryForm) => {
     if (selectedCategoryId) {
       setSelectedCategoryId(selectedCategoryId);
-      if (categoryName) setNewCategoryName(categoryName);
+      if (categoryForm) setCategoryForm(categoryForm);
     } else {
       setSelectedCategoryId(undefined);
-      setNewCategoryName('');
+      setCategoryForm({ categoryName: '', categoryType: undefined });
     }
     setOpenConfirmDelete(!openConfirmDelete);
   }
 
   const handleNewCategoryName = (event: ChangeEvent<HTMLInputElement>) => {
-    setNewCategoryName(event.currentTarget.value);
+    setCategoryForm({...categoryForm, categoryName: event.currentTarget.value});
+  }
+
+  const handleTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setCategoryForm({...categoryForm, categoryType: event.target.value as number});
   }
 
   const handleSnackbarClose = (severity?: string) => {
@@ -97,11 +124,14 @@ export function CategoryAdmin() {
     }
   };
 
-  const submitCategory = (categoryName: string, categoryId?: number) => {
+  const submitCategory = (categoryForm: categoryForm, categoryId?: number) => {
     const category: Category = {
-      name: categoryName,
+      name: categoryForm.categoryName,
       userId: login.login?.id,
-      id: categoryId
+      id: categoryId,
+      categoryType: {
+        id: categoryForm.categoryType
+      }
     }
 
     if (!categoryId) {
@@ -134,10 +164,20 @@ export function CategoryAdmin() {
         if (rsp.success) {
           handleToggleDeleteModal();
           setCategories(categories.filter(cat => cat.id !== categoryId));
-          setSaveSuccess({ success: true, message: `Category ${newCategoryName} deleted succesfully!` });
+          setSaveSuccess({ success: true, message: `Category ${categoryForm.categoryName} deleted succesfully!` });
         } else {
           setError({ hasErrors: true, message: rsp.errorMessage });
         }
+      })
+    }
+  }
+
+  const renderCategoryTypes = (categoryTypesList: Entity[]) => {
+    if (categoryTypesList.length) {
+      return categoryTypesList.map(type => {
+        return (
+          <MenuItem key={type.id} value={type.id}>{type.name}</MenuItem>
+        );
       })
     }
   }
@@ -155,10 +195,21 @@ export function CategoryAdmin() {
                 label="Category Name" 
                 variant="filled" 
                 name="categoryName"
-                value={newCategoryName}
+                value={categoryForm.categoryName}
                 />
+      <FormControl style={{ width: '225px', marginTop: '10px' }} variant='filled'>
+        <InputLabel id="categoryType">Type</InputLabel>
+        <Select
+          labelId="categoryType"
+          id="categoryTypeSelect"
+          value={categoryForm.categoryType ? categoryForm.categoryType : ''}
+          onChange={handleTypeChange}
+        >
+          { renderCategoryTypes(categoryTypesList) }
+        </Select>
+      </FormControl>
         <div className="buttonGroup">
-          <Button variant="contained" color="primary" type="submit" onClick={() => submitCategory(newCategoryName, selectedCategoryId)}>
+          <Button variant="contained" color="primary" type="submit" onClick={() => submitCategory(categoryForm, selectedCategoryId)}>
             Save
           </Button>
         </div>
@@ -172,7 +223,7 @@ export function CategoryAdmin() {
 
   const confirmDeleteBody = (
     <div className="modalBg">
-      <h1>Delete category { newCategoryName }</h1>
+      <h1>Delete category { categoryForm.categoryName }</h1>
       <p>This is irreversible. All transactions will be lost</p>
       <Button variant="contained" color="secondary" type="submit" onClick={() => handleDeleteCategory(selectedCategoryId)}>
           Confirm

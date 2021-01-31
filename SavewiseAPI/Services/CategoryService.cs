@@ -22,14 +22,26 @@ namespace Savewise.Services
         {
             public List<OCategory> categories { get; set; }
         }
+        public class CategoryTypesResponse : ServiceResponse
+        {
+            public List<OCategoryType> categoryTypes { get; set; }
+        }
+
+        public class GetCategoriesInput
+        {
+            public bool includeAmounts { get; set; }
+            public string startDate { get; set; }
+            public string endDate { get; set; }
+            public int? categoryTypeId { get; set; }
+        }
         public CategoryService(SavewiseContext context): base(context)
         {
 
         }
 
-        // GET api/categories/user/{id}
-        [HttpGet("user/{id}")]
-        public IActionResult GetAll(int id)
+        // POST api/categories/user/{id}
+        [HttpPost("user/{id}")]
+        public IActionResult GetAll(int id, [FromBody] GetCategoriesInput input)
         {
             CategoriesResponse response = new CategoriesResponse();
             response.status = new Status();
@@ -37,27 +49,7 @@ namespace Savewise.Services
             try
             {
                 CategoryManager manager = new CategoryManager(context);
-                response.categories = manager.getAll(id, false, null, null);
-                response.status.success = true;
-            }
-            catch (Exception exception)
-            {
-                response.status.errorMessage = exception.Message;
-            }
-            return Json(response);
-        }
-
-        // GET api/categories/user/{id}/spendings
-        [HttpPost("user/{id}/spendings")]
-        public IActionResult GetAllWithSpending(int id, [FromBody] string fromDate, string toDate)
-        {
-            CategoriesResponse response = new CategoriesResponse();
-            response.status = new Status();
-            response.status.success = false;
-            try
-            {
-                CategoryManager manager = new CategoryManager(context);
-                response.categories = manager.getAll(id, true, fromDate, toDate);
+                response.categories = manager.getAll(id, input.includeAmounts, input.startDate, input.endDate, input.categoryTypeId);
                 response.status.success = true;
             }
             catch (Exception exception)
@@ -78,6 +70,26 @@ namespace Savewise.Services
             {
                 CategoryManager manager = new CategoryManager(context);
                 response.category = manager.getById(id);
+                response.status.success = true;
+            }
+            catch (Exception exception)
+            {
+                response.status.errorMessage = exception.Message;
+            }
+            return Json(response);
+        }
+
+        // GET api/categories/types
+        [HttpGet("types")]
+        public IActionResult GetCategoryTypes()
+        {
+            CategoryTypesResponse response = new CategoryTypesResponse();
+            response.status = new Status();
+            response.status.success = false;
+            try
+            {
+                CategoryManager manager = new CategoryManager(context);
+                response.categoryTypes = manager.GetCategoryTypes();
                 response.status.success = true;
             }
             catch (Exception exception)

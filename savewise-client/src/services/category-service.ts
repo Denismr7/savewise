@@ -1,12 +1,36 @@
-import { CategoriesResponse, Category, CategoryResponse } from "./objects/categories";
+import { CategoriesResponse, Category, CategoryResponse, CategoryTypesResponse } from "./objects/categories";
 import { Status } from "./objects/response";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/categories`;
 
-export function getCategories(userId: number): Promise<CategoriesResponse> {
+export interface GetCategoriesInput {
+  includeAmounts: boolean,
+  startDate: string,
+  endDate: string,
+  categoryTypeId?: number
+}
+
+export function getCategories(userId: number, searchOptions: GetCategoriesInput): Promise<CategoriesResponse> {
     if (!userId) return Promise.reject("User id null");
-    const url = `${baseUrl}/user/${userId}`
+    const url = `${baseUrl}/user/${userId}`;
+    const body = JSON.stringify(searchOptions);
+    const options: RequestInit = {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',    
+        'Access-Control-Allow-Origin':'*',
+      },
+      body
+    };
+    return fetch(url, options).then(response =>
+      response.json()
+    );
+  }
+
+export function getCategoryTypes(): Promise<CategoryTypesResponse> {
+    const url = `${baseUrl}/types`;
     return fetch(url).then(response =>
       response.json()
     );

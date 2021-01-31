@@ -27,9 +27,9 @@ namespace Savewise.Models
                    .HasName("PK_Categories");
 
             builder.Property(c => c.cId)
+                   .ValueGeneratedOnAdd()
                    .HasColumnName("c_id")
                    .HasColumnType("int")
-                   .ValueGeneratedOnAdd()
                    .IsRequired();
 
             builder.Property(c => c.cName)
@@ -52,7 +52,7 @@ namespace Savewise.Models
               
             builder.HasOne(c => c.categoryTypeNavigation)
                    .WithMany(ct => ct.Categories)
-                   .HasForeignKey(c => c.cId)
+                   .HasForeignKey(c => c.cTypeId)
                    .HasPrincipalKey(ct => ct.ctId)
                    .HasConstraintName("FK_Categories_CategoryTypes");
 

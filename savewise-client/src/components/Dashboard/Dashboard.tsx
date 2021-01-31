@@ -11,6 +11,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { SnackbarError } from '../../common/SnackbarHelpers';
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
+import { GetCategoriesInput } from '../../services/category-service';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -27,8 +28,13 @@ export default function Dashboard() {
 
     const getCategories = (userId?: number) => {
         setLoading(true);
+        const categoriesOptions: GetCategoriesInput = {
+            includeAmounts: false,
+            startDate: '',
+            endDate: ''
+          }
         if (userId) {
-            CategoryService.getCategories(userId).then((rsp: CategoriesResponse) => {
+            CategoryService.getCategories(userId, categoriesOptions).then((rsp: CategoriesResponse) => {
                 if (rsp.status.success) {
                     setCategories(rsp.categories);
                     setLoading(false);
