@@ -5,7 +5,7 @@ import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
 import { LoginContext } from '../../common/context/LoginContext';
-import { CategoryService } from '../../services/';
+import { CategoryService, TransactionService, UtilService } from '../../services/';
 import { CategoriesResponse, Category } from '../../services/objects/categories';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { SnackbarError } from '../../common/SnackbarHelpers';
@@ -13,15 +13,19 @@ import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import { GetCategoriesInput } from '../../services/category-service';
 import { CategoryTypesId } from '../../common/CategoryTypesId';
+import { Transaction } from '../../services/objects/transactions';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
     const [loading, setLoading] = useState<boolean>(true);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
 
     useEffect(() => {
-        getCategories(login.login?.id);
+        const userId = login.login?.id;
+        getCategories(userId);
+        getTransactions(userId);
         return () => {
             
         }
@@ -30,14 +34,32 @@ export default function Dashboard() {
     const getCategories = (userId?: number) => {
         setLoading(true);
         const categoriesOptions: GetCategoriesInput = {
-            includeAmounts: false,
-            startDate: '',
-            endDate: ''
+            includeAmounts: true,
+            startDate: UtilService.firstDayDate(),
+            endDate: UtilService.today()
           }
         if (userId) {
             CategoryService.getCategories(userId, categoriesOptions).then((rsp: CategoriesResponse) => {
                 if (rsp.status.success) {
                     setCategories(rsp.categories);
+                    setLoading(false);
+                } else {
+                    setError({ hasErrors: true, message: rsp.status.errorMessage });
+                    setLoading(false);
+                }
+            }).catch(e => {
+                setError({ hasErrors: true, message: e });
+                setLoading(false);
+            })
+        }
+    }
+
+    const getTransactions = (userId?: number) => {
+        setLoading(true);
+        if (userId) {
+            TransactionService.GetTransactions(userId).then(rsp => {
+                if (rsp.status.success) {
+                    setTransactions(rsp.transactions);
                     setLoading(false);
                 } else {
                     setError({ hasErrors: true, message: rsp.status.errorMessage });
@@ -66,6 +88,24 @@ export default function Dashboard() {
             ))
         } else (<Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No categories to show</Typography>);
     };
+
+    const renderTransactions = (transactions: Transaction[]) =>  {
+        if (transactions.length) {
+            const sortedByDate = transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            return sortedByDate.map(t => (
+                <Grid item
+                container
+                direction="row"
+                justify="space-between"
+                spacing={1}
+                key={t.id}
+                >
+                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{ t.description }</Typography>
+                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginRight: '15px' }}>{ t.amount ? t.amount : 0 } €</Typography>
+                </Grid>
+            ))
+        } else (<Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No transactions to show</Typography>);
+    }
 
     const handleCloseErrorModal = () => {
         setError({ hasErrors: false });
@@ -164,7 +204,10 @@ export default function Dashboard() {
                                 style={{ height: '70%' }}
                                 spacing={3}
                                 >
-                                    TODO: Transactions
+                                    { loading ? 
+                                    (<CircularProgress color="secondary" />) 
+                                    : renderTransactions(transactions)
+                                }
                                 </Grid>
                                 <Link to="/transactions">
                                     <Button variant="contained" color="primary">

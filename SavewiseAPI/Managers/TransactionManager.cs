@@ -56,7 +56,7 @@ namespace Savewise.Managers
 
             List<Transaction> transactionsModel = context.Transactions.AsNoTracking()
                                                     .Where(t => t.tUserId == userId)
-                                                    .Where(t => t.tDate >= fromDate && t.tDate <= toDate)
+                                                    .Where(t => t.tDate >= fromDate && t.tDate <= toDate.AddHours(23).AddMinutes(59))
                                                     .OrderBy(t => t.tDate)
                                                     .ToList();;
             List<OTransaction> transactions = new List<OTransaction>();
