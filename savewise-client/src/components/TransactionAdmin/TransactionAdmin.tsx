@@ -22,6 +22,7 @@ import "./TransactionAdmin.scss";
 import Select from '@material-ui/core/Select';
 import { formatStringForInputDate, today } from "../../services/utils-service";
 import { KeyboardDatePicker } from '@material-ui/pickers';
+import { Status } from "../../services/objects/response";
 
 interface TransactionForm {
     id?: number;
@@ -188,7 +189,17 @@ export default function TransactionAdmin() {
     }
 
     const onConfirmDelete = () => {
-        console.debug("Delete", transactionForm.id);
+        if (transactionForm.id) {
+            TransactionService.deleteTransaction(transactionForm.id).then((rsp: Status) => {
+                if (rsp.success) {
+                  handleToggleDeleteModal();
+                  setTransactions(transactions.filter(t => t.id !== transactionForm.id));
+                  setSaveSuccess({ success: true, message: `Category ${transactionForm.description} deleted succesfully!` });
+                } else {
+                  setError({ hasErrors: true, message: rsp.errorMessage });
+                }
+              }).catch(e => setError({ hasErrors: true, message: e }))
+        }
     }
 
     const modalBody = (
