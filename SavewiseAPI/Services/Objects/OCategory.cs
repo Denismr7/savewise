@@ -20,7 +20,7 @@ namespace Savewise.Services.Objects
         /// <summary>
         /// Quantity spended between two given dates in the category
         /// </summary>
-        public int? amount { get; set; }
+        public double? amount { get; set; }
 
         /// <summary>
         /// Category Type

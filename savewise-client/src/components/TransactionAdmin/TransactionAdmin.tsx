@@ -133,7 +133,7 @@ export default function TransactionAdmin() {
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.name === 'amount') {
-            setTransactionForm({...transactionForm, [event.target.name]: parseInt(event.target.value)});
+            setTransactionForm({...transactionForm, [event.target.name]: Number(event.target.value)});
         } else {
             setTransactionForm({...transactionForm, [event.target.name]: event.target.value});
         }

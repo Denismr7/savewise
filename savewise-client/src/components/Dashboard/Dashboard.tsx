@@ -59,13 +59,7 @@ export default function Dashboard() {
         if (userId) {
             CategoryService.getCategories(userId, categoriesOptions).then((rsp: CategoriesResponse) => {
                 if (rsp.status.success) {
-                    const sortedByAmount = rsp.categories.sort((a, b) => {
-                        if (a.amount && b.amount) {
-                            return b.amount - a.amount
-                        } else {
-                            return 0;
-                        }
-                    });
+                    const sortedByAmount = UtilService.sortCategoriesByAmount(rsp.categories);
                     setCategories(sortedByAmount);
                     setLoading(false);
                 } else {
@@ -116,7 +110,7 @@ export default function Dashboard() {
 
     const renderTransactions = (transactions: Transaction[]) =>  {
         if (transactions.length) {
-            const sortedByDate = transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            const sortedByDate = transactions.sort((a, b) => Number(b.id) - Number(a.id));
             return sortedByDate.map(t => (
                 <Grid item
                 container
@@ -158,7 +152,7 @@ export default function Dashboard() {
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.name === 'amount') {
-            setTransactionForm({...transactionForm, [event.target.name]: parseInt(event.target.value)});
+            setTransactionForm({...transactionForm, [event.target.name]: Number(event.target.value)});
         } else {
             setTransactionForm({...transactionForm, [event.target.name]: event.target.value});
         }

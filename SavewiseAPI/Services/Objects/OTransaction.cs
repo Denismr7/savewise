@@ -22,7 +22,7 @@ namespace Savewise.Services.Objects
         /// <summary>
         /// Amount
         /// </summary>
-        public int amount { get; set; }
+        public double amount { get; set; }
 
         /// <summary>
         /// Transaction date

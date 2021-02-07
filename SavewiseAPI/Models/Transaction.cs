@@ -10,7 +10,7 @@ namespace Savewise.Models
         public int? tId { get; set; }
         public int tUserId { get; set; }
         public int tCategoryId { get; set; }
-        public int tAmount { get; set; }
+        public double tAmount { get; set; }
         public DateTime tDate { get; set; }
         public string tDescription { get; set; }
         public virtual Category CategoryNavigation { get; set; }
@@ -39,7 +39,7 @@ namespace Savewise.Models
             
             builder.Property(t => t.tAmount)
                    .HasColumnName("t_amount")
-                   .HasColumnType("int")
+                   .HasColumnType("float")
                    .IsRequired();
             
             builder.Property(t => t.tUserId)

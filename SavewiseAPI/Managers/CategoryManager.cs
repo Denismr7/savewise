@@ -68,8 +68,8 @@ namespace Savewise.Managers
         /// <summary>
         /// Returns the expense incurred in a particular category between two dates
         /// </summary>
-        public int getAmount(int userId, int categoryId , string fromDate, string toDate) {
-            int result = 0;
+        public double getAmount(int userId, int categoryId , string fromDate, string toDate) {
+            double result = 0;
             TransactionManager transactionManager = new TransactionManager(context);
             List<OTransaction> transactions = transactionManager.getAllByDates(userId, fromDate, toDate);
             List<OTransaction> categoryTransactions = transactions.Where(t => t.category.id == categoryId).ToList();
