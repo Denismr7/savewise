@@ -75,7 +75,7 @@ export default function TransactionAdmin() {
             return (
                 <div className="transactionItem" key={transaction.id}>
                     <p className="transactionDesc">{transaction.description}</p>
-                    <p>{ UtilService.formatString(transaction.date) }</p>
+                    <p>{ UtilService.formatDateString(transaction.date) }</p>
                     <div className="transactionItemButtons">
                         <IconButton onClick={() => handleToggleModal(transaction)}>
                             <EditIcon />
@@ -116,7 +116,7 @@ export default function TransactionAdmin() {
                 id: transaction.id,
                 categoryId: transaction.category.id,
                 amount: transaction.amount,
-                date: UtilService.formatString(transaction.date),
+                date: transaction.date,
                 description: transaction.description,
             });
         }
@@ -237,7 +237,7 @@ export default function TransactionAdmin() {
             id="date-picker-dialog"
             label="Date"
             format="dd/MM/yyyy"
-            value={UtilService.formatString(transactionForm.date)}
+            value={UtilService.formatStringDatePicker(transactionForm.date)}
             onChange={handleDateChange}
             KeyboardButtonProps={{
                 'aria-label': 'change date',

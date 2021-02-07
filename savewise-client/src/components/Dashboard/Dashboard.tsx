@@ -253,7 +253,7 @@ export default function Dashboard() {
             id="date-picker-dialog"
             label="Date"
             format="dd/MM/yyyy"
-            value={UtilService.formatString(transactionForm.date)}
+            value={UtilService.formatStringDatePicker(transactionForm.date)}
             onChange={handleDateChange}
             KeyboardButtonProps={{
                 'aria-label': 'change date',
