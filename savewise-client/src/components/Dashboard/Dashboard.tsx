@@ -149,7 +149,7 @@ export default function Dashboard() {
                 id: undefined,
                 categoryId: undefined,
                 amount: undefined,
-                date: new Date().toString(),
+                date: UtilService.today(),
                 description: ''
             })
         }
