@@ -24,7 +24,7 @@ namespace Savewise.Managers
             transaction.amount = model.tAmount;
             transaction.category = new OCategory();
             transaction.category.id = model.tCategoryId;
-            transaction.date = model.tDate;
+            transaction.date = model.tDate.ToString();
             transaction.description = model.tDescription;
             transaction.userId = model.tUserId;
 
@@ -129,7 +129,7 @@ namespace Savewise.Managers
             }
             model.tAmount = transaction.amount;
             model.tCategoryId = transaction.category.id.Value;
-            model.tDate = transaction.date;
+            model.tDate = DateTime.Parse(transaction.date);
             model.tDescription = transaction.description;
             model.tUserId = transaction.userId;
 

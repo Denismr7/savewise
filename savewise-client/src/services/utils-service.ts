@@ -1,14 +1,18 @@
+import moment from "moment";
+
 export function today(): string {
-    const today: Date = new Date();
-    return `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`
+    return moment().format("DD/MM/YYYY");
 }
 
-export function formatStringForInputDate(date: string) {
-    const dateObj: Date = new Date(date);
-    return `${dateObj.getFullYear()}/${dateObj.getMonth() + 1}/${dateObj.getDate()}`
+export function formatString(date: string): string {
+    return moment(date).format("DD/MM/YYYY");
 }
 
-export function firstDayDate() {
+export function formatDate(date: Date): string {
+    return moment(date).format("DD/MM/YYYY");
+}
+
+export function firstDayDate(): string {
     const monthNumber = new Date().getMonth() + 1;
     const month = monthNumber < 10 ? `0${monthNumber}` : monthNumber;
     const year = new Date().getFullYear();

@@ -27,7 +27,7 @@ namespace Savewise.Services.Objects
         /// <summary>
         /// Transaction date
         /// </summary>
-        public DateTime date { get; set; }
+        public string date { get; set; }
 
         /// <summary>
         /// Transaction description

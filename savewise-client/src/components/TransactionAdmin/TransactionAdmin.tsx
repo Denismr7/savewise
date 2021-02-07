@@ -4,7 +4,7 @@ import { Category } from "../../services/objects/categories";
 import { Transaction } from "../../services/objects/transactions";
 import { LoginContext } from "../../common/context/LoginContext";
 import { GetCategoriesInput } from "../../services/category-service";
-import { CategoryService, TransactionService } from "../../services";
+import { CategoryService, TransactionService, UtilService } from "../../services";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
@@ -20,17 +20,9 @@ import Alert from "@material-ui/lab/Alert";
 import Button from "@material-ui/core/Button";
 import "./TransactionAdmin.scss";
 import Select from '@material-ui/core/Select';
-import { formatStringForInputDate, today } from "../../services/utils-service";
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { Status } from "../../services/objects/response";
-
-interface TransactionForm {
-    id?: number;
-    categoryId: number | undefined;
-    amount: number | undefined;
-    date: string;
-    description: string;
-}
+import { TransactionForm } from "../../common/Transaction";
 
 export default function TransactionAdmin() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -39,11 +31,11 @@ export default function TransactionAdmin() {
     const [transactionForm, setTransactionForm] = useState<TransactionForm>({
         categoryId: undefined,
         amount: undefined,
-        date: today(),
+        date: UtilService.today(),
         description: "",
     });
     const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
-    const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({success: false,});
+    const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({success: false});
     const [loading, setLoading] = useState(true);
     const [userCategories, setUserCategories] = useState<Category[]>([]);
     const { login } = useContext(LoginContext);
@@ -83,7 +75,7 @@ export default function TransactionAdmin() {
             return (
                 <div className="transactionItem" key={transaction.id}>
                     <p className="transactionDesc">{transaction.description}</p>
-                    <p>{ new Date(transaction.date).toLocaleDateString()}</p>
+                    <p>{ UtilService.formatString(transaction.date) }</p>
                     <div className="transactionItemButtons">
                         <IconButton onClick={() => handleToggleModal(transaction)}>
                             <EditIcon />
@@ -111,7 +103,7 @@ export default function TransactionAdmin() {
                 id: undefined,
                 categoryId: undefined,
                 amount: undefined,
-                date: new Date().toString(),
+                date: UtilService.today(),
                 description: ''
             })
         }
@@ -124,7 +116,7 @@ export default function TransactionAdmin() {
                 id: transaction.id,
                 categoryId: transaction.category.id,
                 amount: transaction.amount,
-                date: formatStringForInputDate(transaction.date),
+                date: UtilService.formatString(transaction.date),
                 description: transaction.description,
             });
         }
@@ -152,7 +144,7 @@ export default function TransactionAdmin() {
     }
 
     const handleDateChange = (date: Date | null) => {
-        setTransactionForm({...transactionForm, date: date ? date.toLocaleDateString() : ''});
+        setTransactionForm({...transactionForm, date: date ? UtilService.formatDate(date) : ''});
     };
 
     const renderUserCategories = (userCategories: Category[]) => {
@@ -245,7 +237,7 @@ export default function TransactionAdmin() {
             id="date-picker-dialog"
             label="Date"
             format="dd/MM/yyyy"
-            value={transactionForm.date}
+            value={UtilService.formatString(transactionForm.date)}
             onChange={handleDateChange}
             KeyboardButtonProps={{
                 'aria-label': 'change date',

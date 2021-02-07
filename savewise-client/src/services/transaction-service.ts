@@ -19,7 +19,7 @@ export function GetTransactions(userId: number, startDate?: string, endDate?: st
 
 export function SaveTransaction(transaction: Transaction): Promise<TransactionResponse> {
     const url = baseUrl;
-    const body = JSON.stringify({...transaction, date: new Date(transaction.date)});
+    const body = JSON.stringify(transaction);
     const options: RequestInit = {
         method: 'POST',
         mode: 'cors',
