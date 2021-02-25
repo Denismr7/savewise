@@ -27,6 +27,13 @@ import Select from "@material-ui/core/Select";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { Status } from "../../services/objects/response";
 import { TransactionForm } from "../../common/Transaction";
+import SearchIcon from '@material-ui/icons/Search';
+import CancelIcon from '@material-ui/icons/Cancel';
+
+interface SearchByDates {
+    fromDate: string,
+    toDate: string
+}
 
 export default function TransactionAdmin() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -44,6 +51,8 @@ export default function TransactionAdmin() {
   });
   const [loading, setLoading] = useState(true);
   const [userCategories, setUserCategories] = useState<Category[]>([]);
+  const [showSearch, setShowSearch] = useState<boolean>(false);
+  const [searchForm, setSearchForm] = useState<SearchByDates>({ fromDate: UtilService.today(), toDate: UtilService.tomorrow() });
   const { login } = useContext(LoginContext);
 
   useEffect(() => {
@@ -97,6 +106,50 @@ export default function TransactionAdmin() {
       );
     });
   };
+
+  const renderSearch = () => {
+      return (
+          <>
+            <KeyboardDatePicker
+                inputVariant="filled"
+                margin="normal"
+                id="date-picker-dialog"
+                label="From"
+                format="dd/MM/yyyy"
+                value={UtilService.formatStringDatePicker(searchForm.fromDate)}
+                onChange={(_ ,value) => handleSearchDateChange(value, 'fromDate')}
+                KeyboardButtonProps={{
+                "aria-label": "to date",
+                }}
+            />
+            <KeyboardDatePicker
+                inputVariant="filled"
+                margin="normal"
+                id="date-picker-dialog"
+                label="To"
+                format="dd/MM/yyyy"
+                value={UtilService.formatStringDatePicker(searchForm.toDate)}
+                onChange={(_ ,value) => handleSearchDateChange(value, 'toDate')}
+                KeyboardButtonProps={{
+                "aria-label": "from date",
+                }}
+                style={{ marginTop: "10px", width: "225px" }}
+            />
+            <IconButton onClick={() => console.debug(searchForm)}>
+                <SearchIcon />
+            </IconButton>
+            <IconButton onClick={() => setShowSearch(false)}>
+                <CancelIcon />
+            </IconButton>
+          </>
+      );
+  };
+
+  const handleSearchDateChange = (date: string | null | undefined, name: 'fromDate' | 'toDate') => {
+      if (date) {
+          setSearchForm({ ...searchForm, [name]: date });
+      }
+  }
 
   const handleToggleModal = (transaction?: Transaction) => {
     if (transaction) {
@@ -322,27 +375,38 @@ export default function TransactionAdmin() {
     </div>
   );
 
+    const renderHeader = () => {
+        return (
+            <>
+                <Button variant="contained" startIcon={<ArrowBackIosIcon />}>
+                    <Link
+                        to="/dashboard"
+                        color="inherit"
+                        style={{ textDecoration: "none" }}
+                    >
+                        Dashboard
+                    </Link>
+                </Button>
+                <h1>Last transactions</h1>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    onClick={() => handleToggleModal()}
+                >
+                    Add new
+                </Button>
+                <IconButton onClick={() => setShowSearch(true)}>
+                    <SearchIcon />
+                </IconButton>
+            </>
+        );
+    }
+
   return (
     <div className="componentBg">
       <div className="titleButton">
-        <Button variant="contained" startIcon={<ArrowBackIosIcon />}>
-          <Link
-            to="/dashboard"
-            color="inherit"
-            style={{ textDecoration: "none" }}
-          >
-            Dashboard
-          </Link>
-        </Button>
-        <h1>Last transactions</h1>
-        <Button
-          variant="contained"
-          color="primary"
-          type="submit"
-          onClick={() => handleToggleModal()}
-        >
-          Add new
-        </Button>
+          { showSearch ? renderSearch() : renderHeader() }
       </div>
       <div
         style={{

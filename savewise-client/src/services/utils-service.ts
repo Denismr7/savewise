@@ -5,6 +5,10 @@ export function today(): string {
     return moment().format("DD/MM/YYYY");
 }
 
+export function tomorrow(): string {
+    return moment().add(1, "day").format("DD/MM/YYYY");
+}
+
 export function formatStringDatePicker(date: string): string {
     const d = date.split("/");
     const day = d[0];
