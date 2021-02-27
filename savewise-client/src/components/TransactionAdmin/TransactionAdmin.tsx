@@ -135,7 +135,7 @@ export default function TransactionAdmin() {
                     }}
                     style={{ marginTop: "10px", width: "225px" }}
                 />
-                <IconButton onClick={() => console.debug(searchForm)}>
+                <IconButton onClick={handleSubmitSearch} disabled={disableSearch()}>
                     <SearchIcon />
                 </IconButton>
                 <IconButton onClick={() => setShowSearch(false)}>
@@ -145,9 +145,34 @@ export default function TransactionAdmin() {
         );
     };
 
+    const disableSearch = (): boolean => {
+        if (searchForm.fromDate && searchForm.toDate) {
+            let fromDate = new Date(searchForm.fromDate);
+            let toDate = new Date(searchForm.toDate);
+            return fromDate > toDate;
+        } else {
+            return true;
+        }
+    }
+
     const handleSearchDateChange = (date: string | null | undefined, name: 'fromDate' | 'toDate') => {
         if (date) {
             setSearchForm({ ...searchForm, [name]: date });
+        }
+    }
+
+    const handleSubmitSearch = async () => {
+        if (login.login?.id) {
+            try {
+                const { status, transactions } = await TransactionService.GetTransactions(login.login?.id, searchForm.fromDate, searchForm.toDate);
+                if (status.success) {
+                    setTransactions(transactions);
+                } else {
+                    setError({ hasErrors: true, message: status.errorMessage });
+                }
+            } catch (error) {
+                setError({ hasErrors: true, message: error });
+            }
         }
     }
 
@@ -415,7 +440,11 @@ export default function TransactionAdmin() {
                     alignItems: "center",
                 }}
             >
-                {loading ? "Loading" : renderTransactions(transactions)}
+                {loading ? "Loading" : 
+                    (<div className="transactionsContainer">
+                         {renderTransactions(transactions)}
+                    </div>)
+                }
             </div>
             <Modal
                 open={openModal}
@@ -441,6 +470,11 @@ export default function TransactionAdmin() {
                     severity="success"
                 >
                     {saveSuccess.message}
+                </Alert>
+            </Snackbar>
+            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose("error")}>
+                <Alert onClose={() => handleSnackbarClose("error")} severity="error">
+                    { error.message }
                 </Alert>
             </Snackbar>
         </div>

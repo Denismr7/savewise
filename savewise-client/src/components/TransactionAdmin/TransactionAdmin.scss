@@ -46,3 +46,10 @@
     font-size: 1.10rem;
     cursor: default;
 }
+.transactionsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    overflow: auto;
+}
