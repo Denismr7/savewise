@@ -1,7 +1,9 @@
 .LoginComponent {
-    background-color: rgba(172, 167, 203, 0.9);
     width: 600px;
     height: 350px;
     padding: 5rem 8rem;
-    border-radius: 20px;
+    border-radius: 25px;
+    background: #ebebeb;
+    box-shadow:  29px 29px 50px #c3c3c3,
+             -29px -29px 50px #ffffff;
 }
