@@ -3,7 +3,7 @@ import { Category, CategoryResponse } from '../../services/objects/categories';
 import { CategoryService } from "../../services";
 import { LoginContext } from '../../common/context/LoginContext';
 import Button from '@material-ui/core/Button';
-import "./CategoryAdmin.scss";
+import styles from "./CategoryAdmin.module.scss";
 import Modal from '@material-ui/core/Modal';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
@@ -70,13 +70,13 @@ export function CategoryAdmin() {
   const showCategories = (categories: Category[]) => {
     return categories.map(category => {
       return (
-        <div className="categoryItem" key={category.id}>
-          <p className="categoryName">{ category.name }</p>
-          <div className="categoryItemButtons">
-            <IconButton onClick={() => handleToggleModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
+        <div className={styles.categoryItem} key={category.id}>
+          <p className={styles.categoryName}>{ category.name }</p>
+          <div>
+            <IconButton size="small" onClick={() => handleToggleModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
               <EditIcon />
             </IconButton>
-            <IconButton onClick={() => handleToggleDeleteModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
+            <IconButton size="small" onClick={() => handleToggleDeleteModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
               <DeleteIcon />
             </IconButton>
           </div>
@@ -183,23 +183,24 @@ export function CategoryAdmin() {
   }
 
   const modalBody = (
-    <div className="modalBg">
+    <div className={styles.modalBg}>
       { selectedCategoryId ? 
-        (<h1 id="add-category">Edit category</h1>) 
+        (<h1 id={styles.addCategory}>Edit category</h1>) 
         : 
-        (<h1 id="add-category">Create category</h1>) 
+        (<h1 id={styles.addCategory}>Create category</h1>) 
       }
       <TextField 
                 id="filled-basic"
                 onChange={handleNewCategoryName} 
                 label="Category Name" 
-                variant="filled" 
+                variant="outlined" 
                 name="categoryName"
                 value={categoryForm.categoryName}
                 />
       <FormControl style={{ width: '225px', marginTop: '10px' }} variant='filled'>
         <InputLabel id="categoryType">Type</InputLabel>
         <Select
+          variant="outlined"
           labelId="categoryType"
           id="categoryTypeSelect"
           value={categoryForm.categoryType ? categoryForm.categoryType : ''}
@@ -208,7 +209,7 @@ export function CategoryAdmin() {
           { renderCategoryTypes(categoryTypesList) }
         </Select>
       </FormControl>
-        <div className="buttonGroup">
+        <div className={styles.buttonGroup}>
           <Button variant="contained" color="primary" type="submit" onClick={() => submitCategory(categoryForm, selectedCategoryId)}>
             Save
           </Button>
@@ -222,7 +223,7 @@ export function CategoryAdmin() {
   );
 
   const confirmDeleteBody = (
-    <div className="modalBg">
+    <div className={styles.modalBg}>
       <h1>Delete category { categoryForm.categoryName }</h1>
       <p>This is irreversible. All transactions will be lost</p>
       <Button variant="contained" color="secondary" type="submit" onClick={() => handleDeleteCategory(selectedCategoryId)}>
@@ -232,14 +233,14 @@ export function CategoryAdmin() {
   );
 
   return (
-    <div className="componentBg">
-      <div className="titleButton">
+    <div className={styles.componentBg}>
+      <div className={styles.titleButton}>
         <Button variant="contained" startIcon={<ArrowBackIosIcon />}>
           <Link to="/dashboard" color="inherit" style={{ textDecoration: 'none' }}>
             Dashboard
           </Link>
         </Button>
-        <h1>Your categories</h1>
+        <h1 id={styles.title}>Your categories</h1>
         <Button variant="contained" color="primary" type="submit" onClick={() => handleToggleModal()}>
           Add new
         </Button>
