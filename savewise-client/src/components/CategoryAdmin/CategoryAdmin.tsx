@@ -185,9 +185,9 @@ export function CategoryAdmin() {
   const modalBody = (
     <div className={styles.modalBg}>
       { selectedCategoryId ? 
-        (<h1 id={styles.addCategory}>Edit category</h1>) 
+        (<h1 id={styles.title}>Edit category</h1>) 
         : 
-        (<h1 id={styles.addCategory}>Create category</h1>) 
+        (<h1 id={styles.title}>Create category</h1>) 
       }
       <TextField 
                 id="filled-basic"
@@ -196,8 +196,9 @@ export function CategoryAdmin() {
                 variant="outlined" 
                 name="categoryName"
                 value={categoryForm.categoryName}
+                fullWidth
                 />
-      <FormControl style={{ width: '225px', marginTop: '10px' }} variant='filled'>
+      <FormControl style={{ marginTop: '10px' }} variant='filled' fullWidth>
         <InputLabel id="categoryType">Type</InputLabel>
         <Select
           variant="outlined"
@@ -240,7 +241,7 @@ export function CategoryAdmin() {
             Dashboard
           </Link>
         </Button>
-        <h1 id={styles.title}>Your categories</h1>
+        <h1 className={styles.title}>Your categories</h1>
         <Button variant="contained" color="primary" type="submit" onClick={() => handleToggleModal()}>
           Add new
         </Button>
