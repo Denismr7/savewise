@@ -22,7 +22,7 @@ import TextField from "@material-ui/core/TextField";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
 import Button from "@material-ui/core/Button";
-import "./TransactionAdmin.scss";
+import styles from "./TransactionAdmin.module.scss";
 import Select from "@material-ui/core/Select";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { Status } from "../../services/objects/response";
@@ -91,14 +91,14 @@ export default function TransactionAdmin() {
     const renderTransactions = (transactions: Transaction[]) => {
         return transactions.map((transaction) => {
             return (
-                <div className="transactionItem" key={transaction.id}>
-                    <p className="transactionDesc">{transaction.description}</p>
-                    <p>{UtilService.formatDateString(transaction.date)}</p>
-                    <div className="transactionItemButtons">
-                        <IconButton onClick={() => handleToggleModal(transaction)}>
+                <div className={styles.transactionItem} key={transaction.id}>
+                    <p className={styles.transactionDesc}>{transaction.description}</p>
+                    <div>
+                        <span className={styles.date}>{UtilService.formatDateString(transaction.date)}</span>
+                        <IconButton size="small" onClick={() => handleToggleModal(transaction)}>
                             <EditIcon />
                         </IconButton>
-                        <IconButton onClick={() => handleToggleDeleteModal(transaction)}>
+                        <IconButton size="small" onClick={() => handleToggleDeleteModal(transaction)}>
                             <DeleteIcon />
                         </IconButton>
                     </div>
@@ -111,7 +111,7 @@ export default function TransactionAdmin() {
         return (
             <>
                 <KeyboardDatePicker
-                    inputVariant="filled"
+                    inputVariant="outlined"
                     margin="normal"
                     id="date-picker-dialog"
                     label="From"
@@ -123,7 +123,7 @@ export default function TransactionAdmin() {
                     }}
                 />
                 <KeyboardDatePicker
-                    inputVariant="filled"
+                    inputVariant="outlined"
                     margin="normal"
                     id="date-picker-dialog"
                     label="To"
@@ -133,7 +133,7 @@ export default function TransactionAdmin() {
                     KeyboardButtonProps={{
                         "aria-label": "from date",
                     }}
-                    style={{ marginTop: "10px", width: "225px" }}
+                    style={{ marginTop: "10px" }}
                 />
                 <IconButton onClick={handleSubmitSearch} disabled={disableSearch()}>
                     <SearchIcon />
@@ -300,7 +300,7 @@ export default function TransactionAdmin() {
                         );
                         setSaveSuccess({
                             success: true,
-                            message: `Category ${transactionForm.description} deleted succesfully!`,
+                            message: `Transaction ${transactionForm.description} deleted succesfully!`,
                         });
                     } else {
                         setError({ hasErrors: true, message: rsp.errorMessage });
@@ -311,34 +311,36 @@ export default function TransactionAdmin() {
     };
 
     const modalBody = (
-        <div className="modalBg">
-            {transactionForm.id ? (
-                <h1 id="add-transaction">Edit transaction</h1>
-            ) : (
-                    <h1 id="add-transaction">Create transaction</h1>
-                )}
+        <div className={styles.modalBg}>
+            {transactionForm.id ? 
+            (<h1 className={styles.title}>Edit transaction</h1>) 
+            : 
+            (<h1 className={styles.title}>Create transaction</h1>)}
             <TextField
-                id="filled-basic"
+                id="outlined-basic"
                 onChange={handleInputChange}
                 label="Transaction Name"
-                variant="filled"
+                variant="outlined"
                 name="description"
                 value={transactionForm.description}
+                fullWidth
             />
             <TextField
-                id="filled-basic"
+                id="outlined-basic"
                 onChange={handleInputChange}
                 label="Amount (€)"
-                variant="filled"
+                variant="outlined"
                 name="amount"
                 type="number"
                 value={transactionForm.amount ? transactionForm.amount : ""}
                 style={{ marginTop: "10px" }}
                 placeholder="€"
+                fullWidth
             />
             <FormControl
-                style={{ width: "225px", marginTop: "10px" }}
-                variant="filled"
+                style={{ marginTop: "10px" }}
+                variant="outlined"
+                fullWidth
             >
                 <InputLabel id="category">Category</InputLabel>
                 <Select
@@ -351,7 +353,7 @@ export default function TransactionAdmin() {
                 </Select>
             </FormControl>
             <KeyboardDatePicker
-                inputVariant="filled"
+                inputVariant="outlined"
                 margin="normal"
                 id="date-picker-dialog"
                 label="Date"
@@ -361,9 +363,10 @@ export default function TransactionAdmin() {
                 KeyboardButtonProps={{
                     "aria-label": "change date",
                 }}
-                style={{ marginTop: "10px", width: "225px" }}
+                style={{ marginTop: "10px" }}
+                fullWidth
             />
-            <div className="buttonGroup">
+            <div className={styles.buttonGroup}>
                 <Button
                     variant="contained"
                     color="primary"
@@ -386,7 +389,7 @@ export default function TransactionAdmin() {
     );
 
     const confirmDeleteBody = (
-        <div className="modalBg">
+        <div className={styles.modalBg}>
             <h1>Delete transaction {transactionForm.description}</h1>
             <p>This is irreversible. Are you sure?</p>
             <Button
@@ -412,7 +415,7 @@ export default function TransactionAdmin() {
                         Dashboard
                     </Link>
                 </Button>
-                <h1>Last transactions</h1>
+                <h1 className={styles.title}>Last transactions</h1>
                 <Button
                     variant="contained"
                     color="primary"
@@ -429,23 +432,15 @@ export default function TransactionAdmin() {
     }
 
     return (
-        <div className="componentBg">
-            <div className="titleButton">
+        <div className={styles.componentBg}>
+            <div className={styles.titleButton}>
                 {showSearch ? renderSearch() : renderHeader()}
             </div>
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                }}
-            >
-                {loading ? "Loading" : 
-                    (<div className="transactionsContainer">
-                         {renderTransactions(transactions)}
-                    </div>)
-                }
-            </div>
+            {loading ? "Loading" : 
+                (<div className={styles.transactionsContainer}>
+                        {renderTransactions(transactions)}
+                </div>)
+            }
             <Modal
                 open={openModal}
                 onClose={() => handleToggleModal()}

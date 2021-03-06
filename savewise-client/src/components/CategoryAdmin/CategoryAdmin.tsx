@@ -207,7 +207,9 @@ export function CategoryAdmin() {
           value={categoryForm.categoryType ? categoryForm.categoryType : ''}
           onChange={handleTypeChange}
         >
-          { renderCategoryTypes(categoryTypesList) }
+          { <div className={styles.categoriesContainer}>
+              renderCategoryTypes(categoryTypesList)
+            </div> }
         </Select>
       </FormControl>
         <div className={styles.buttonGroup}>
