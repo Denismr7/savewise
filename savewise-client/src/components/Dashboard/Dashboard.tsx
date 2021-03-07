@@ -39,9 +39,11 @@ export default function Dashboard() {
         date: UtilService.today(),
         description: "",
     });
+    const [actualMonth, setActualMonth] = useState<string>('');
 
     useEffect(() => {
         const userId = login.login?.id;
+        setActualMonth(UtilService.currentMonth());
         getCategories(userId);
         getTransactions(userId);
         return () => {
@@ -268,21 +270,32 @@ export default function Dashboard() {
                 </Alert>
             </Snackbar>
         </div>
-      );
+    );
+
+    const renderMonth = () => (
+        <>
+            <Typography variant="h3" component="h2" style={{ marginBottom: '5%' }}>
+                    { actualMonth }
+            </Typography>
+        </>
+    )
 
     return (
         <Grid 
             container
-            direction="row"
+            direction="column"
             justify="center"
             alignItems="center"
-            spacing={0}
+            spacing={5}
             style={{ width: '99%' }}
             >
             <Grid item>
-                <Typography variant="h2" component="h1" style={{ marginTop: '5%', marginBottom: '10%' }}>
+                <Typography variant="h2" component="h1" style={{ marginTop: '5%' }}>
                     Welcome back, { login.login?.name }
                 </Typography>
+            </Grid>
+            <Grid item>
+                { renderMonth() }
             </Grid>
             <Grid container
             direction="row"
