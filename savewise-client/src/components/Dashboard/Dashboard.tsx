@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, ChangeEvent } from 'react';
 import Grid from '@material-ui/core/Grid';
-import "./Dashboard.scss"
+import styles from "./Dashboard.module.scss";
 import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
@@ -23,7 +23,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import Select from '@material-ui/core/Select';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import IconButton from '@material-ui/core/IconButton';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -98,14 +98,14 @@ export default function Dashboard() {
                 container
                 direction="row"
                 justify="space-between"
-                spacing={1}
+                spacing={0}
                 key={category.id}
                 >
-                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{ category.name }</Typography>
-                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginRight: '15px' }}>{ category.amount ? category.amount : 0 } €</Typography>
+                    <Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{ category.name }</Typography>
+                    <Typography variant="h6" component="h2" style={{ display: 'inline', marginRight: '15px' }}>{ category.amount ? category.amount : 0 } €</Typography>
                 </Grid>
             ))
-        } else (<Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No categories to show</Typography>);
+        } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No categories to show</Typography>);
     };
 
     const renderTransactions = (transactions: Transaction[]) =>  {
@@ -116,14 +116,14 @@ export default function Dashboard() {
                 container
                 direction="row"
                 justify="space-between"
-                spacing={1}
+                spacing={0}
                 key={t.id}
                 >
-                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{ t.description }</Typography>
-                    <Typography variant="h4" component="h2" style={{ display: 'inline', marginRight: '15px' }}>{ t.amount ? t.amount : 0 } €</Typography>
+                    <Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{ t.description }</Typography>
+                    <Typography variant="h6" component="h2" style={{ display: 'inline', marginRight: '15px' }}>{ t.amount ? t.amount : 0 } €</Typography>
                 </Grid>
             ))
-        } else (<Typography variant="h4" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No transactions to show</Typography>);
+        } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No transactions to show</Typography>);
     }
 
     const handleCloseErrorModal = () => {
@@ -209,61 +209,64 @@ export default function Dashboard() {
     }
 
     const modalBody = (
-        <div className="modalBg">
-        <h1 id="add-transaction">Add new transaction</h1>
-        <TextField 
-                id="filled-basic"
-                onChange={handleInputChange} 
-                label="Transaction Name" 
-                variant="filled" 
-                name="description"
-                value={transactionForm.description}
-                />
-        <TextField 
-                id="filled-basic"
-                onChange={handleInputChange} 
-                label="Amount (€)" 
-                variant="filled" 
-                name="amount"
-                type="number"
-                value={transactionForm.amount ? transactionForm.amount : ''}
+        <div className={styles.modalBg}>
+            <h1 className={styles.title}>Add new transaction</h1>
+            <TextField 
+                    id="outlined-basic"
+                    onChange={handleInputChange} 
+                    label="Transaction Name" 
+                    variant="outlined" 
+                    name="description"
+                    value={transactionForm.description}
+                    fullWidth
+                    />
+            <TextField 
+                    id="outlined-basic"
+                    onChange={handleInputChange} 
+                    label="Amount (€)" 
+                    variant="outlined" 
+                    name="amount"
+                    type="number"
+                    value={transactionForm.amount ? transactionForm.amount : ''}
+                    style={{ marginTop: '10px' }}
+                    fullWidth
+                    placeholder="€"
+                    />
+            <FormControl style={{ marginTop: '10px' }} fullWidth variant='outlined'>
+                <InputLabel id="category">Category</InputLabel>
+                <Select
+                labelId="category"
+                id="categorySelect"
+                value={transactionForm.categoryId ? transactionForm.categoryId : ''}
+                onChange={handleSelectChange}
+                >
+                { renderUserCategories(categories) }
+                </Select>
+            </FormControl>
+            <KeyboardDatePicker
+                inputVariant="outlined"
+                margin="normal"
+                id="date-picker-dialog"
+                label="Date"
+                format="dd/MM/yyyy"
+                value={UtilService.formatStringDatePicker(transactionForm.date)}
+                onChange={handleDateChange}
+                KeyboardButtonProps={{
+                    'aria-label': 'change date',
+                }}
                 style={{ marginTop: '10px' }}
-                placeholder="€"
-                />
-          <FormControl style={{ width: '225px', marginTop: '10px' }} variant='filled'>
-            <InputLabel id="category">Category</InputLabel>
-            <Select
-              labelId="category"
-              id="categorySelect"
-              value={transactionForm.categoryId ? transactionForm.categoryId : ''}
-              onChange={handleSelectChange}
-            >
-              { renderUserCategories(categories) }
-            </Select>
-          </FormControl>
-        <KeyboardDatePicker
-            inputVariant="filled"
-            margin="normal"
-            id="date-picker-dialog"
-            label="Date"
-            format="dd/MM/yyyy"
-            value={UtilService.formatStringDatePicker(transactionForm.date)}
-            onChange={handleDateChange}
-            KeyboardButtonProps={{
-                'aria-label': 'change date',
-            }}
-            style={{ marginTop: '10px', width: '225px' }}
-        />
-            <div className="buttonGroup">
-              <Button variant="contained" color="primary" type="submit" onClick={onSave}>
-                Save
-              </Button>
+                fullWidth
+            />
+            <div className={styles.buttonGroup}>
+                <Button variant="contained" color="primary" type="submit" onClick={onSave}>
+                    Save
+                </Button>
             </div>
-        <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose('error')}>
-            <Alert onClose={() => handleSnackbarClose('error')} severity="error">
-                { error.message }
-            </Alert>
-          </Snackbar>
+            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose('error')}>
+                <Alert onClose={() => handleSnackbarClose('error')} severity="error">
+                    { error.message }
+                </Alert>
+            </Snackbar>
         </div>
       );
 
@@ -273,10 +276,11 @@ export default function Dashboard() {
             direction="row"
             justify="center"
             alignItems="center"
-            spacing={1}
+            spacing={0}
+            style={{ width: '99%' }}
             >
             <Grid item>
-                <Typography variant="h2" component="h1" style={{ marginTop: '5%' }}>
+                <Typography variant="h2" component="h1" style={{ marginTop: '5%', marginBottom: '10%' }}>
                     Welcome back, { login.login?.name }
                 </Typography>
             </Grid>
@@ -284,10 +288,10 @@ export default function Dashboard() {
             direction="row"
             justify="center"
             alignItems="center"
-            spacing={1}
+            spacing={10}
             >
                 <Grid item>
-                    <div className="panel">
+                    <div className={styles.panel}>
                         <Grid container
                         direction="column"
                         alignItems="center"
@@ -304,11 +308,14 @@ export default function Dashboard() {
                             >
                                 { loading ? 
                                     (<CircularProgress color="secondary" />) 
-                                    : renderExpenses(categories.filter(c => c.categoryType.id === CategoryTypesId.Expenses))
+                                    : 
+                                    (<div className={styles.itemsContainer}>
+                                        {renderExpenses(categories.filter(c => c.categoryType.id === CategoryTypesId.Expenses))}
+                                    </div>)
                                 }
                             </Grid>
                             <Link to="/categories">
-                                <Button variant="contained" color="primary">
+                                <Button variant="outlined" color="primary">
                                     Manage
                                 </Button>
                             </Link>
@@ -316,7 +323,7 @@ export default function Dashboard() {
                     </div>
                 </Grid>
                 <Grid item>
-                    <div className="panel">
+                    <div className={styles.panel}>
                         <Grid container
                         direction="column"
                         alignItems="center"
@@ -333,11 +340,14 @@ export default function Dashboard() {
                             >
                                 { loading ? 
                                     (<CircularProgress color="secondary" />) 
-                                    : renderExpenses(categories.filter(c => c.categoryType.id === CategoryTypesId.Incomes)) 
+                                    : 
+                                    (<div className={styles.itemsContainer}>
+                                        {renderExpenses(categories.filter(c => c.categoryType.id === CategoryTypesId.Incomes))}
+                                    </div>)
                                 }
                             </Grid>
                             <Link to="/categories">
-                                <Button variant="contained" color="primary">
+                                <Button variant="outlined" color="primary">
                                     Manage
                                 </Button>
                             </Link>
@@ -345,7 +355,7 @@ export default function Dashboard() {
                     </div>
                 </Grid>
                 <Grid item>
-                    <div className="panel">
+                    <div className={styles.panel}>
                         <Grid container
                             direction="column"
                             alignItems="center"
@@ -354,8 +364,8 @@ export default function Dashboard() {
                             >
                                 <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
                                     Last transactions
-                                    <IconButton color="primary" aria-label="upload picture" component="span" onClick={() => handleToggleModal()}>
-                                        <AddCircleIcon />
+                                    <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => handleToggleModal()}>
+                                        <AddCircleOutlineIcon />
                                     </IconButton>
                                 </Typography>
                                 <Grid container
@@ -365,11 +375,14 @@ export default function Dashboard() {
                                 >
                                     { loading ? 
                                     (<CircularProgress color="secondary" />) 
-                                    : renderTransactions(transactions)
+                                    : 
+                                    (<div className={styles.itemsContainer}>
+                                        {renderTransactions(transactions)}
+                                    </div>)    
                                 }
                                 </Grid>
                                 <Link to="/transactions">
-                                    <Button variant="contained" color="primary">
+                                    <Button variant="outlined" color="primary">
                                         Manage
                                     </Button>
                                 </Link>

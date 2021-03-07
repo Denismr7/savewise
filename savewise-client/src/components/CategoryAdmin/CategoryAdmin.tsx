@@ -207,9 +207,7 @@ export function CategoryAdmin() {
           value={categoryForm.categoryType ? categoryForm.categoryType : ''}
           onChange={handleTypeChange}
         >
-          { <div className={styles.categoriesContainer}>
-              renderCategoryTypes(categoryTypesList)
-            </div> }
+          { renderCategoryTypes(categoryTypesList) }
         </Select>
       </FormControl>
         <div className={styles.buttonGroup}>
@@ -238,19 +236,21 @@ export function CategoryAdmin() {
   return (
     <div className={styles.componentBg}>
       <div className={styles.titleButton}>
-        <Button variant="contained" startIcon={<ArrowBackIosIcon />}>
-          <Link to="/dashboard" color="inherit" style={{ textDecoration: 'none' }}>
-            Dashboard
-          </Link>
-        </Button>
+        <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+          <ArrowBackIosIcon />
+        </Link>
         <h1 className={styles.title}>Your categories</h1>
-        <Button variant="contained" color="primary" type="submit" onClick={() => handleToggleModal()}>
+        <Button variant="outlined" color="primary" type="submit" onClick={() => handleToggleModal()}>
           Add new
         </Button>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        { loading ? "Loading" : showCategories(categories) }
-      </div>
+      { loading ? 
+        "Loading" 
+      : 
+        (<div className={styles.categoriesContainer}>
+          {showCategories(categories)}
+        </div>)
+      }
       <Modal
         open={openModal}
         onClose={() => handleToggleModal()}

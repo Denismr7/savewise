@@ -406,18 +406,12 @@ export default function TransactionAdmin() {
     const renderHeader = () => {
         return (
             <>
-                <Button variant="contained" startIcon={<ArrowBackIosIcon />}>
-                    <Link
-                        to="/dashboard"
-                        color="inherit"
-                        style={{ textDecoration: "none" }}
-                    >
-                        Dashboard
-                    </Link>
-                </Button>
+                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+                    <ArrowBackIosIcon />
+                </Link>
                 <h1 className={styles.title}>Last transactions</h1>
                 <Button
-                    variant="contained"
+                    variant="outlined"
                     color="primary"
                     type="submit"
                     onClick={() => handleToggleModal()}
