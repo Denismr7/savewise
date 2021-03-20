@@ -1,4 +1,4 @@
-import { User } from "../common/user";
+import { User } from "../common/objects/user";
 
 const loginKey: string = 'savewlogin';
 

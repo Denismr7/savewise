@@ -1,4 +1,4 @@
-import { Entity } from "../../common/Entity";
+import { Entity } from "./Entity";
 import { BasicResponse } from "./response";
 
 export interface Category {

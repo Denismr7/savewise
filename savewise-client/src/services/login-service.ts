@@ -1,4 +1,4 @@
-import { LoginData, LoginResponse } from "../common/login";
+import { LoginData, LoginResponse } from "../common/objects/login";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/login`;

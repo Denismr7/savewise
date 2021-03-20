@@ -1,5 +1,5 @@
-import { Status } from "./objects/response";
-import { Transaction, TransactionResponse, TransactionsResponse } from "./objects/transactions";
+import { Status } from "../common/objects/response";
+import { Transaction, TransactionResponse, TransactionsResponse } from "../common/objects/transactions";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/transactions`;

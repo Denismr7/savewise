@@ -3,14 +3,14 @@ import "./Login.scss";
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
-import { LoginData } from '../../common/login';
+import { LoginData } from '../../common/objects/login';
 import { LoginService, SessionService } from "../../services";
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import { LoginContext } from '../../common/context/LoginContext';
 import { Redirect, useHistory } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
-import { SnackbarError } from '../../common/SnackbarHelpers';
+import { SnackbarError } from '../../common/objects/SnackbarHelpers';
 
 export default function Login(): ReactElement {
     const [loginForm, setLoginForm] = useState<LoginData>({ userName: '', password: '' });

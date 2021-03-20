@@ -1,12 +1,15 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { CategoryAdmin } from "./CategoryAdmin";
-import { CategoriesResponse, Category } from '../../services/objects/categories';
+import { CategoriesResponse, Category } from '../../common/objects/categories';
 import { CategoryService } from "../../services/";
 
 const mockCategory: Category = {
   id: 1,
-  name: 'Mock category'
+  name: 'Mock category',
+  categoryType: {
+    id: 1
+  }
 };
 const mockCategories: Category[] = [mockCategory];
 const mockResponse: CategoriesResponse = {

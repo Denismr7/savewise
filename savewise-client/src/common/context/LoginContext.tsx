@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react'
-import { ILogin } from '../ILoginContext';
+import { ILogin } from '../objects/ILoginContext';
 
 interface ILoginContext {
     login: ILogin,

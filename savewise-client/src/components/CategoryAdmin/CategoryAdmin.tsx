@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
-import { Category, CategoryResponse } from '../../services/objects/categories';
+import { Category, CategoryResponse } from '../../common/objects/categories';
 import { CategoryService } from "../../services";
 import { LoginContext } from '../../common/context/LoginContext';
 import Button from '@material-ui/core/Button';
@@ -8,19 +8,19 @@ import Modal from '@material-ui/core/Modal';
 import TextField from '@material-ui/core/TextField';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
-import { SnackbarError, SnackbarSuccess } from '../../common/SnackbarHelpers';
+import { SnackbarError, SnackbarSuccess } from '../../common/objects/SnackbarHelpers';
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Link } from 'react-router-dom';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import { Status } from '../../services/objects/response';
+import { Status } from '../../common/objects/response';
 import { GetCategoriesInput } from '../../services/category-service';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import { Entity } from '../../common/Entity';
+import { Entity } from '../../common/objects/Entity';
 
 interface categoryForm {
   categoryName: string,

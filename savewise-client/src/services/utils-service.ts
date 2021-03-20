@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Category } from "./objects/categories";
+import { Category } from "../common/objects/categories";
 
 export function today(): string {
     return moment().format("DD/MM/YYYY");

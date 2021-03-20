@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
-import { SnackbarError, SnackbarSuccess } from "../../common/SnackbarHelpers";
-import { Category } from "../../services/objects/categories";
-import { Transaction } from "../../services/objects/transactions";
+import { SnackbarError, SnackbarSuccess } from "../../common/objects/SnackbarHelpers";
+import { Category } from "../../common/objects/categories";
+import { Transaction } from "../../common/objects/transactions";
 import { LoginContext } from "../../common/context/LoginContext";
 import { GetCategoriesInput } from "../../services/category-service";
 import {
@@ -25,8 +25,8 @@ import Button from "@material-ui/core/Button";
 import styles from "./TransactionAdmin.module.scss";
 import Select from "@material-ui/core/Select";
 import { KeyboardDatePicker } from "@material-ui/pickers";
-import { Status } from "../../services/objects/response";
-import { TransactionForm } from "../../common/Transaction";
+import { Status } from "../../common/objects/response";
+import { TransactionForm } from "../../common/objects/Transaction";
 import SearchIcon from '@material-ui/icons/Search';
 import CancelIcon from '@material-ui/icons/Cancel';
 

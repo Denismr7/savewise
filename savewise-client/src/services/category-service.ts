@@ -1,5 +1,5 @@
-import { CategoriesResponse, Category, CategoryResponse, CategoryTypesResponse } from "./objects/categories";
-import { Status } from "./objects/response";
+import { CategoriesResponse, Category, CategoryResponse, CategoryTypesResponse } from "../common/objects/categories";
+import { Status } from "../common/objects/response";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/categories`;

@@ -13,7 +13,7 @@ import PrivateRoute from './common/wrappers/PrivateRoute';
 import { LoginContext } from './common/context/LoginContext';
 import Dashboard from './components/Dashboard/Dashboard';
 import { SessionService } from './services';
-import { User } from './common/user';
+import { User } from './common/objects/user';
 import TransactionAdmin from './components/TransactionAdmin/TransactionAdmin';
 
 function App() {

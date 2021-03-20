@@ -1,4 +1,4 @@
-import { BasicResponse } from "../services/objects/response";
+import { BasicResponse } from "./response";
 import { User } from "./user";
 
 export interface LoginData {

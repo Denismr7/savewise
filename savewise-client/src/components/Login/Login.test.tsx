@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Login from './Login';
-import { LoginData, LoginResponse } from '../../common/login';
+import { LoginData, LoginResponse } from '../../common/objects/login';
 import { LoginService } from "../../services";
-import { User } from '../../common/user';
+import { User } from '../../common/objects/user';
 
 test('Should show labels for username and password', () => {
     // Arrange
