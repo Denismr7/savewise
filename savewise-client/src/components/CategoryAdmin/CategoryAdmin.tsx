@@ -185,9 +185,9 @@ export function CategoryAdmin() {
   const modalBody = (
     <div className={styles.modalBg}>
       { selectedCategoryId ? 
-        (<h1 id={styles.title}>Edit category</h1>) 
+        (<h1 className="titleColor">Edit category</h1>) 
         : 
-        (<h1 id={styles.title}>Create category</h1>) 
+        (<h1 className="titleColor">Create category</h1>) 
       }
       <TextField 
                 id="filled-basic"
@@ -215,61 +215,61 @@ export function CategoryAdmin() {
             Save
           </Button>
         </div>
-        <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose('error')}>
-        <Alert onClose={() => handleSnackbarClose('error')} severity="error">
-            { error.message }
-        </Alert>
-      </Snackbar>
     </div>
   );
 
   const confirmDeleteBody = (
     <div className={styles.modalBg}>
-      <h1>Delete category { categoryForm.categoryName }</h1>
-      <p>This is irreversible. All transactions will be lost</p>
-      <Button variant="contained" color="secondary" type="submit" onClick={() => handleDeleteCategory(selectedCategoryId)}>
-          Confirm
-      </Button>
+        <h1>Delete category { categoryForm.categoryName }</h1>
+        <p>This is irreversible. All transactions will be lost</p>
+        <Button variant="contained" color="secondary" type="submit" onClick={() => handleDeleteCategory(selectedCategoryId)}>
+            Confirm
+        </Button>
     </div>
   );
 
   return (
-    <div className={styles.componentBg}>
-      <div className={styles.titleButton}>
-        <Link to="/dashboard" style={{ textDecoration: 'none' }}>
-          <ArrowBackIosIcon />
-        </Link>
-        <h1 className={styles.title}>Your categories</h1>
-        <Button variant="outlined" color="primary" type="submit" onClick={() => handleToggleModal()}>
-          Add new
-        </Button>
-      </div>
-      { loading ? 
-        "Loading" 
-      : 
-        (<div className={styles.categoriesContainer}>
-          {showCategories(categories)}
-        </div>)
-      }
-      <Modal
-        open={openModal}
-        onClose={() => handleToggleModal()}
-        aria-labelledby="add-category"
-      >
-        {modalBody}
-      </Modal>
-      <Modal
-        open={openConfirmDelete}
-        onClose={() => handleToggleDeleteModal()}
-        aria-labelledby="delete-category"
-      >
-        {confirmDeleteBody}
-      </Modal>
-      <Snackbar open={saveSuccess.success} autoHideDuration={6000} onClose={() => handleSnackbarClose('success')}>
-        <Alert onClose={() => handleSnackbarClose('success')} severity="success">
-            { saveSuccess.message }
-        </Alert>
-      </Snackbar>
+    <div className="componentBg">
+        <div className="componentHeader">
+            <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+                <ArrowBackIosIcon />
+            </Link>
+            <h1 className="titleColor">Your categories</h1>
+            <Button variant="outlined" color="primary" type="submit" onClick={() => handleToggleModal()}>
+                Add new
+            </Button>
+        </div>
+        { loading ? 
+            "Loading" 
+            : 
+            (<div className={styles.categoriesContainer}>
+                {showCategories(categories)}
+            </div>)
+        }
+        <Modal
+            open={openModal}
+            onClose={() => handleToggleModal()}
+            aria-labelledby="add-category"
+            >
+                {modalBody}
+        </Modal>
+        <Modal
+            open={openConfirmDelete}
+            onClose={() => handleToggleDeleteModal()}
+            aria-labelledby="delete-category"
+            >
+                {confirmDeleteBody}
+        </Modal>
+        <Snackbar open={saveSuccess.success} autoHideDuration={6000} onClose={() => handleSnackbarClose('success')}>
+            <Alert onClose={() => handleSnackbarClose('success')} severity="success">
+                { saveSuccess.message }
+            </Alert>
+        </Snackbar>
+        <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose("error")}>
+            <Alert onClose={() => handleSnackbarClose("error")} severity="error">
+                { error.message }
+            </Alert>
+        </Snackbar>
     </div>
   );
 }

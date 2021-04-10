@@ -15,6 +15,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import { SessionService } from './services';
 import { User } from './common/objects/user';
 import TransactionAdmin from './components/TransactionAdmin/TransactionAdmin';
+import UserAdmin from './components/UserAdmin/UserAdmin';
 
 function App() {
   const {login, setLogin} = useContext(LoginContext);
@@ -40,6 +41,7 @@ function App() {
             <PrivateRoute component={Dashboard} path="/dashboard" exact conditionToRender={login.isLogged} />
             <PrivateRoute component={CategoryAdmin} path="/categories" exact conditionToRender={login.isLogged} />
             <PrivateRoute component={TransactionAdmin} path="/transactions" exact conditionToRender={login.isLogged} />
+            <PrivateRoute component={UserAdmin} path="/user" exact conditionToRender={login.isLogged} />
             <Redirect from="/" to="/login" exact/>
           </Switch>
         </div>

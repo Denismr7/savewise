@@ -1,3 +1,8 @@
+@keyframes rotate {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+
 .panel {
     width: 400px;
     height: 500px;
@@ -28,4 +33,14 @@
 }
 .title {
     color: #292929;
+}
+
+.settingsIcon {
+    margin-bottom: 20px;
+    margin-left: 5px;
+}
+
+.settingsIcon:hover {
+    animation: rotate 2s;
+    animation-iteration-count: infinite;
 }

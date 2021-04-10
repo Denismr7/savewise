@@ -24,6 +24,7 @@ import Select from '@material-ui/core/Select';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -292,6 +293,9 @@ export default function Dashboard() {
             <Grid item>
                 <Typography variant="h2" component="h1" style={{ marginTop: '5%' }}>
                     Welcome back, { login.login?.name }
+                    <Link to="/user" style={{ textDecoration: 'none' }}>
+                        <SettingsOutlinedIcon className={styles.settingsIcon} />
+                    </Link>
                 </Typography>
             </Grid>
             <Grid item>

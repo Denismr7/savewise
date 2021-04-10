@@ -313,9 +313,9 @@ export default function TransactionAdmin() {
     const modalBody = (
         <div className={styles.modalBg}>
             {transactionForm.id ? 
-            (<h1 className={styles.title}>Edit transaction</h1>) 
+            (<h1 className="titleColor">Edit transaction</h1>) 
             : 
-            (<h1 className={styles.title}>Create transaction</h1>)}
+            (<h1 className="titleColor">Create transaction</h1>)}
             <TextField
                 id="outlined-basic"
                 onChange={handleInputChange}
@@ -409,7 +409,7 @@ export default function TransactionAdmin() {
                 <Link to="/dashboard" style={{ textDecoration: 'none' }}>
                     <ArrowBackIosIcon />
                 </Link>
-                <h1 className={styles.title}>Last transactions</h1>
+                <h1 className="titleColor">Last transactions</h1>
                 <Button
                     variant="outlined"
                     color="primary"
@@ -426,8 +426,8 @@ export default function TransactionAdmin() {
     }
 
     return (
-        <div className={styles.componentBg}>
-            <div className={styles.titleButton}>
+        <div className="componentBg">
+            <div className="componentHeader">
                 {showSearch ? renderSearch() : renderHeader()}
             </div>
             {loading ? "Loading" : 

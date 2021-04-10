@@ -1,0 +1,23 @@
+.marginAuto {
+    margin: 0 auto;
+}
+
+.userForm {
+    margin: 0 auto;
+    width: 80%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.formRow {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.saveBtnContainer {
+    display: flex;
+    justify-content: center;
+}
