@@ -47,6 +47,5 @@ export function sortCategoriesByAmount(categories: Category[]): Category[] {
 }
 
 export function currentMonth(): string {
-    console.debug("Month: ", moment().format("MMMM"))
     return moment().format("MMMM");
 }

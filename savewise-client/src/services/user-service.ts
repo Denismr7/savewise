@@ -22,7 +22,7 @@ export function createUser(request: UserInput): Promise<BasicResponse> {
 }
 
 export function editUser(request: UserInput): Promise<UserResponse> {
-    const url = `${baseUrl}`;
+    const url = `${baseUrl}/${request.user.id}`;
     const body = JSON.stringify(request);
     const options: RequestInit = {
         method: 'PATCH',

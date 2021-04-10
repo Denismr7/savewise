@@ -1,9 +1,15 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import Button from '@material-ui/core/Button';
 import styles from "./UserAdmin.module.scss";
 import TextField from '@material-ui/core/TextField';
+import { LoginContext } from '../../common/context/LoginContext';
+import { UserService } from '../../services';
+import { User, UserInput } from '../../common/objects/user';
+import Alert from '@material-ui/lab/Alert';
+import Snackbar from '@material-ui/core/Snackbar';
+import { SnackbarError, SnackbarSuccess } from '../../common/objects/SnackbarHelpers';
 
 interface IUserForm {
     name?: string;
@@ -13,15 +19,74 @@ interface IUserForm {
 }
 
 export default function UserAdmin() {
+    // Context
+    const { login, setLogin } = useContext(LoginContext);
+
+    // States
     const [userForm, setUserForm] = useState<IUserForm>({});
+    const [editMode, setEditMode] = useState<boolean>(false);
+    const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
+    const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({ success: false });
 
+    useEffect(() => {
+        if (login) {
+            setUserForm({
+                name: login.login?.name,
+                lastName: login.login?.lastName
+            });
+            setEditMode(true);
+        } else {
+            setEditMode(false);
+        }
+        return () => {
 
-    // FORM HANDLERS
+        }
+    }, [login])
+
+    // HANDLERS
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setUserForm({...userForm, [event.currentTarget.name]: event.currentTarget.value});
     }
     const handleSubmit = () => {
-        console.debug("Form: ", userForm);
+        // TODO: Password validation
+
+        if (editMode) {
+            editUser();
+        } else {
+            // TODO
+        }
+    }
+    const handleSnackbarClose = (severity?: string) => {
+        if (severity === "error") {
+            setError({ ...error, hasErrors: false });
+        } else if (severity === "success") {
+            setSaveSuccess({ ...saveSuccess, success: false });
+        }
+    };
+
+    // Methods
+    const editUser = async () => {
+        const user: User = {
+            name: userForm.name ? userForm.name : '',
+            lastName: userForm.lastName ? userForm.lastName : '',
+            password: userForm.password,
+            login: login.login?.login as string,
+            id: login.login?.id as number
+        }
+        try {
+            const { status, user: editedUser } = await UserService.editUser({ user });
+            if (status.success) {
+                setLogin({...login, login: editedUser});
+                setSaveSuccess({
+                    success: true,
+                    message: `User edited succesfully!`,
+                });
+            } else {
+                setError({ hasErrors: true, message: status.errorMessage });
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     return (
@@ -81,6 +146,16 @@ export default function UserAdmin() {
                     Save
                 </Button>
             </div>
+            <Snackbar open={saveSuccess.success} autoHideDuration={6000} onClose={() => handleSnackbarClose('success')}>
+                <Alert onClose={() => handleSnackbarClose('success')} severity="success">
+                    { saveSuccess.message }
+                </Alert>
+            </Snackbar>
+            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose("error")}>
+                <Alert onClose={() => handleSnackbarClose("error")} severity="error">
+                    { error.message }
+                </Alert>
+            </Snackbar>
         </div>
     )
 }
