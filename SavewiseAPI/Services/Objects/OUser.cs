@@ -23,7 +23,7 @@ namespace Savewise.Services.Objects
         public string lastName { get; set; }
 
         /// <summary>
-        /// User password TODO: Use password encryption
+        /// User password
         /// </summary>
         public string password { get; set; }
     }
