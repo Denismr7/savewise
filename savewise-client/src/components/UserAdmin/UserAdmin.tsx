@@ -6,7 +6,7 @@ import styles from "./UserAdmin.module.scss";
 import TextField from '@material-ui/core/TextField';
 import { LoginContext } from '../../common/context/LoginContext';
 import { UserService } from '../../services';
-import { User, UserInput } from '../../common/objects/user';
+import { User } from '../../common/objects/user';
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import { SnackbarError, SnackbarSuccess } from '../../common/objects/SnackbarHelpers';
