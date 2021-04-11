@@ -3,3 +3,5 @@ docker-db-pg/pg-scripts
 .vscode
 SavewiseAPI/bin
 SavewiseAPI/obj
+SavewiseAPI/appsettings.Development.json
+SavewiseAPI/appsettings.Production.json
