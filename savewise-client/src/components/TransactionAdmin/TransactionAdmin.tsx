@@ -1,5 +1,4 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
-import { SnackbarError, SnackbarSuccess } from "../../common/objects/SnackbarHelpers";
 import { Category } from "../../common/objects/categories";
 import { Transaction } from "../../common/objects/transactions";
 import { LoginContext } from "../../common/context/LoginContext";
@@ -19,8 +18,6 @@ import { Link } from "react-router-dom";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import Modal from "@material-ui/core/Modal";
 import TextField from "@material-ui/core/TextField";
-import Snackbar from "@material-ui/core/Snackbar";
-import Alert from "@material-ui/lab/Alert";
 import Button from "@material-ui/core/Button";
 import styles from "./TransactionAdmin.module.scss";
 import Select from "@material-ui/core/Select";
@@ -29,6 +26,7 @@ import { Status } from "../../common/objects/response";
 import { TransactionForm } from "../../common/objects/Transaction";
 import SearchIcon from '@material-ui/icons/Search';
 import CancelIcon from '@material-ui/icons/Cancel';
+import { SnackbarContext } from "../../common/context/SnackbarContext";
 
 interface SearchByDates {
     fromDate: string,
@@ -36,6 +34,9 @@ interface SearchByDates {
 }
 
 export default function TransactionAdmin() {
+    const { login } = useContext(LoginContext);
+    const { setSnackbarInfo } = useContext(SnackbarContext);
+
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
@@ -45,15 +46,10 @@ export default function TransactionAdmin() {
         date: UtilService.today(),
         description: "",
     });
-    const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
-    const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({
-        success: false,
-    });
     const [loading, setLoading] = useState(true);
     const [userCategories, setUserCategories] = useState<Category[]>([]);
     const [showSearch, setShowSearch] = useState<boolean>(false);
     const [searchForm, setSearchForm] = useState<SearchByDates>({ fromDate: UtilService.today(), toDate: UtilService.tomorrow() });
-    const { login } = useContext(LoginContext);
 
     useEffect(() => {
         const id: number = login.login?.id as number;
@@ -168,10 +164,10 @@ export default function TransactionAdmin() {
                 if (status.success) {
                     setTransactions(transactions);
                 } else {
-                    setError({ hasErrors: true, message: status.errorMessage });
+                    setSnackbarInfo({ severity: "error", message: status.errorMessage });
                 }
             } catch (error) {
-                setError({ hasErrors: true, message: error });
+                setSnackbarInfo({ severity: "error", message: error });
             }
         }
     }
@@ -208,14 +204,6 @@ export default function TransactionAdmin() {
             });
         }
         setOpenConfirmDelete(!openConfirmDelete);
-    };
-
-    const handleSnackbarClose = (severity?: string) => {
-        if (severity === "error") {
-            setError({ ...error, hasErrors: false });
-        } else if (severity === "success") {
-            setSaveSuccess({ ...saveSuccess, success: false });
-        }
     };
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -283,10 +271,10 @@ export default function TransactionAdmin() {
                         setTransactions([...transactions, rsp.transaction]);
                     }
                 } else {
-                    setError({ hasErrors: true, message: rsp.status.errorMessage });
+                    setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
                 }
             })
-            .catch((e) => setError({ hasErrors: true, message: e }));
+            .catch((e) => setSnackbarInfo({ severity: "error", message: e }));
     };
 
     const onConfirmDelete = () => {
@@ -298,15 +286,12 @@ export default function TransactionAdmin() {
                         setTransactions(
                             transactions.filter((t) => t.id !== transactionForm.id)
                         );
-                        setSaveSuccess({
-                            success: true,
-                            message: `Transaction ${transactionForm.description} deleted succesfully!`,
-                        });
+                        setSnackbarInfo({ severity: "success", message: `Transaction ${transactionForm.description} deleted succesfully!` });
                     } else {
-                        setError({ hasErrors: true, message: rsp.errorMessage });
+                        setSnackbarInfo({ severity: "error", message: rsp.errorMessage });
                     }
                 })
-                .catch((e) => setError({ hasErrors: true, message: e }));
+                .catch((e) => setSnackbarInfo({ severity: "error", message: e }));
         }
     };
 
@@ -376,15 +361,6 @@ export default function TransactionAdmin() {
                     Save
                 </Button>
             </div>
-            <Snackbar
-                open={error.hasErrors}
-                autoHideDuration={6000}
-                onClose={() => handleSnackbarClose("error")}
-            >
-                <Alert onClose={() => handleSnackbarClose("error")} severity="error">
-                    {error.message}
-                </Alert>
-            </Snackbar>
         </div>
     );
 
@@ -449,23 +425,6 @@ export default function TransactionAdmin() {
             >
                 {confirmDeleteBody}
             </Modal>
-            <Snackbar
-                open={saveSuccess.success}
-                autoHideDuration={6000}
-                onClose={() => handleSnackbarClose("success")}
-            >
-                <Alert
-                    onClose={() => handleSnackbarClose("success")}
-                    severity="success"
-                >
-                    {saveSuccess.message}
-                </Alert>
-            </Snackbar>
-            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose("error")}>
-                <Alert onClose={() => handleSnackbarClose("error")} severity="error">
-                    { error.message }
-                </Alert>
-            </Snackbar>
         </div>
     );
 }

@@ -5,16 +5,14 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import { LoginData } from '../../common/objects/login';
 import { LoginService, SessionService } from "../../services";
-import Alert from '@material-ui/lab/Alert';
-import Snackbar from '@material-ui/core/Snackbar';
 import { LoginContext } from '../../common/context/LoginContext';
 import { Redirect, useHistory, Link } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
-import { SnackbarError } from '../../common/objects/SnackbarHelpers';
+import { SnackbarContext } from '../../common/context/SnackbarContext';
 
 export default function Login(): ReactElement {
     const [loginForm, setLoginForm] = useState<LoginData>({ userName: '', password: '' });
-    const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
+    const { setSnackbarInfo } = useContext(SnackbarContext);
     const {login, setLogin} = useContext(LoginContext);
     const history = useHistory();
 
@@ -33,17 +31,9 @@ export default function Login(): ReactElement {
             SessionService.setLogin(login);
             history.push("/dashboard");
         } else {
-            setError({ hasErrors: !status.success, message: status.errorMessage });
+            setSnackbarInfo({ severity: "error", message: status.errorMessage });
         }
     }
-
-    
-  const handleClose = (event?: React.SyntheticEvent, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setError({ ...error, hasErrors: false });
-  };
 
   if (login.isLogged) {
      return (
@@ -103,11 +93,6 @@ export default function Login(): ReactElement {
                     </Grid>
                 </Grid>
             </form>
-            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={handleClose}>
-                <Alert onClose={handleClose} severity="error">
-                    { error.message }
-                </Alert>
-            </Snackbar>
         </div>
     )
 

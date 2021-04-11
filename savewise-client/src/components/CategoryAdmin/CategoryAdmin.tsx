@@ -6,9 +6,6 @@ import Button from '@material-ui/core/Button';
 import styles from "./CategoryAdmin.module.scss";
 import Modal from '@material-ui/core/Modal';
 import TextField from '@material-ui/core/TextField';
-import Snackbar from '@material-ui/core/Snackbar';
-import Alert from '@material-ui/lab/Alert';
-import { SnackbarError, SnackbarSuccess } from '../../common/objects/SnackbarHelpers';
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -21,6 +18,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { Entity } from '../../common/objects/Entity';
+import { SnackbarContext } from '../../common/context/SnackbarContext';
 
 interface categoryForm {
   categoryName: string,
@@ -28,159 +26,150 @@ interface categoryForm {
 }
 
 export function CategoryAdmin() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
-  const [categoryForm, setCategoryForm] = useState<categoryForm>({ categoryName: '', categoryType: 0 });
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined);
-  const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
-  const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({ success: false });
-  const [loading, setLoading] = useState(true);
-  const [categoryTypesList, setCategoryTypesList] = useState<Entity[]>([]);
-  const {login} = useContext(LoginContext);
+    const {login} = useContext(LoginContext);
+    const { setSnackbarInfo } = useContext(SnackbarContext);
+
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [openModal, setOpenModal] = useState<boolean>(false);
+    const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
+    const [categoryForm, setCategoryForm] = useState<categoryForm>({ categoryName: '', categoryType: 0 });
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined);
+    const [loading, setLoading] = useState(true);
+    const [categoryTypesList, setCategoryTypesList] = useState<Entity[]>([]);
   
-  useEffect(() => {
-    const id: number = login.login?.id as number;
-    const categoriesOptions: GetCategoriesInput = {
-      includeAmounts: false,
-      startDate: '',
-      endDate: ''
-    }
-    CategoryService.getCategories(id, categoriesOptions).then(rsp => {
-      if (rsp.status.success) {
-        setCategories(rsp.categories);
-        setLoading(false);
-      } else {
-        console.log(`Error: ${rsp.status.errorMessage}`);
-      }
-    }).catch(e => console.log(`ERROR: ${e}`));
-    
-    CategoryService.getCategoryTypes().then(rsp => {
-      if (rsp.status.success) {
-        setCategoryTypesList(rsp.categoryTypes);
-      } else {
-        console.log(`ERROR: ${rsp.status.errorMessage}`);
-      }
-    }).catch(e => console.log(`ERROR: ${e}`));
-    return () => {
-      setCategories([]);
-    }
-  }, [login]);
-
-  const showCategories = (categories: Category[]) => {
-    return categories.map(category => {
-      return (
-        <div className={styles.categoryItem} key={category.id}>
-          <p className={styles.categoryName}>{ category.name }</p>
-          <div>
-            <IconButton size="small" onClick={() => handleToggleModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
-              <EditIcon />
-            </IconButton>
-            <IconButton size="small" onClick={() => handleToggleDeleteModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
-              <DeleteIcon />
-            </IconButton>
-          </div>
-        </div>
-        )
-    })
-  }
-
-  const handleToggleModal = (selectedCategoryId?: number, categoryForm?: categoryForm) => {
-    if (selectedCategoryId) {
-      setSelectedCategoryId(selectedCategoryId);
-      if (categoryForm) setCategoryForm(categoryForm);
-    } else {
-      setSelectedCategoryId(undefined);
-      setCategoryForm({ categoryName: '', categoryType: undefined });
-    }
-    setOpenModal(!openModal);
-  }
-
-  const handleToggleDeleteModal = (selectedCategoryId?: number, categoryForm?: categoryForm) => {
-    if (selectedCategoryId) {
-      setSelectedCategoryId(selectedCategoryId);
-      if (categoryForm) setCategoryForm(categoryForm);
-    } else {
-      setSelectedCategoryId(undefined);
-      setCategoryForm({ categoryName: '', categoryType: undefined });
-    }
-    setOpenConfirmDelete(!openConfirmDelete);
-  }
-
-  const handleNewCategoryName = (event: ChangeEvent<HTMLInputElement>) => {
-    setCategoryForm({...categoryForm, categoryName: event.currentTarget.value});
-  }
-
-  const handleTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setCategoryForm({...categoryForm, categoryType: event.target.value as number});
-  }
-
-  const handleSnackbarClose = (severity?: string) => {
-    if (severity === 'error') {
-      setError({ ...error, hasErrors: false });
-    }
-    else if (severity === 'success') {
-      setSaveSuccess({ ...saveSuccess, success: false });
-    }
-  };
-
-  const submitCategory = (categoryForm: categoryForm, categoryId?: number) => {
-    const category: Category = {
-      name: categoryForm.categoryName,
-      userId: login.login?.id,
-      id: categoryId,
-      categoryType: {
-        id: categoryForm.categoryType
-      }
-    }
-
-    if (!categoryId) {
-      CategoryService.saveCategory(category).then((rsp: CategoryResponse) => {
-        if (rsp.status.success) {
-          handleToggleModal();
-          setCategories([ ...categories, rsp.category ])
-          setSaveSuccess({ success: true, message: `Category ${rsp.category.name} saved succesfully!` });
-        } else {
-          setError({ hasErrors: true, message: rsp.status.errorMessage });
+    useEffect(() => {
+        const id: number = login.login?.id as number;
+        const categoriesOptions: GetCategoriesInput = {
+            includeAmounts: false,
+            startDate: '',
+            endDate: ''
         }
-      })
-    } else {
-      CategoryService.editCategory(category).then((rsp: CategoryResponse) => {
-        if (rsp.status.success) {
-          handleToggleModal();
-          setCategories(categories.map(cat => cat.id === category.id ? category : cat));
-          setSaveSuccess({ success: true, message: `Category ${rsp.category.name} edited succesfully!` });
-        } else {
-          setError({ hasErrors: true, message: rsp.status.errorMessage });
-        }
-      })
-    }
-    
-  }
+        CategoryService.getCategories(id, categoriesOptions).then(rsp => {
+            if (rsp.status.success) {
+                setCategories(rsp.categories);
+                setLoading(false);
+            } else {
+                console.log(`Error: ${rsp.status.errorMessage}`);
+            }
+        }).catch(e => console.log(`ERROR: ${e}`));
 
-  const handleDeleteCategory = (categoryId?: number) => {
-    if (categoryId) {
-      CategoryService.deleteCategory(categoryId).then((rsp: Status) => {
-        if (rsp.success) {
-          handleToggleDeleteModal();
-          setCategories(categories.filter(cat => cat.id !== categoryId));
-          setSaveSuccess({ success: true, message: `Category ${categoryForm.categoryName} deleted succesfully!` });
-        } else {
-          setError({ hasErrors: true, message: rsp.errorMessage });
+        CategoryService.getCategoryTypes().then(rsp => {
+            if (rsp.status.success) {
+                setCategoryTypesList(rsp.categoryTypes);
+            } else {
+                console.log(`ERROR: ${rsp.status.errorMessage}`);
+            }
+        }).catch(e => console.log(`ERROR: ${e}`));
+        return () => {
+            setCategories([]);
         }
-      })
-    }
-  }
+    }, [login]);
 
-  const renderCategoryTypes = (categoryTypesList: Entity[]) => {
-    if (categoryTypesList.length) {
-      return categoryTypesList.map(type => {
-        return (
-          <MenuItem key={type.id} value={type.id}>{type.name}</MenuItem>
-        );
-      })
+    const showCategories = (categories: Category[]) => {
+        return categories.map(category => {
+            return (
+                <div className={styles.categoryItem} key={category.id}>
+                    <p className={styles.categoryName}>{category.name}</p>
+                    <div>
+                        <IconButton size="small" onClick={() => handleToggleModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton size="small" onClick={() => handleToggleDeleteModal(category.id, { categoryName: category.name, categoryType: category.categoryType.id })}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </div>
+                </div>
+            )
+        })
     }
-  }
+
+    const handleToggleModal = (selectedCategoryId?: number, categoryForm?: categoryForm) => {
+        if (selectedCategoryId) {
+            setSelectedCategoryId(selectedCategoryId);
+            if (categoryForm) setCategoryForm(categoryForm);
+        } else {
+            setSelectedCategoryId(undefined);
+            setCategoryForm({ categoryName: '', categoryType: undefined });
+        }
+        setOpenModal(!openModal);
+    }
+
+    const handleToggleDeleteModal = (selectedCategoryId?: number, categoryForm?: categoryForm) => {
+        if (selectedCategoryId) {
+            setSelectedCategoryId(selectedCategoryId);
+            if (categoryForm) setCategoryForm(categoryForm);
+        } else {
+            setSelectedCategoryId(undefined);
+            setCategoryForm({ categoryName: '', categoryType: undefined });
+        }
+        setOpenConfirmDelete(!openConfirmDelete);
+    }
+
+    const handleNewCategoryName = (event: ChangeEvent<HTMLInputElement>) => {
+        setCategoryForm({ ...categoryForm, categoryName: event.currentTarget.value });
+    }
+
+    const handleTypeChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setCategoryForm({ ...categoryForm, categoryType: event.target.value as number });
+    }
+
+    const submitCategory = (categoryForm: categoryForm, categoryId?: number) => {
+        const category: Category = {
+            name: categoryForm.categoryName,
+            userId: login.login?.id,
+            id: categoryId,
+            categoryType: {
+                id: categoryForm.categoryType
+            }
+        }
+
+        if (!categoryId) {
+            CategoryService.saveCategory(category).then((rsp: CategoryResponse) => {
+                if (rsp.status.success) {
+                    handleToggleModal();
+                    setCategories([...categories, rsp.category])
+                    setSnackbarInfo({ severity: "success", message: `Category ${rsp.category.name} saved succesfully!` });
+                } else {
+                    setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
+                }
+            })
+        } else {
+            CategoryService.editCategory(category).then((rsp: CategoryResponse) => {
+                if (rsp.status.success) {
+                    handleToggleModal();
+                    setCategories(categories.map(cat => cat.id === category.id ? category : cat));
+                    setSnackbarInfo({ severity: "success", message: `Category ${rsp.category.name} edited succesfully!` });
+                } else {
+                    setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
+                }
+            })
+        }
+
+    }
+
+    const handleDeleteCategory = (categoryId?: number) => {
+        if (categoryId) {
+            CategoryService.deleteCategory(categoryId).then((rsp: Status) => {
+                if (rsp.success) {
+                    handleToggleDeleteModal();
+                    setCategories(categories.filter(cat => cat.id !== categoryId));
+                    setSnackbarInfo({ severity: "success", message: `Category ${categoryForm.categoryName} deleted succesfully!` });
+                } else {
+                    setSnackbarInfo({ severity: "error", message: rsp.errorMessage });
+                }
+            })
+        }
+    }
+
+    const renderCategoryTypes = (categoryTypesList: Entity[]) => {
+        if (categoryTypesList.length) {
+            return categoryTypesList.map(type => {
+                return (
+                    <MenuItem key={type.id} value={type.id}>{type.name}</MenuItem>
+                );
+            })
+        }
+    }
 
   const modalBody = (
     <div className={styles.modalBg}>
@@ -260,16 +249,6 @@ export function CategoryAdmin() {
             >
                 {confirmDeleteBody}
         </Modal>
-        <Snackbar open={saveSuccess.success} autoHideDuration={6000} onClose={() => handleSnackbarClose('success')}>
-            <Alert onClose={() => handleSnackbarClose('success')} severity="success">
-                { saveSuccess.message }
-            </Alert>
-        </Snackbar>
-        <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose("error")}>
-            <Alert onClose={() => handleSnackbarClose("error")} severity="error">
-                { error.message }
-            </Alert>
-        </Snackbar>
     </div>
   );
 }

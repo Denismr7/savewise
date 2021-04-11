@@ -6,13 +6,16 @@ import reportWebVitals from './reportWebVitals';
 import { LoginProvider } from './common/context/LoginContext';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import { SnackbarProvider } from './common/context/SnackbarContext';
 
 ReactDOM.render(
   <React.StrictMode>
     <LoginProvider>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <App />
-      </MuiPickersUtilsProvider>
+        <SnackbarProvider>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <App />
+            </MuiPickersUtilsProvider>
+        </SnackbarProvider>
     </LoginProvider>
   </React.StrictMode>,
   document.getElementById('root')

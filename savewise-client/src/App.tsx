@@ -16,6 +16,7 @@ import { SessionService } from './services';
 import { User } from './common/objects/user';
 import TransactionAdmin from './components/TransactionAdmin/TransactionAdmin';
 import UserAdmin from './components/UserAdmin/UserAdmin';
+import SnackbarComponent from './components/Snackbar/SnackbarComponent';
 
 function App() {
   const {login, setLogin} = useContext(LoginContext);
@@ -46,6 +47,7 @@ function App() {
             <PrivateRoute component={TransactionAdmin} path="/transactions" exact conditionToRender={login.isLogged} />
             <Redirect from="/" to="/login" exact/>
           </Switch>
+          <SnackbarComponent />
         </div>
       </Router>
   );

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, ChangeEvent } from 'react';
+import React, { useContext, useEffect, useState, ChangeEvent, useCallback } from 'react';
 import Grid from '@material-ui/core/Grid';
 import styles from "./Dashboard.module.scss";
 import { Typography } from '@material-ui/core';
@@ -8,9 +8,6 @@ import { LoginContext } from '../../common/context/LoginContext';
 import { CategoryService, TransactionService, UtilService } from '../../services/';
 import { CategoriesResponse, Category } from '../../common/objects/categories';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { SnackbarError, SnackbarSuccess } from '../../common/objects/SnackbarHelpers';
-import Alert from '@material-ui/lab/Alert';
-import Snackbar from '@material-ui/core/Snackbar';
 import { GetCategoriesInput } from '../../services/category-service';
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
 import { Transaction } from '../../common/objects/transactions';
@@ -25,14 +22,15 @@ import { KeyboardDatePicker } from '@material-ui/pickers';
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
+import { SnackbarContext } from '../../common/context/SnackbarContext';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
+    const { setSnackbarInfo } = useContext(SnackbarContext);
+
     const [loading, setLoading] = useState<boolean>(true);
     const [categories, setCategories] = useState<Category[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
-    const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({success: false,});
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [transactionForm, setTransactionForm] = useState<TransactionForm>({
         categoryId: undefined,
@@ -42,6 +40,54 @@ export default function Dashboard() {
     });
     const [actualMonth, setActualMonth] = useState<string>('');
 
+    const getCategories = useCallback(
+        (userId?: number) => {
+            setLoading(true);
+            const categoriesOptions: GetCategoriesInput = {
+                includeAmounts: true,
+                startDate: UtilService.firstDayDate(),
+                endDate: UtilService.today()
+            }
+            if (userId) {
+                CategoryService.getCategories(userId, categoriesOptions).then((rsp: CategoriesResponse) => {
+                    if (rsp.status.success) {
+                        const sortedByAmount = UtilService.sortCategoriesByAmount(rsp.categories);
+                        setCategories(sortedByAmount);
+                        setLoading(false);
+                    } else {
+                        setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
+                        setLoading(false);
+                    }
+                }).catch(e => {
+                    setSnackbarInfo({ severity: "error", message: e });
+                    setLoading(false);
+                })
+            }
+        },
+        [setSnackbarInfo],
+    );
+
+    const getTransactions = useCallback(
+        (userId?: number) => {
+            setLoading(true);
+            if (userId) {
+                TransactionService.GetTransactions(userId).then(rsp => {
+                    if (rsp.status.success) {
+                        setTransactions(rsp.transactions);
+                        setLoading(false);
+                    } else {
+                        setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
+                        setLoading(false);
+                    }
+                }).catch(e => {
+                    setSnackbarInfo({ severity: "error", message: e });
+                    setLoading(false);
+                })
+            }
+        },
+        [setSnackbarInfo],
+    );
+
     useEffect(() => {
         const userId = login.login?.id;
         setActualMonth(UtilService.currentMonth());
@@ -50,49 +96,7 @@ export default function Dashboard() {
         return () => {
             
         }
-    }, [login]);
-
-    const getCategories = (userId?: number) => {
-        setLoading(true);
-        const categoriesOptions: GetCategoriesInput = {
-            includeAmounts: true,
-            startDate: UtilService.firstDayDate(),
-            endDate: UtilService.today()
-          }
-        if (userId) {
-            CategoryService.getCategories(userId, categoriesOptions).then((rsp: CategoriesResponse) => {
-                if (rsp.status.success) {
-                    const sortedByAmount = UtilService.sortCategoriesByAmount(rsp.categories);
-                    setCategories(sortedByAmount);
-                    setLoading(false);
-                } else {
-                    setError({ hasErrors: true, message: rsp.status.errorMessage });
-                    setLoading(false);
-                }
-            }).catch(e => {
-                setError({ hasErrors: true, message: e });
-                setLoading(false);
-            })
-        }
-    }
-
-    const getTransactions = (userId?: number) => {
-        setLoading(true);
-        if (userId) {
-            TransactionService.GetTransactions(userId).then(rsp => {
-                if (rsp.status.success) {
-                    setTransactions(rsp.transactions);
-                    setLoading(false);
-                } else {
-                    setError({ hasErrors: true, message: rsp.status.errorMessage });
-                    setLoading(false);
-                }
-            }).catch(e => {
-                setError({ hasErrors: true, message: e });
-                setLoading(false);
-            })
-        }
-    }
+    }, [login, getCategories, getTransactions]);
     
     const renderExpenses = (categories: Category[]) => {
         if (categories.length) {
@@ -129,9 +133,6 @@ export default function Dashboard() {
         } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No transactions to show</Typography>);
     }
 
-    const handleCloseErrorModal = () => {
-        setError({ hasErrors: false });
-    }
     const handleToggleModal = (transaction?: Transaction) => {
         if (transaction) {
             setTransactionForm({
@@ -169,14 +170,6 @@ export default function Dashboard() {
         setTransactionForm({...transactionForm, date: date ? UtilService.formatDate(date) : ''});
     };
 
-    const handleSnackbarClose = (severity?: string) => {
-        if (severity === "error") {
-            setError({ ...error, hasErrors: false });
-        } else if (severity === "success") {
-            setSaveSuccess({ ...saveSuccess, success: false });
-        }
-    };
-
     const renderUserCategories = (userCategories: Category[]) => {
         if (userCategories.length) {
           return userCategories.map(category => {
@@ -206,9 +199,9 @@ export default function Dashboard() {
                 }
                 getCategories(login.login?.id);
             } else {
-                setError({ hasErrors: true, message: rsp.status.errorMessage })
+                setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
             }
-        }).catch(e => setError({ hasErrors: true, message: e }));
+        }).catch(e => setSnackbarInfo({ severity: "error", message: e }));
     }
 
     const modalBody = (
@@ -265,11 +258,6 @@ export default function Dashboard() {
                     Save
                 </Button>
             </div>
-            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose('error')}>
-                <Alert onClose={() => handleSnackbarClose('error')} severity="error">
-                    { error.message }
-                </Alert>
-            </Snackbar>
         </div>
     );
 
@@ -414,23 +402,6 @@ export default function Dashboard() {
                 {modalBody}
             </Modal>
             </Grid>
-            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={handleCloseErrorModal}>
-                <Alert onClose={handleCloseErrorModal} severity="error">
-                    { error.message }
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                open={saveSuccess.success}
-                autoHideDuration={6000}
-                onClose={() => handleSnackbarClose("success")}
-            >
-                <Alert
-                    onClose={() => handleSnackbarClose("success")}
-                    severity="success"
-                >
-                    {saveSuccess.message}
-                </Alert>
-            </Snackbar>
         </Grid>
     )
 }

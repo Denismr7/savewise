@@ -7,9 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import { LoginContext } from '../../common/context/LoginContext';
 import { UserService } from '../../services';
 import { User } from '../../common/objects/user';
-import Alert from '@material-ui/lab/Alert';
-import Snackbar from '@material-ui/core/Snackbar';
-import { SnackbarError, SnackbarSuccess } from '../../common/objects/SnackbarHelpers';
+import { SnackbarContext } from '../../common/context/SnackbarContext';
 
 interface IUserForm {
     name?: string;
@@ -22,13 +20,12 @@ interface IUserForm {
 export default function UserAdmin() {
     // Context and routing
     const { login, setLogin } = useContext(LoginContext);
+    const { setSnackbarInfo } = useContext(SnackbarContext);
     const history = useHistory();
 
     // States
     const [userForm, setUserForm] = useState<IUserForm>({});
     const [editMode, setEditMode] = useState<boolean>(false);
-    const [error, setError] = React.useState<SnackbarError>({ hasErrors: false });
-    const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({ success: false });
 
     useEffect(() => {
         if (login.isLogged) {
@@ -52,15 +49,15 @@ export default function UserAdmin() {
 
     const handleSubmit = () => {
         if ((userForm.password || userForm.rptPassword) && userForm.password !== userForm.rptPassword) {
-            setError({ hasErrors: true, message: 'Passwords does not match' });
+            setSnackbarInfo({ severity: "error", message: 'Passwords does not match' });
             return;
         }
         if (!editMode && !userForm.login) {
-            setError({ hasErrors: true, message: 'Login is required' });
+            setSnackbarInfo({ severity: "error", message: 'Login is required' });
             return;
         }
         if (!editMode && ((!userForm.password || !userForm.rptPassword) || (userForm.password !== userForm.rptPassword))) {
-            setError({ hasErrors: true, message: 'Password is required' });
+            setSnackbarInfo({ severity: "error", message: 'Password is required' });
             return;
         }
 
@@ -75,26 +72,15 @@ export default function UserAdmin() {
         editMode ? editUser(user) : createUser(user);
     }
 
-    const handleSnackbarClose = (severity?: string) => {
-        if (severity === "error") {
-            setError({ ...error, hasErrors: false });
-        } else if (severity === "success") {
-            setSaveSuccess({ ...saveSuccess, success: false });
-        }
-    };
-
     // Methods
     const editUser = async (user: User) => {
         try {
             const { status, user: editedUser } = await UserService.editUser({ user });
             if (status.success) {
                 setLogin({...login, login: editedUser});
-                setSaveSuccess({
-                    success: true,
-                    message: `User edited succesfully!`,
-                });
+                setSnackbarInfo({ severity: "success", message: 'User edited succesfully!' });
             } else {
-                setError({ hasErrors: true, message: status.errorMessage });
+                setSnackbarInfo({ severity: "error", message: status.errorMessage });
             }
         } catch (error) {
             console.error(error);
@@ -106,12 +92,9 @@ export default function UserAdmin() {
             const { status } = await UserService.createUser({ user });
             if (status.success) {
                 history.push("/login");
-                setSaveSuccess({
-                    success: true,
-                    message: `User created successfully! You can login now`,
-                });
+                setSnackbarInfo({ severity: "success", message: 'User created successfully! You can login now' });
             } else {
-                setError({ hasErrors: true, message: status.errorMessage });
+                setSnackbarInfo({ severity: "error", message: status.errorMessage });
             }
         } catch (error) {
             console.error(error);
@@ -196,16 +179,6 @@ export default function UserAdmin() {
                     Save
                 </Button>
             </div>
-            <Snackbar open={saveSuccess.success} autoHideDuration={6000} onClose={() => handleSnackbarClose('success')}>
-                <Alert onClose={() => handleSnackbarClose('success')} severity="success">
-                    { saveSuccess.message }
-                </Alert>
-            </Snackbar>
-            <Snackbar open={error.hasErrors} autoHideDuration={6000} onClose={() => handleSnackbarClose("error")}>
-                <Alert onClose={() => handleSnackbarClose("error")} severity="error">
-                    { error.message }
-                </Alert>
-            </Snackbar>
         </div>
     )
 }
