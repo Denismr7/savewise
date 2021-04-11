@@ -38,10 +38,12 @@ function App() {
                 <Login />
               </div>
             </Route>
+            <Route path="/user" exact>
+                <UserAdmin />
+            </Route>
             <PrivateRoute component={Dashboard} path="/dashboard" exact conditionToRender={login.isLogged} />
             <PrivateRoute component={CategoryAdmin} path="/categories" exact conditionToRender={login.isLogged} />
             <PrivateRoute component={TransactionAdmin} path="/transactions" exact conditionToRender={login.isLogged} />
-            <PrivateRoute component={UserAdmin} path="/user" exact conditionToRender={login.isLogged} />
             <Redirect from="/" to="/login" exact/>
           </Switch>
         </div>

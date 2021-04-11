@@ -8,7 +8,7 @@ import { LoginService, SessionService } from "../../services";
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 import { LoginContext } from '../../common/context/LoginContext';
-import { Redirect, useHistory } from 'react-router-dom';
+import { Redirect, useHistory, Link } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 import { SnackbarError } from '../../common/objects/SnackbarHelpers';
 
@@ -93,6 +93,13 @@ export default function Login(): ReactElement {
                         <Button variant="contained" color="primary" type="submit">
                             Login
                         </Button>
+                    </Grid>
+                    <Grid item md={12}>
+                        <Link to="/user">
+                            <Button variant="outlined" color="default" type="button">
+                                Create account
+                            </Button>
+                        </Link>
                     </Grid>
                 </Grid>
             </form>

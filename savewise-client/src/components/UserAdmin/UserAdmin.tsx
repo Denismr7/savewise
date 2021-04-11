@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import Button from '@material-ui/core/Button';
 import styles from "./UserAdmin.module.scss";
@@ -16,11 +16,13 @@ interface IUserForm {
     lastName?: string;
     password?: string;
     rptPassword?: string;
+    login?: string;
 }
 
 export default function UserAdmin() {
-    // Context
+    // Context and routing
     const { login, setLogin } = useContext(LoginContext);
+    const history = useHistory();
 
     // States
     const [userForm, setUserForm] = useState<IUserForm>({});
@@ -29,7 +31,7 @@ export default function UserAdmin() {
     const [saveSuccess, setSaveSuccess] = React.useState<SnackbarSuccess>({ success: false });
 
     useEffect(() => {
-        if (login) {
+        if (login.isLogged) {
             setUserForm({
                 name: login.login?.name,
                 lastName: login.login?.lastName
@@ -47,15 +49,32 @@ export default function UserAdmin() {
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setUserForm({...userForm, [event.currentTarget.name]: event.currentTarget.value});
     }
-    const handleSubmit = () => {
-        // TODO: Password validation
 
-        if (editMode) {
-            editUser();
-        } else {
-            // TODO
+    const handleSubmit = () => {
+        if ((userForm.password || userForm.rptPassword) && userForm.password !== userForm.rptPassword) {
+            setError({ hasErrors: true, message: 'Passwords does not match' });
+            return;
         }
+        if (!editMode && !userForm.login) {
+            setError({ hasErrors: true, message: 'Login is required' });
+            return;
+        }
+        if (!editMode && ((!userForm.password || !userForm.rptPassword) || (userForm.password !== userForm.rptPassword))) {
+            setError({ hasErrors: true, message: 'Password is required' });
+            return;
+        }
+
+        const user: User = {
+            name: userForm.name ? userForm.name : '',
+            lastName: userForm.lastName ? userForm.lastName : '',
+            password: userForm.password,
+            login: userForm.login as string,
+            id: login.login?.id as number
+        }
+
+        editMode ? editUser(user) : createUser(user);
     }
+
     const handleSnackbarClose = (severity?: string) => {
         if (severity === "error") {
             setError({ ...error, hasErrors: false });
@@ -65,14 +84,7 @@ export default function UserAdmin() {
     };
 
     // Methods
-    const editUser = async () => {
-        const user: User = {
-            name: userForm.name ? userForm.name : '',
-            lastName: userForm.lastName ? userForm.lastName : '',
-            password: userForm.password,
-            login: login.login?.login as string,
-            id: login.login?.id as number
-        }
+    const editUser = async (user: User) => {
         try {
             const { status, user: editedUser } = await UserService.editUser({ user });
             if (status.success) {
@@ -89,24 +101,59 @@ export default function UserAdmin() {
         }
     }
 
+    const createUser = async (user: User) => {
+        try {
+            const { status } = await UserService.createUser({ user });
+            if (status.success) {
+                history.push("/login");
+                setSaveSuccess({
+                    success: true,
+                    message: `User created successfully! You can login now`,
+                });
+            } else {
+                setError({ hasErrors: true, message: status.errorMessage });
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return (
         <div className="componentBg">
             <div className="componentHeader">
                 <Link to="/dashboard" style={{ textDecoration: 'none' }}>
                     <ArrowBackIosIcon />
                 </Link>
-                <h1 className={`${styles.marginAuto} componentHeaderTitle`}>Your profile</h1>
+                <h1 className={`${styles.marginAuto} componentHeaderTitle`}>
+                    { editMode ? 'Your account' : 'Create account' }
+                </h1>
             </div>
             <div className={styles.userForm}>
                 <div className={styles.formRow}>
+                    { !editMode &&
+                        <TextField 
+                        id="filled-basic"
+                        onChange={handleInputChange} 
+                        label="Login" 
+                        variant="outlined" 
+                        name="login"
+                        value={userForm.login ? userForm.login : ''}
+                        inputProps={{ maxLength: 15 }}
+                        style={{ marginRight: '10px' }}
+                        fullWidth
+                        />
+                    }
                     <TextField 
                         id="filled-basic"
                         onChange={handleInputChange} 
                         label="Name" 
                         variant="outlined" 
                         name="name"
-                        style={{ width: '45%' }}
-                        value={userForm.name}
+                        value={userForm.name ? userForm.name : ''}
+                        inputProps={{ maxLength: 20 }}
+                        style={{ marginRight: '10px' }}
+                        required
+                        fullWidth
                         />
                     <TextField 
                         id="filled-basic"
@@ -114,8 +161,10 @@ export default function UserAdmin() {
                         label="Last Name" 
                         variant="outlined" 
                         name="lastName"
-                        style={{ width: '45%' }}
-                        value={userForm.lastName}
+                        value={userForm.lastName ? userForm.lastName : ''}
+                        inputProps={{ maxLength: 20 }}
+                        required
+                        fullWidth
                         />
                 </div>
                 <div className={styles.formRow}>
@@ -126,18 +175,19 @@ export default function UserAdmin() {
                         variant="outlined" 
                         name="password"
                         type="password"
-                        style={{ width: '45%' }}
-                        value={userForm.password}
+                        style={{ marginRight: '10px' }}
+                        fullWidth
+                        value={userForm.password ? userForm.password : ''}
                         />
                     <TextField 
                         id="filled-basic"
                         onChange={handleInputChange} 
-                        label="Repeat password" 
+                        label="Repeat password"
                         variant="outlined" 
                         name="rptPassword"
                         type="password"
-                        style={{ width: '45%' }}
-                        value={userForm.rptPassword}
+                        fullWidth
+                        value={userForm.rptPassword ? userForm.rptPassword : ''}
                         />
                 </div>
             </div>
