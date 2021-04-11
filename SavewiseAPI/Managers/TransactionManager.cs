@@ -83,7 +83,7 @@ namespace Savewise.Managers
             }
             List<Transaction> transactionsModel = context.Transactions.AsNoTracking()
                                                     .Where(t => t.tUserId == userId)
-                                                    .OrderBy(t => t.tDate)
+                                                    .OrderByDescending(t => t.tDate)
                                                     .Take(limit)
                                                     .ToList();
             List<OTransaction> transactions = new List<OTransaction>();

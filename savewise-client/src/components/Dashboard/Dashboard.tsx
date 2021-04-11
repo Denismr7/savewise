@@ -73,7 +73,7 @@ export default function Dashboard() {
             if (userId) {
                 TransactionService.GetTransactions(userId).then(rsp => {
                     if (rsp.status.success) {
-                        setTransactions(rsp.transactions);
+                        setTransactions( UtilService.sortTransactionByDate(rsp.transactions));
                         setLoading(false);
                     } else {
                         setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });

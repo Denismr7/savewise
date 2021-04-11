@@ -1,5 +1,6 @@
 import moment from "moment";
 import { Category } from "../common/objects/categories";
+import { Transaction } from "../common/objects/transactions";
 
 export function today(): string {
     return moment().format("DD/MM/YYYY");
@@ -44,6 +45,10 @@ export function sortCategoriesByAmount(categories: Category[]): Category[] {
             return 0
         }
     });
+}
+
+export function sortTransactionByDate(transactions: Transaction[]): Transaction[] {
+    return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
 export function currentMonth(): string {

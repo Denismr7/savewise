@@ -263,13 +263,14 @@ export default function TransactionAdmin() {
                     handleToggleModal();
                     if (transactions.find((t) => t.id === rsp.transaction.id)) {
                         setTransactions(
-                            transactions.map((t) =>
+                            UtilService.sortTransactionByDate(transactions.map((t) =>
                                 t.id === rsp.transaction.id ? rsp.transaction : t
-                            )
+                            ))
                         );
                     } else {
-                        setTransactions([...transactions, rsp.transaction]);
+                        setTransactions( UtilService.sortTransactionByDate([...transactions, rsp.transaction]));
                     }
+                    setSnackbarInfo({ severity: "success", message: "Transaction saved successfully!" })
                 } else {
                     setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
                 }
@@ -284,7 +285,7 @@ export default function TransactionAdmin() {
                     if (rsp.success) {
                         handleToggleDeleteModal();
                         setTransactions(
-                            transactions.filter((t) => t.id !== transactionForm.id)
+                            UtilService.sortTransactionByDate(transactions.filter((t) => t.id !== transactionForm.id))
                         );
                         setSnackbarInfo({ severity: "success", message: `Transaction ${transactionForm.description} deleted succesfully!` });
                     } else {
