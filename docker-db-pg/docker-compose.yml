@@ -11,4 +11,4 @@ services:
     volumes:
       - ${PWD}/pg-scripts:/docker-entrypoint-initdb.d/
     ports:
-      - 5432:5432
+      - 5500:5432
