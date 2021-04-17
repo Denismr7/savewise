@@ -1,13 +1,18 @@
 import moment from "moment";
 import { Category } from "../common/objects/categories";
+import { constants } from "../common/objects/constants";
 import { Transaction } from "../common/objects/transactions";
 
 export function today(): string {
-    return moment().format("DD/MM/YYYY");
+    return moment().format(constants.dateFormats.date);
 }
 
 export function tomorrow(): string {
-    return moment().add(1, "day").format("DD/MM/YYYY");
+    return moment().add(1, "day").format(constants.dateFormats.date);
+}
+
+export function toDate(dateAsString: string): Date {
+    return moment(dateAsString, constants.dateFormats.fullDate).toDate();
 }
 
 export function formatStringDatePicker(date: string): string {
@@ -23,7 +28,7 @@ export function formatDateString(string: string): string {
 }
 
 export function formatDate(date: Date): string {
-    return moment(date).format("DD/MM/YYYY");
+    return moment(date).format(constants.dateFormats.date);
 }
 
 export function firstDayDate(): string {
@@ -48,7 +53,7 @@ export function sortCategoriesByAmount(categories: Category[]): Category[] {
 }
 
 export function sortTransactionByDate(transactions: Transaction[]): Transaction[] {
-    return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    return transactions.sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime());
 }
 
 export function currentMonth(): string {

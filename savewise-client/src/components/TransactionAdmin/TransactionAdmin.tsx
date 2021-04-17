@@ -261,15 +261,14 @@ export default function TransactionAdmin() {
             .then((rsp) => {
                 if (rsp.status.success) {
                     handleToggleModal();
+                    let updatedTransactions: Transaction[];
                     if (transactions.find((t) => t.id === rsp.transaction.id)) {
-                        setTransactions(
-                            UtilService.sortTransactionByDate(transactions.map((t) =>
-                                t.id === rsp.transaction.id ? rsp.transaction : t
-                            ))
-                        );
+                        updatedTransactions = UtilService.sortTransactionByDate(transactions.map((t) =>t.id === rsp.transaction.id ? rsp.transaction : t))
                     } else {
-                        setTransactions( UtilService.sortTransactionByDate([...transactions, rsp.transaction]));
+                        updatedTransactions = [...transactions, rsp.transaction];
                     }
+                    const sortedTransactions = UtilService.sortTransactionByDate(updatedTransactions);
+                    setTransactions(sortedTransactions);
                     setSnackbarInfo({ severity: "success", message: "Transaction saved successfully!" })
                 } else {
                     setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });

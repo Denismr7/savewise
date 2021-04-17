@@ -140,9 +140,8 @@ namespace Savewise.Managers
                 context.Transactions.Add(model);
             }
             context.SaveChanges();
-            if (!transaction.id.HasValue) transaction.id = model.tId;
 
-            return transaction;
+            return convert(model);
         }
 
         public bool delete(int transactionId)
