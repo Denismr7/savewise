@@ -23,6 +23,7 @@ import IconButton from '@material-ui/core/IconButton';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
+import { constants } from '../../common/objects/constants';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -115,21 +116,29 @@ export default function Dashboard() {
         } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No categories to show</Typography>);
     };
 
-    const renderTransactions = (transactions: Transaction[]) =>  {
+    const renderTransactions = (transactions: Transaction[]) => {
         if (transactions.length) {
             const sortedByDate = transactions.sort((a, b) => Number(b.id) - Number(a.id));
-            return sortedByDate.map(t => (
-                <Grid item
-                container
-                direction="row"
-                justify="space-between"
-                spacing={0}
-                key={t.id}
-                >
-                    <Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{ t.description }</Typography>
-                    <Typography variant="h6" component="h2" style={{ display: 'inline', marginRight: '15px' }}>{ t.amount ? t.amount : 0 } €</Typography>
-                </Grid>
-            ))
+            return sortedByDate.map(t => {
+                const isIncome = t.category.categoryType?.id === CategoryTypesId.Incomes ? true : false; 
+                const symbol: string = isIncome ? "+" : "-";
+                const color = isIncome ? 'incomeGreenColor' : 'regularColor';
+                return (
+                    <Grid item
+                        container
+                        direction="row"
+                        justify="space-between"
+                        spacing={0}
+                        key={t.id}
+                    >
+                        <Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{t.description}</Typography>
+                        <Typography variant="h6" component="h2" style={{ display: 'inline', marginRight: '15px' }} className={color}>
+                            { symbol } { t.amount } { constants.currency }
+                        </Typography>
+                    </Grid>
+                )
+            }
+            )
         } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No transactions to show</Typography>);
     }
 
