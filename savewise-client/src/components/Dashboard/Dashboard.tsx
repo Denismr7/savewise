@@ -24,6 +24,8 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
 import { constants } from '../../common/objects/constants';
+import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
+import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -39,15 +41,17 @@ export default function Dashboard() {
         date: UtilService.today(),
         description: "",
     });
-    const [actualMonth, setActualMonth] = useState<string>('');
+    const [currentMonth, setCurrentMonth] = useState<string>('');
+    const [selectedMonthNumber, setSelectedMonthNumber] = useState<number>(new Date().getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
     const getCategories = useCallback(
         (userId?: number) => {
             setLoading(true);
             const categoriesOptions: GetCategoriesInput = {
                 includeAmounts: true,
-                startDate: UtilService.firstDayDate(),
-                endDate: UtilService.today()
+                startDate: UtilService.firstDayDate(selectedMonthNumber, selectedYear),
+                endDate: UtilService.lastDayMonthDate(selectedMonthNumber, selectedYear)
             }
             if (userId) {
                 CategoryService.getCategories(userId, categoriesOptions).then((rsp: CategoriesResponse) => {
@@ -65,14 +69,16 @@ export default function Dashboard() {
                 })
             }
         },
-        [setSnackbarInfo],
+        [setSnackbarInfo, selectedMonthNumber, selectedYear],
     );
 
     const getTransactions = useCallback(
         (userId?: number) => {
             setLoading(true);
             if (userId) {
-                TransactionService.GetTransactions(userId, undefined, undefined, 10).then(rsp => {
+                const fromDate = UtilService.firstDayDate(selectedMonthNumber, selectedYear);
+                const toDate = UtilService.lastDayMonthDate(selectedMonthNumber, selectedYear)
+                TransactionService.GetTransactions(userId, fromDate, toDate, 10).then(rsp => {
                     if (rsp.status.success) {
                         setTransactions( UtilService.sortTransactionByDate(rsp.transactions));
                         setLoading(false);
@@ -86,18 +92,18 @@ export default function Dashboard() {
                 })
             }
         },
-        [setSnackbarInfo],
+        [setSnackbarInfo, selectedMonthNumber, selectedYear],
     );
 
     useEffect(() => {
         const userId = login.login?.id;
-        setActualMonth(UtilService.currentMonth());
+        setCurrentMonth(UtilService.currentMonth(selectedMonthNumber));
         getCategories(userId);
         getTransactions(userId);
         return () => {
             
         }
-    }, [login, getCategories, getTransactions]);
+    }, [login, getCategories, getTransactions, selectedMonthNumber]);
     
     const renderExpenses = (categories: Category[]) => {
         if (categories.length) {
@@ -270,12 +276,47 @@ export default function Dashboard() {
         </div>
     );
 
-    const renderMonth = () => (
-        <>
-            <Typography variant="h3" component="h2" style={{ marginBottom: '5%' }}>
-                    { actualMonth }
+    const navigateMonth = (direction: "b" | "f") => {
+        let month = selectedMonthNumber;
+        let year = selectedYear;
+        switch (direction) {
+            case "b":
+                if (month > 1) {
+                    month = month - 1;
+                } else {
+                    year = year - 1;
+                    month = 12;
+                }
+                break;
+            case "f":
+                if (month < 12) {
+                    month = month + 1;
+                } else {
+                    year = year + 1;
+                    month = 1;
+                }
+                break;
+            default:
+                break;
+        }
+        if (year !== selectedYear) {
+            setSelectedYear(year);
+        }
+        setSelectedMonthNumber(month);
+    }
+
+    const renderMonthController = () => (
+        <div className={styles.monthController}>
+            <IconButton aria-label="backMonth" component="span" onClick={() => navigateMonth("b")}>
+                <ArrowBackIosOutlinedIcon />
+            </IconButton>
+            <Typography variant="h3" component="h2" className={styles.currentMonthName}>
+                {currentMonth}, {selectedYear}
             </Typography>
-        </>
+            <IconButton aria-label="forwardMonth" component="span" onClick={() => navigateMonth("f")}>
+                <ArrowForwardIosOutlinedIcon />
+            </IconButton>
+        </div>
     )
 
     return (
@@ -296,7 +337,7 @@ export default function Dashboard() {
                 </Typography>
             </Grid>
             <Grid item>
-                { renderMonth() }
+                { renderMonthController() }
             </Grid>
             <Grid container
             direction="row"

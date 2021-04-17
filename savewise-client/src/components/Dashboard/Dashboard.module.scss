@@ -44,3 +44,13 @@
     animation: rotate 2s;
     animation-iteration-count: infinite;
 }
+
+.monthController {
+    display: flex;
+    margin-bottom: 5%;
+}
+
+.currentMonthName {
+    width: 500px;
+    text-align: center;
+}

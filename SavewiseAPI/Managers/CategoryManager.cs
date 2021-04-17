@@ -78,7 +78,7 @@ namespace Savewise.Managers
                 result = result + transaction.amount;
             }
 
-            return result;
+            return Math.Round(result, 2);
         }
 
         public OCategory getById(int id)

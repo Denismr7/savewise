@@ -11,6 +11,12 @@ export function tomorrow(): string {
     return moment().add(1, "day").format(constants.dateFormats.date);
 }
 
+export function lastDayMonthDate(month: number, year: number): string {
+    const d = new Date(year, month, 0);
+    const asString = formatDate(d);
+    return asString;
+}
+
 export function toDate(dateAsString: string): Date {
     return moment(dateAsString, constants.dateFormats.fullDate).toDate();
 }
@@ -31,10 +37,8 @@ export function formatDate(date: Date): string {
     return moment(date).format(constants.dateFormats.date);
 }
 
-export function firstDayDate(): string {
-    const monthNumber = new Date().getMonth() + 1;
+export function firstDayDate(monthNumber: number, year: number): string {
     const month = monthNumber < 10 ? `0${monthNumber}` : monthNumber;
-    const year = new Date().getFullYear();
     return `01/${month}/${year}`;
 }
 
@@ -63,6 +67,7 @@ export function sortTransactionByDate(transactions: Transaction[]): Transaction[
     });
 }
 
-export function currentMonth(): string {
-    return moment().format("MMMM");
+export function currentMonth(monthNumber: number): string {
+    const string = `${monthNumber}/01/2021`;
+    return moment(string).format("MMMM");
 }
