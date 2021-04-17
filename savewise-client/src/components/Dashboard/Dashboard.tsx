@@ -319,6 +319,22 @@ export default function Dashboard() {
         </div>
     )
 
+    const renderCurrentBalance = () => {
+        const incomes: number = categories.filter(c => c.categoryType.id === CategoryTypesId.Incomes).reduce((acc, c) => acc = Number(c.amount) + acc, 0);
+        const expenses: number = categories.filter(c => c.categoryType.id !== CategoryTypesId.Incomes).reduce((acc, c) => acc = Number(c.amount) + acc, 0);
+        const result = Number((incomes - expenses).toFixed(2));
+        return (
+            <div className={styles.balanceContainer}>
+                <Typography variant="h4" component="h4">
+                    Balance:
+                    <span className={`${styles.balanceResult} ${result > 0 ? 'incomeGreenColor' : 'regularColor'}`}>
+                        { result } { constants.currency }
+                    </span>
+                </Typography>
+            </div>
+        )
+    }
+
     return (
         <Grid 
             container
@@ -338,6 +354,7 @@ export default function Dashboard() {
             </Grid>
             <Grid item>
                 { renderMonthController() }
+                { renderCurrentBalance() }
             </Grid>
             <Grid container
             direction="row"
