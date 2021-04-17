@@ -5,7 +5,7 @@ import { Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { Link } from 'react-router-dom';
 import { LoginContext } from '../../common/context/LoginContext';
-import { CategoryService, TransactionService, UtilService } from '../../services/';
+import { CategoryService, StatsService, TransactionService, UtilService } from '../../services/';
 import { CategoriesResponse, Category } from '../../common/objects/categories';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { GetCategoriesInput } from '../../services/category-service';
@@ -27,6 +27,7 @@ import { constants } from '../../common/objects/constants';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 import MonthsBalanceChart from '../MonthsBalanceChart/MonthsBalanceChart';
+import { MonthInformation } from '../../common/objects/stats';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -45,6 +46,7 @@ export default function Dashboard() {
     const [currentMonth, setCurrentMonth] = useState<string>('');
     const [selectedMonthNumber, setSelectedMonthNumber] = useState<number>(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+    const [chartData, setChartData] = useState<MonthInformation[]>([]);
 
     const getCategories = useCallback(
         (userId?: number) => {
@@ -95,15 +97,34 @@ export default function Dashboard() {
         },
         [setSnackbarInfo, selectedMonthNumber, selectedYear],
     );
+
+    const getMonthsInformation = useCallback(
+        async (userId: number, selectedYear: number) => {
+            try {
+                const { status, monthsInformation } = await StatsService.getMonthIncomeExpenses(userId, selectedYear);
+                if (status.success) {
+                    setChartData(monthsInformation);
+                } else {
+                    setSnackbarInfo({ severity: "error", message: status.errorMessage });
+                }
+            } catch (error) {
+                setSnackbarInfo({ severity: "error", message: error });
+            }
+        },
+        [setSnackbarInfo],
+    )
+
     useEffect(() => {
         const userId = login.login?.id;
+        if (!userId) return console.error("User id not found");
         setCurrentMonth(UtilService.currentMonth(selectedMonthNumber));
         getCategories(userId);
         getTransactions(userId);
+        getMonthsInformation(userId, selectedYear)
         return () => {
             
         }
-    }, [login, getCategories, getTransactions, selectedMonthNumber]);
+    }, [login, getCategories, getTransactions, selectedMonthNumber, getMonthsInformation, selectedYear]);
     
     const renderExpenses = (categories: Category[]) => {
         if (categories.length) {
@@ -212,6 +233,7 @@ export default function Dashboard() {
                 } else {
                     setTransactions([...transactions, rsp.transaction]);
                 }
+                getMonthsInformation(login.login?.id as number, selectedYear);
                 getCategories(login.login?.id);
             } else {
                 setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
@@ -353,7 +375,7 @@ export default function Dashboard() {
                 </Typography>
             </Grid>
             <Grid item>
-                { login.login && <MonthsBalanceChart userId={login.login.id} selectedYear={selectedYear} /> }
+                { login.login && chartData.length && <MonthsBalanceChart userId={login.login.id} selectedYear={selectedYear} chartData={chartData} /> }
             </Grid>
             <Grid item>
                 { renderMonthController() }
