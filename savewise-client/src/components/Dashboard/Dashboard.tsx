@@ -72,7 +72,7 @@ export default function Dashboard() {
         (userId?: number) => {
             setLoading(true);
             if (userId) {
-                TransactionService.GetTransactions(userId).then(rsp => {
+                TransactionService.GetTransactions(userId, undefined, undefined, 10).then(rsp => {
                     if (rsp.status.success) {
                         setTransactions( UtilService.sortTransactionByDate(rsp.transactions));
                         setLoading(false);
