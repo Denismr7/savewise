@@ -30,6 +30,7 @@
 .transactionName {
     font-size: 1.10rem;
     cursor: default;
+    width: 300px;
 }
 .transactionsContainer {
     display: flex;
@@ -41,4 +42,7 @@
 }
 .date {
     margin-right: 50px;
+}
+.transactionAmount {
+    width: 300px;
 }

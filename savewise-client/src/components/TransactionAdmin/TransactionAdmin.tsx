@@ -27,6 +27,8 @@ import { TransactionForm } from "../../common/objects/Transaction";
 import SearchIcon from '@material-ui/icons/Search';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { SnackbarContext } from "../../common/context/SnackbarContext";
+import { constants } from "../../common/objects/constants";
+import { CategoryTypesId } from "../../common/objects/CategoryTypesId";
 
 interface SearchByDates {
     fromDate: string,
@@ -86,9 +88,15 @@ export default function TransactionAdmin() {
 
     const renderTransactions = (transactions: Transaction[]) => {
         return transactions.map((transaction) => {
+            const isIncome = transaction.category.categoryType?.id === CategoryTypesId.Incomes ? true : false; 
+            const symbol: string = isIncome ? "+" : "-";
+            const color = isIncome ? 'incomeGreenColor' : 'regularColor';
             return (
                 <div className={styles.transactionItem} key={transaction.id}>
-                    <p className={styles.transactionDesc}>{transaction.description}</p>
+                    <p className={styles.transactionName}>{transaction.description}</p>
+                    <span className={`${styles.transactionAmount} ${color}`}>
+                       { symbol } { transaction.amount } { constants.currency } 
+                    </span>
                     <div>
                         <span className={styles.date}>{UtilService.formatDateString(transaction.date)}</span>
                         <IconButton size="small" onClick={() => handleToggleModal(transaction)}>

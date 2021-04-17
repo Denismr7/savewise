@@ -53,7 +53,14 @@ export function sortCategoriesByAmount(categories: Category[]): Category[] {
 }
 
 export function sortTransactionByDate(transactions: Transaction[]): Transaction[] {
-    return transactions.sort((a, b) => toDate(b.date).getTime() - toDate(a.date).getTime());
+    return transactions.sort((a, b) => {
+        const first = toDate(a.date).getTime();
+        const second = toDate(b.date).getTime();
+        if (second === first) {
+            return Number(b.id) - Number(a.id);
+        }
+        return second - first;
+    });
 }
 
 export function currentMonth(): string {

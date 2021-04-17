@@ -22,11 +22,16 @@ namespace Savewise.Managers
             OTransaction transaction = new OTransaction();
             transaction.id = model.tId;
             transaction.amount = model.tAmount;
-            transaction.category = new OCategory();
-            transaction.category.id = model.tCategoryId;
             transaction.date = model.tDate.ToString();
             transaction.description = model.tDescription;
             transaction.userId = model.tUserId;
+            transaction.category = new OCategory();
+            transaction.category.id = model.tCategoryId;
+            if (model.CategoryNavigation != null)
+            {
+                transaction.category.categoryType = new OCategoryType();
+                transaction.category.categoryType.id = model.CategoryNavigation.cTypeId;
+            }
 
             return transaction;
         }
@@ -58,7 +63,8 @@ namespace Savewise.Managers
                                                     .Where(t => t.tUserId == userId)
                                                     .Where(t => t.tDate >= fromDate && t.tDate <= toDate.AddHours(23).AddMinutes(59))
                                                     .OrderBy(t => t.tDate)
-                                                    .ToList();;
+                                                    .Include(t => t.CategoryNavigation)
+                                                    .ToList();
             List<OTransaction> transactions = new List<OTransaction>();
 
             foreach (Transaction transaction in transactionsModel)
@@ -85,6 +91,7 @@ namespace Savewise.Managers
                                                     .Where(t => t.tUserId == userId)
                                                     .OrderByDescending(t => t.tDate)
                                                     .Take(limit)
+                                                    .Include(t => t.CategoryNavigation)
                                                     .ToList();
             List<OTransaction> transactions = new List<OTransaction>();
 
@@ -140,6 +147,7 @@ namespace Savewise.Managers
                 context.Transactions.Add(model);
             }
             context.SaveChanges();
+            context.Entry(model).Reference(t => t.CategoryNavigation).Load();
 
             return convert(model);
         }
