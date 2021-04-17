@@ -48,13 +48,15 @@ export default function MonthsBalanceChart(props: MonthsBalanceChartProps) {
                             label: "Incomes",
                             data: chartData.map(d => d.incomes),
                             borderColor: constants.chart.incomesColor,
-                            backgroundColor: constants.chart.incomesBgColor
+                            backgroundColor: constants.chart.incomesBgColor,
+                            hoverBackgroundColor: constants.chart.incomesColor
                         },
                         {
                             label: "Expenses",
                             data: chartData.map(d => d.expenses),
                             borderColor: constants.chart.expensesColor,
-                            backgroundColor: constants.chart.expensesBgColor
+                            backgroundColor: constants.chart.expensesBgColor,
+                            hoverBackgroundColor: constants.chart.expensesColor
                         }
                     ]
                 },
