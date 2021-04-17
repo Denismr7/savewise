@@ -71,3 +71,11 @@ export function currentMonth(monthNumber: number): string {
     const string = `${monthNumber}/01/2021`;
     return moment(string).format("MMMM");
 }
+
+export function getAllMonthsLabels(): string[] {
+    const months: string[] = [];
+    for (let index = 1; index <= 12; index++) {
+        months.push(currentMonth(index));
+    }
+    return months;
+}

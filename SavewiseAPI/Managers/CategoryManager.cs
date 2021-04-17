@@ -38,8 +38,8 @@ namespace Savewise.Managers
         /// </summary>
         /// <param name="userId">User ID</param>
         /// <param name="includeAmounts">Whether or not include spendings in each category</param>
-        /// <param name="fromDate">If includeAmounts it should have a starting date</param>
-        /// <param name="toDate">If includeAmounts it should have an ending date</param>
+        /// <param name="fromDate">If includeAmounts it must have a starting date</param>
+        /// <param name="toDate">If includeAmounts it must have an ending date</param>
         /// <param name="categoryTypeId">Type of category id</param>
         public List<OCategory> getAll(int userId, bool includeAmounts, string fromDate, string toDate, int? categoryTypeId)
         {
@@ -57,6 +57,10 @@ namespace Savewise.Managers
                 OCategory categoryObject = convert(cat);
                 if (includeAmounts)
                 {
+                    if (fromDate == null || toDate == null)
+                    {
+                        throw new Exception("Undefined dates");
+                    }
                     categoryObject.amount = getAmount(userId, cat.cId.Value, fromDate, toDate);
                 }
                 categories.Add(categoryObject);

@@ -26,6 +26,7 @@ import { SnackbarContext } from '../../common/context/SnackbarContext';
 import { constants } from '../../common/objects/constants';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
+import MonthsBalanceChart from '../MonthsBalanceChart/MonthsBalanceChart';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -94,7 +95,6 @@ export default function Dashboard() {
         },
         [setSnackbarInfo, selectedMonthNumber, selectedYear],
     );
-
     useEffect(() => {
         const userId = login.login?.id;
         setCurrentMonth(UtilService.currentMonth(selectedMonthNumber));
@@ -310,7 +310,7 @@ export default function Dashboard() {
             <IconButton aria-label="backMonth" component="span" onClick={() => navigateMonth("b")}>
                 <ArrowBackIosOutlinedIcon />
             </IconButton>
-            <Typography variant="h3" component="h2" className={styles.currentMonthName}>
+            <Typography variant="h4" component="h4" className={styles.currentMonthName}>
                 {currentMonth}, {selectedYear}
             </Typography>
             <IconButton aria-label="forwardMonth" component="span" onClick={() => navigateMonth("f")}>
@@ -321,11 +321,11 @@ export default function Dashboard() {
 
     const renderCurrentBalance = () => {
         const incomes: number = categories.filter(c => c.categoryType.id === CategoryTypesId.Incomes).reduce((acc, c) => acc = Number(c.amount) + acc, 0);
-        const expenses: number = categories.filter(c => c.categoryType.id !== CategoryTypesId.Incomes).reduce((acc, c) => acc = Number(c.amount) + acc, 0);
+        const expenses: number = categories.filter(c => c.categoryType.id === CategoryTypesId.Expenses).reduce((acc, c) => acc = Number(c.amount) + acc, 0);
         const result = Number((incomes - expenses).toFixed(2));
         return (
             <div className={styles.balanceContainer}>
-                <Typography variant="h4" component="h4">
+                <Typography variant="h6" component="h6">
                     Balance:
                     <span className={`${styles.balanceResult} ${result > 0 ? 'incomeGreenColor' : 'regularColor'}`}>
                         { result } { constants.currency }
@@ -351,6 +351,9 @@ export default function Dashboard() {
                         <SettingsOutlinedIcon className={styles.settingsIcon} />
                     </Link>
                 </Typography>
+            </Grid>
+            <Grid item>
+                { login.login && <MonthsBalanceChart userId={login.login.id} selectedYear={selectedYear} /> }
             </Grid>
             <Grid item>
                 { renderMonthController() }
