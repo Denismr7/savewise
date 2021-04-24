@@ -1,0 +1,41 @@
+.App {
+  width: 98vw;
+  height: 80vh;
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+  padding-top: 10%;
+}
+
+/* GLOBAL STYLES */
+
+.componentBg {
+    margin: 5% auto 0 auto;
+    width: 70%;
+    height: 70vh;
+    padding: 20px 5%;
+    border-radius: 25px;
+    background-color: #ebebeb;
+    box-shadow:  29px 29px 50px #c3c3c3,
+             -29px -29px 50px #ffffff;
+}
+
+.componentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.titleColor {
+    color: #292929;
+}
+
+.incomeGreenColor {
+    color: #007a2b;
+}
+
+.regularColor {
+    color: #1c1c1c;
+}

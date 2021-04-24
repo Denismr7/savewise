@@ -18,5 +18,12 @@ namespace Savewise.Managers
         {
             get { return _context; }
         }
+
+        public bool userExists(int userId)
+        {
+            User user = context.Users.FirstOrDefault(u => u.uId == userId);
+            if (user != null) return true;
+            else return false;
+        }
     }
 }

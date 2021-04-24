@@ -1,0 +1,63 @@
+@keyframes rotate {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+
+.panel {
+    width: 400px;
+    height: 500px;
+    border-radius: 25px;
+    background-color: #ebebeb;
+    box-shadow:  16px 16px 32px #cecece,
+             -16px -16px 32px #e8e8e8;
+}
+.modalBg {
+    border-radius: 5px;
+    padding-left: 10px;
+    min-height: 400px;
+    width: 400px;
+    background-color:   rgba(219, 219, 219, 1);
+    margin: 20px auto 0 auto;
+    padding: 0 15px 20px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+.itemsContainer {
+    width: 90%;
+    height: 100%;
+    margin: 0 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.title {
+    color: #292929;
+}
+
+.settingsIcon {
+    margin-bottom: 20px;
+    margin-left: 5px;
+}
+
+.settingsIcon:hover {
+    animation: rotate 2s;
+    animation-iteration-count: infinite;
+}
+
+.monthController {
+    display: flex;
+}
+
+.currentMonthName {
+    width: 500px;
+    text-align: center;
+}
+
+.balanceContainer {
+    text-align: center;
+}
+
+.balanceResult {
+    margin-left: 10px;
+}
