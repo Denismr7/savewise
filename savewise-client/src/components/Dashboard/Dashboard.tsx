@@ -28,6 +28,7 @@ import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
 import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutlined';
 import MonthsBalanceChart from '../MonthsBalanceChart/MonthsBalanceChart';
 import { MonthInformation } from '../../common/objects/stats';
+import moment from 'moment';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -114,17 +115,47 @@ export default function Dashboard() {
         [setSnackbarInfo],
     )
 
+    const updateMonthsBalance = (newTransaction: Transaction) => {
+        const transactionMonth = moment(UtilService.toDate(newTransaction.date)).format("M");
+
+        const monthIndex: number = chartData.findIndex(mi => mi.month.toString() === transactionMonth);
+        if (monthIndex === -1) {
+            return;
+        }
+
+        const monthBalance: MonthInformation = chartData[monthIndex];
+        const categoryTipe = newTransaction.category.categoryType.id;
+        if (categoryTipe === CategoryTypesId.Incomes) {
+            monthBalance.incomes += newTransaction.amount;
+        } else if (categoryTipe === CategoryTypesId.Expenses) {
+            monthBalance.expenses += newTransaction.amount;
+        } else {
+            return;
+        }
+
+        setChartData(chartData.map((mi, index) => index === monthIndex ? monthBalance : mi ));
+    }
+
     useEffect(() => {
         const userId = login.login?.id;
         if (!userId) return console.error("User id not found");
         setCurrentMonth(UtilService.currentMonth(selectedMonthNumber));
         getCategories(userId);
         getTransactions(userId);
-        getMonthsInformation(userId, selectedYear)
         return () => {
             
         }
     }, [login, getCategories, getTransactions, selectedMonthNumber, getMonthsInformation, selectedYear]);
+    
+    // Only update balance if the year changes
+    useEffect(() => {
+        const userId = login.login?.id;
+        if (!userId) return console.error("User id not found");
+        getMonthsInformation(userId, selectedYear);
+        return () => {
+            
+        }
+    }, [login, selectedYear, getMonthsInformation])
     
     const renderExpenses = (categories: Category[]) => {
         if (categories.length) {
@@ -233,7 +264,7 @@ export default function Dashboard() {
                 } else {
                     setTransactions([...transactions, rsp.transaction]);
                 }
-                getMonthsInformation(login.login?.id as number, selectedYear);
+                updateMonthsBalance(rsp.transaction);
                 getCategories(login.login?.id);
             } else {
                 setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
