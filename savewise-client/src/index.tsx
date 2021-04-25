@@ -9,15 +9,13 @@ import DateFnsUtils from '@date-io/date-fns';
 import { SnackbarProvider } from './common/context/SnackbarContext';
 
 ReactDOM.render(
-  <React.StrictMode>
     <LoginProvider>
         <SnackbarProvider>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <App />
             </MuiPickersUtilsProvider>
         </SnackbarProvider>
-    </LoginProvider>
-  </React.StrictMode>,
+    </LoginProvider>,
   document.getElementById('root')
 );
 
