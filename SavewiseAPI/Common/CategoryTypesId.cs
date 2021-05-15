@@ -4,6 +4,7 @@ namespace Savewise.Common
     {
         Incomes = 1,
         Expenses = 2,
-        Investments = 3
+        VaultsIncomes = 3,
+        VaultsExpenses = 4
     }
 }
