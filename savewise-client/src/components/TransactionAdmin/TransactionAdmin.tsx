@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import { Category } from "../../common/objects/categories";
-import { Transaction } from "../../common/objects/transactions";
+import { Transaction, TransactionForm } from "../../common/objects/transactions";
 import { LoginContext } from "../../common/context/LoginContext";
 import { GetCategoriesInput } from "../../services/category-service";
 import {
@@ -23,7 +23,6 @@ import styles from "./TransactionAdmin.module.scss";
 import Select from "@material-ui/core/Select";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { Status } from "../../common/objects/response";
-import { TransactionForm } from "../../common/objects/Transaction";
 import SearchIcon from '@material-ui/icons/Search';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { SnackbarContext } from "../../common/context/SnackbarContext";
