@@ -14,7 +14,7 @@ namespace Savewise.Models
 
         public virtual User userNavigation { get; set; }
         public virtual CategoryType categoryTypeNavigation { get; set; }
-        public List<Transaction> transactions { get; set; }
+        public ICollection<Transaction> transactions { get; set; }
     }
 
     public class CategoryConfig : IEntityTypeConfiguration<Category>
