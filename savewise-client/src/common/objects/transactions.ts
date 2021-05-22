@@ -25,4 +25,5 @@ export interface TransactionForm {
     amount: number | undefined;
     date: string;
     description: string;
+    vaultId?: number;
 }

@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import Modal from "@material-ui/core/Modal";
-import { CategoryService, TransactionService, UtilService } from '../../services';
+import { CategoryService, TransactionService, UtilService, VaultService } from '../../services';
 import { Transaction, TransactionForm } from '../../common/objects/transactions';
 import TextField from "@material-ui/core/TextField";
 import FormControl from "@material-ui/core/FormControl";
@@ -13,14 +13,17 @@ import { Category } from '../../common/objects/categories';
 import { SnackbarContext } from "../../common/context/SnackbarContext";
 import { LoginContext } from "../../common/context/LoginContext";
 import { GetCategoriesInput } from '../../services/category-service';
+import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
+import { Vault } from '../../common/objects/vault';
 
 export interface ITransactionModalProps {
     conditionToShow: boolean;
+    transaction?: Transaction;
     handleVisibility: () => void;
     handleSave: (t: Transaction) => void;
 }
 
-export default function TransactionModal({ conditionToShow, handleVisibility, handleSave }: ITransactionModalProps) {
+export default function TransactionModal({ conditionToShow, transaction, handleVisibility, handleSave }: ITransactionModalProps) {
     const [transactionForm, setTransactionForm] = useState<TransactionForm>({
         categoryId: undefined,
         amount: undefined,
@@ -28,6 +31,8 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
         description: "",
     });
     const [userCategories, setUserCategories] = useState<Category[]>([]);
+    const [userVaults, setUserVaults] = useState<Vault[]>([]);
+    const [showVaultSelect, setShowVaultSelect] = useState<boolean>(false);
     const { setSnackbarInfo } = useContext(SnackbarContext);
     const { login } = useContext(LoginContext);
 
@@ -39,18 +44,27 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
             endDate: "",
         };
         CategoryService.getCategories(id, categoriesOptions)
-            .then((rsp) => {
-                if (rsp.status.success) {
-                    setUserCategories(rsp.categories);
+            .then(({ status, categories }) => {
+                if (status.success) {
+                    setUserCategories(categories);
                 } else {
-                    console.log(`Error: ${rsp.status.errorMessage}`);
+                    console.log(`Error: ${status.errorMessage}`);
                 }
             })
             .catch((e) => console.log(`ERROR: ${e}`));
+
+        VaultService.getUserVaults(id).then(({ status, vaults }) => {
+            if (status.success) {
+                setUserVaults(vaults);
+            } else {
+                setSnackbarInfo({ severity: 'error', message: status.errorMessage });
+            }
+        }).catch(e => setSnackbarInfo({ severity: 'error', message: `Error: ${e}` }));
+
         return () => {
             
         }
-    }, [login])
+    }, [login, setSnackbarInfo])
 
     const handleToggleModal = (transaction?: Transaction) => {
         if (transaction) {
@@ -60,6 +74,7 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
                 amount: transaction.amount,
                 date: transaction.date,
                 description: transaction.description,
+                vaultId: transaction.vaultId
             });
         } else {
             setTransactionForm({
@@ -68,10 +83,36 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
                 amount: undefined,
                 date: UtilService.today(),
                 description: "",
+                vaultId: undefined
             });
         }
         handleVisibility();
     };
+
+    useEffect(() => {
+        if (transaction) {
+            setTransactionForm({
+                id: transaction.id,
+                categoryId: transaction.category.id,
+                amount: transaction.amount,
+                date: transaction.date,
+                description: transaction.description,
+                vaultId: transaction.vaultId
+            });
+        } else {
+            setTransactionForm({
+                id: undefined,
+                categoryId: undefined,
+                amount: undefined,
+                date: UtilService.today(),
+                description: "",
+                vaultId: undefined
+            });
+        }
+        return () => {
+            
+        }
+    }, [transaction]);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.name === "amount") {
@@ -87,11 +128,40 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
         }
     };
 
-    const handleSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const handleSelectChange = (event: React.ChangeEvent<{ value: unknown, name?: string }>) => {
+        switch (event.target.name) {
+            case "category":
+                handleCategorySelectChange(event.target.value);
+                break;
+            case "vault":
+                handleVaultSelectChange(event.target.value);
+                break;
+            default:
+                console.warn("TransactionModal.handleSelectChange: Invalid target name");
+                break;
+        }
+    };
+
+    const handleVaultSelectChange = (value: unknown) => {
         setTransactionForm({
             ...transactionForm,
-            categoryId: event.target.value as number,
+            vaultId: value as number,
         });
+    };
+
+    const handleCategorySelectChange = (value: unknown) => {
+        setTransactionForm({
+            ...transactionForm,
+            categoryId: value as number,
+        });
+
+        const categorySelected: Category = userCategories.find(c => c.id === value) as Category;
+        // If selected category is related to vaults show the vault selector
+        if ([CategoryTypesId.VaultIncomes, CategoryTypesId.VaultExpenses].indexOf(categorySelected.categoryType.id as number) >= 0) {
+            setShowVaultSelect(true);
+        } else {
+            setShowVaultSelect(false);
+        }
     };
 
     const handleDateChange = (date: Date | null) => {
@@ -111,6 +181,7 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
             date: transactionForm.date,
             description: transactionForm.description,
             id: transactionForm.id,
+            vaultId: showVaultSelect ? transactionForm.vaultId : undefined
         };
         TransactionService.SaveTransaction(transaction)
             .then((rsp) => {
@@ -122,7 +193,7 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
                     setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
                 }
             })
-            .catch((e) => setSnackbarInfo({ severity: "error", message: e }));
+            .catch((e) => setSnackbarInfo({ severity: "error", message: `Error: ${e}` }));
     };
 
     const renderUserCategories = (userCategories: Category[]) => {
@@ -136,6 +207,39 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
             });
         }
     };
+
+    const renderUserVaults = (userVaults: Vault[]) => {
+        if (userVaults.length) {
+            return userVaults.map(vault => {
+                return (
+                    <MenuItem key={vault.id} value={vault.id}>
+                        {vault.name}
+                    </MenuItem>
+                )
+            })
+        }
+    }
+
+    const renderVaultSelect = (userVaults: Vault[]) => {
+        return (
+            <FormControl
+                style={{ marginTop: "10px" }}
+                variant="outlined"
+                fullWidth
+            >
+                <InputLabel id="vault">Vault</InputLabel>
+                <Select
+                    labelId="vault"
+                    id="vaultSelect"
+                    name="vault"
+                    value={transactionForm.vaultId ? transactionForm.vaultId : ""}
+                    onChange={handleSelectChange}
+                >
+                    {renderUserVaults(userVaults)}
+                </Select>
+            </FormControl>
+        );
+    }
 
     const modalBody = (
         <div className="modalBg">
@@ -173,12 +277,17 @@ export default function TransactionModal({ conditionToShow, handleVisibility, ha
                 <Select
                     labelId="category"
                     id="categorySelect"
+                    name="category"
                     value={transactionForm.categoryId ? transactionForm.categoryId : ""}
                     onChange={handleSelectChange}
                 >
                     {renderUserCategories(userCategories)}
                 </Select>
             </FormControl>
+            { showVaultSelect ?
+             renderVaultSelect(userVaults) 
+             : null 
+            }
             <KeyboardDatePicker
                 inputVariant="outlined"
                 margin="normal"

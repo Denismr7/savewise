@@ -61,9 +61,14 @@ namespace Savewise.Services
             response.status.success = false;
             try
             {
-                TransactionManager manager = new TransactionManager(context);
-                response.transaction = manager.saveTransaction(transaction);
-                response.status.success = true;
+                using (var dbContextTransaction = context.Database.BeginTransaction())
+                {
+                    TransactionManager manager = new TransactionManager(context);
+                    response.transaction = manager.saveTransaction(transaction);
+                    response.status.success = true;
+
+                    dbContextTransaction.Commit();
+                }
             }
             catch (Exception exception)
             {

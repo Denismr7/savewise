@@ -32,6 +32,7 @@ export default function TransactionAdmin() {
     const { setSnackbarInfo } = useContext(SnackbarContext);
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | undefined>();
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
     const [transactionForm, setTransactionForm] = useState<TransactionForm>({
@@ -157,23 +158,7 @@ export default function TransactionAdmin() {
     }
 
     const handleToggleModal = (transaction?: Transaction) => {
-        if (transaction) {
-            setTransactionForm({
-                id: transaction.id,
-                categoryId: transaction.category.id,
-                amount: transaction.amount,
-                date: transaction.date,
-                description: transaction.description,
-            });
-        } else {
-            setTransactionForm({
-                id: undefined,
-                categoryId: undefined,
-                amount: undefined,
-                date: UtilService.today(),
-                description: "",
-            });
-        }
+        setSelectedTransaction(transaction);
         setOpenModal(!openModal);
     };
 
@@ -266,7 +251,8 @@ export default function TransactionAdmin() {
                         {renderTransactions(transactions)}
                 </div>)
             }
-            <TransactionModal conditionToShow={openModal} handleVisibility={() => setOpenModal(!openModal)} handleSave={(t: Transaction) => onSave(t)} />
+            <TransactionModal conditionToShow={openModal} transaction={selectedTransaction}
+             handleVisibility={() => setOpenModal(!openModal)} handleSave={(t: Transaction) => onSave(t)} />
             <Modal
                 open={openConfirmDelete}
                 onClose={() => handleToggleDeleteModal()}

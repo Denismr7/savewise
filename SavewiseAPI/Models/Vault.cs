@@ -38,7 +38,7 @@ namespace Savewise.Models
                    .IsRequired();
             
             builder.Property(t => t.vAmount)
-                   .HasColumnName("t_amount")
+                   .HasColumnName("v_amount")
                    .HasColumnType("float")
                    .IsRequired();
             

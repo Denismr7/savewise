@@ -5,3 +5,4 @@ export * as SessionService from "./session-storage";
 export * as UtilService from "./utils-service";
 export * as UserService from "./user-service";
 export * as StatsService from "./stats-service";
+export * as VaultService from "./vault-service";

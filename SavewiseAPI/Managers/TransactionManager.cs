@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Savewise.Common;
 using Savewise.Models;
 using Savewise.Services.Objects;
 using System;
@@ -108,7 +109,10 @@ namespace Savewise.Managers
         /// </summary>
         private Transaction getByIdEdition(int transactionId)
         {
-            Transaction transactionModel = context.Transactions.FirstOrDefault(t => t.tId == transactionId);
+            Transaction transactionModel = context.Transactions
+                                                .Include(t => t.CategoryNavigation)
+                                                .ThenInclude(c => c.categoryTypeNavigation)
+                                                .FirstOrDefault(t => t.tId == transactionId);
             if (transactionModel == null)
             {
                 throw new Exception($"ERROR: Transaction with ID [{transactionId}] not found");
@@ -128,9 +132,11 @@ namespace Savewise.Managers
 
             // Get model and modify properties
             Transaction model;
+            Transaction modelBeforeEdited = null;
             if (transaction.id.HasValue) 
             {
                 model = getByIdEdition(transaction.id.Value);
+                modelBeforeEdited = model;
             } else {
                 model = new Transaction();
             }
@@ -139,6 +145,7 @@ namespace Savewise.Managers
             model.tDate = DateTime.Parse(transaction.date);
             model.tDescription = transaction.description;
             model.tUserId = transaction.userId;
+            model.tVaultId = transaction.vaultId;
 
             // Update or Add if is a new one
             if (transaction.id.HasValue) {
@@ -147,7 +154,15 @@ namespace Savewise.Managers
                 context.Transactions.Add(model);
             }
             context.SaveChanges();
-            context.Entry(model).Reference(t => t.CategoryNavigation).Load();
+            context.Entry(model).Reference(t => t.CategoryNavigation)
+                                .Query()
+                                .Include(c => c.categoryTypeNavigation).Load();
+
+            // Update vault if necessary
+            if (transaction.vaultId.HasValue) {
+                VaultManager vaultManager = new VaultManager(context);
+                vaultManager.updateVaultAmount(model, modelBeforeEdited);
+            }
 
             return convert(model);
         }
@@ -157,6 +172,12 @@ namespace Savewise.Managers
             bool deleted = false;
 
             Transaction transaction = getByIdEdition(transactionId);
+
+            int cagegoryTypeId = transaction.CategoryNavigation.categoryTypeNavigation.ctId.Value;
+            if (cagegoryTypeId == (int)CategoryTypesId.VaultsIncomes || cagegoryTypeId == (int)CategoryTypesId.VaultsExpenses) {
+                VaultManager vaultManager = new VaultManager(context);
+                vaultManager.updateVaultAmount(transaction, null, true);
+            }
 
             context.Transactions.Remove(transaction);
             context.SaveChanges();
