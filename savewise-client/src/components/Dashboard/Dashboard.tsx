@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, ChangeEvent, useCallback } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import Grid from '@material-ui/core/Grid';
 import styles from "./Dashboard.module.scss";
 import { Typography } from '@material-ui/core';
@@ -10,14 +10,7 @@ import { CategoriesResponse, Category } from '../../common/objects/categories';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { GetCategoriesInput } from '../../services/category-service';
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
-import { Transaction, TransactionForm } from '../../common/objects/transactions';
-import Modal from "@material-ui/core/Modal";
-import MenuItem from "@material-ui/core/MenuItem";
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from '@material-ui/core/Select';
-import { KeyboardDatePicker } from '@material-ui/pickers';
+import { Transaction } from '../../common/objects/transactions';
 import IconButton from '@material-ui/core/IconButton';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
@@ -28,6 +21,7 @@ import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutli
 import MonthsBalanceChart from '../MonthsBalanceChart/MonthsBalanceChart';
 import { MonthInformation } from '../../common/objects/stats';
 import moment from 'moment';
+import TransactionModal from '../TransactionModal/TransactionModal';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -37,12 +31,6 @@ export default function Dashboard() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [transactionForm, setTransactionForm] = useState<TransactionForm>({
-        categoryId: undefined,
-        amount: undefined,
-        date: UtilService.today(),
-        description: "",
-    });
     const [currentMonth, setCurrentMonth] = useState<string>('');
     const [selectedMonthNumber, setSelectedMonthNumber] = useState<number>(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
@@ -199,134 +187,15 @@ export default function Dashboard() {
         } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No transactions to show</Typography>);
     }
 
-    const handleToggleModal = (transaction?: Transaction) => {
-        if (transaction) {
-            setTransactionForm({
-                id: transaction.id,
-                categoryId: transaction.category.id,
-                amount: transaction.amount,
-                date: transaction.date,
-                description: transaction.description,
-            });
+    const onSave = (newTransaction: Transaction) => {
+        if (transactions.find(t => t.id === newTransaction.id)) {
+            setTransactions(transactions.map(t => t.id === newTransaction.id ? newTransaction : t));
         } else {
-            setTransactionForm({
-                id: undefined,
-                categoryId: undefined,
-                amount: undefined,
-                date: UtilService.today(),
-                description: ''
-            })
+            setTransactions([...transactions, newTransaction]);
         }
-        setOpenModal(!openModal);
+        updateMonthsBalance(newTransaction);
+        getCategories(login.login?.id);
     };
-
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.name === 'amount') {
-            setTransactionForm({...transactionForm, [event.target.name]: Number(event.target.value)});
-        } else {
-            setTransactionForm({...transactionForm, [event.target.name]: event.target.value});
-        }
-    }
-
-    const handleSelectChange = (event: ChangeEvent<{ value: unknown }>) => {
-        setTransactionForm({...transactionForm, categoryId: event.target.value as number});
-    }
-
-    const handleDateChange = (date: Date | null) => {
-        setTransactionForm({...transactionForm, date: date ? UtilService.formatDate(date) : ''});
-    };
-
-    const renderUserCategories = (userCategories: Category[]) => {
-        if (userCategories.length) {
-          return userCategories.map(category => {
-            return (
-              <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
-            );
-          })
-        }
-    }
-
-    const onSave = () => {
-        const transaction: Transaction = {
-            userId: login.login?.id as number,
-            category: categories.find(c => c.id === transactionForm.categoryId) as Category,
-            amount: transactionForm.amount as number,
-            date: transactionForm.date,
-            description: transactionForm.description,
-            id: transactionForm.id
-        }
-        TransactionService.SaveTransaction(transaction).then(rsp => {
-            if (rsp.status.success) {
-                handleToggleModal();
-                if (transactions.find(t => t.id === rsp.transaction.id)) {
-                    setTransactions(transactions.map(t => t.id === rsp.transaction.id ? rsp.transaction : t));
-                } else {
-                    setTransactions([...transactions, rsp.transaction]);
-                }
-                updateMonthsBalance(rsp.transaction);
-                getCategories(login.login?.id);
-            } else {
-                setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
-            }
-        }).catch(e => setSnackbarInfo({ severity: "error", message: e }));
-    }
-
-    const modalBody = (
-        <div className={styles.modalBg}>
-            <h1 className={styles.title}>Add new transaction</h1>
-            <TextField 
-                    id="outlined-basic"
-                    onChange={handleInputChange} 
-                    label="Transaction Name" 
-                    variant="outlined" 
-                    name="description"
-                    value={transactionForm.description}
-                    fullWidth
-                    />
-            <TextField 
-                    id="outlined-basic"
-                    onChange={handleInputChange} 
-                    label="Amount (€)" 
-                    variant="outlined" 
-                    name="amount"
-                    type="number"
-                    value={transactionForm.amount ? transactionForm.amount : ''}
-                    style={{ marginTop: '10px' }}
-                    fullWidth
-                    placeholder="€"
-                    />
-            <FormControl style={{ marginTop: '10px' }} fullWidth variant='outlined'>
-                <InputLabel id="category">Category</InputLabel>
-                <Select
-                labelId="category"
-                id="categorySelect"
-                value={transactionForm.categoryId ? transactionForm.categoryId : ''}
-                onChange={handleSelectChange}
-                >
-                { renderUserCategories(categories) }
-                </Select>
-            </FormControl>
-            <KeyboardDatePicker
-                inputVariant="outlined"
-                margin="normal"
-                id="date-picker-dialog"
-                label="Date"
-                format="dd/MM/yyyy"
-                value={UtilService.formatStringDatePicker(transactionForm.date)}
-                onChange={handleDateChange}
-                KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                }}
-                style={{ marginTop: '10px' }}
-                fullWidth
-            />
-            <div className={styles.buttonGroup}>
-                <Button variant="contained" color="primary" type="submit" onClick={onSave}>
-                    Save
-                </Button>
-            </div>
-        </div>
-    );
 
     const navigateMonth = (direction: "b" | "f") => {
         let month = selectedMonthNumber;
@@ -491,7 +360,7 @@ export default function Dashboard() {
                             >
                                 <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
                                     Last transactions
-                                    <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => handleToggleModal()}>
+                                    <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => setOpenModal(true)}>
                                         <AddCircleOutlineIcon />
                                     </IconButton>
                                 </Typography>
@@ -516,13 +385,7 @@ export default function Dashboard() {
                             </Grid>
                     </div>
                 </Grid>
-            <Modal
-                open={openModal}
-                onClose={() => handleToggleModal()}
-                aria-labelledby="add-transaction"
-            >
-                {modalBody}
-            </Modal>
+            <TransactionModal conditionToShow={openModal} handleVisibility={() => setOpenModal(!openModal)} handleSave={(t: Transaction) => onSave(t)} />
             </Grid>
         </Grid>
     )
