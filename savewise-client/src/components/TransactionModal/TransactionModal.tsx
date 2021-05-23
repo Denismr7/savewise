@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useContext, useEffect, useState } from 'react';
 import Modal from "@material-ui/core/Modal";
 import { CategoryService, TransactionService, UtilService, VaultService } from '../../services';
 import { Transaction, TransactionForm } from '../../common/objects/transactions';
@@ -24,6 +24,11 @@ export interface ITransactionModalProps {
 }
 
 export default function TransactionModal({ conditionToShow, transaction, handleVisibility, handleSave }: ITransactionModalProps) {
+    // Context
+    const { setSnackbarInfo } = useContext(SnackbarContext);
+    const { login } = useContext(LoginContext);
+
+    // State
     const [transactionForm, setTransactionForm] = useState<TransactionForm>({
         categoryId: undefined,
         amount: undefined,
@@ -33,9 +38,9 @@ export default function TransactionModal({ conditionToShow, transaction, handleV
     const [userCategories, setUserCategories] = useState<Category[]>([]);
     const [userVaults, setUserVaults] = useState<Vault[]>([]);
     const [showVaultSelect, setShowVaultSelect] = useState<boolean>(false);
-    const { setSnackbarInfo } = useContext(SnackbarContext);
-    const { login } = useContext(LoginContext);
 
+
+    // Get user categories and vaults
     useEffect(() => {
         const id: number = login.login?.id as number;
         const categoriesOptions: GetCategoriesInput = {
@@ -66,54 +71,40 @@ export default function TransactionModal({ conditionToShow, transaction, handleV
         }
     }, [login, setSnackbarInfo])
 
-    const handleToggleModal = (transaction?: Transaction) => {
-        if (transaction) {
-            setTransactionForm({
-                id: transaction.id,
-                categoryId: transaction.category.id,
-                amount: transaction.amount,
-                date: transaction.date,
-                description: transaction.description,
-                vaultId: transaction.vaultId
-            });
-        } else {
-            setTransactionForm({
-                id: undefined,
-                categoryId: undefined,
-                amount: undefined,
-                date: UtilService.today(),
-                description: "",
-                vaultId: undefined
-            });
-        }
-        handleVisibility();
-    };
+    const patchTransaction = useCallback(
+        (transaction?: Transaction) => {
+            if (transaction) {
+                setTransactionForm({
+                    id: transaction.id,
+                    categoryId: transaction.category.id,
+                    amount: transaction.amount,
+                    date: transaction.date,
+                    description: transaction.description,
+                    vaultId: transaction.vaultId
+                });
+            } else {
+                setTransactionForm({
+                    id: undefined,
+                    categoryId: undefined,
+                    amount: undefined,
+                    date: UtilService.today(),
+                    description: "",
+                    vaultId: undefined
+                });
+            }
+        },
+        [],
+    );
 
+    // Patch the selected transaction data in the form or clean it if it's a new transaction
     useEffect(() => {
-        if (transaction) {
-            setTransactionForm({
-                id: transaction.id,
-                categoryId: transaction.category.id,
-                amount: transaction.amount,
-                date: transaction.date,
-                description: transaction.description,
-                vaultId: transaction.vaultId
-            });
-        } else {
-            setTransactionForm({
-                id: undefined,
-                categoryId: undefined,
-                amount: undefined,
-                date: UtilService.today(),
-                description: "",
-                vaultId: undefined
-            });
-        }
+        patchTransaction(transaction);
         return () => {
             
         }
-    }, [transaction]);
+    }, [transaction, patchTransaction]);
 
+    // Handlers
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.name === "amount") {
             setTransactionForm({
@@ -186,7 +177,7 @@ export default function TransactionModal({ conditionToShow, transaction, handleV
         TransactionService.SaveTransaction(transaction)
             .then((rsp) => {
                 if (rsp.status.success) {
-                    handleToggleModal();
+                    patchTransaction(undefined);
                     handleSave(rsp.transaction);
                     setSnackbarInfo({ severity: "success", message: "Transaction saved successfully!" })
                 } else {
@@ -196,6 +187,7 @@ export default function TransactionModal({ conditionToShow, transaction, handleV
             .catch((e) => setSnackbarInfo({ severity: "error", message: `Error: ${e}` }));
     };
 
+    // Renderers
     const renderUserCategories = (userCategories: Category[]) => {
         if (userCategories.length) {
             return userCategories.map((category) => {
@@ -318,7 +310,7 @@ export default function TransactionModal({ conditionToShow, transaction, handleV
     return (
         <Modal
                 open={conditionToShow}
-                onClose={() => handleToggleModal()}
+                onClose={() => handleVisibility()}
                 aria-labelledby="add-transaction"
             >
                 {modalBody}
