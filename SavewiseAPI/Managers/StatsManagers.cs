@@ -63,5 +63,53 @@ namespace Savewise.Managers
 
             return results;
         }
+
+        /// <summary>
+        /// Returns the amount saved each month of a vault for a specific year
+        /// </summary>
+        public List<OVaultMonthlyInformation> getVaultMonthlyAmount(int userId, int vaultId, int year) {
+            List<OVaultMonthlyInformation> results = new List<OVaultMonthlyInformation>();
+
+            // Iterate each month
+            for (int currentMonth = 1; currentMonth <= 12; currentMonth++)
+            {
+                OVaultMonthlyInformation currentMonthData = getMonthVaultAmount(userId, vaultId, currentMonth, year);
+                results.Add(currentMonthData);
+            }
+
+            return results;
+        }
+
+
+        /// <summary>
+        /// Returns the amount saved of a vault for a specific month
+        /// </summary>
+        private OVaultMonthlyInformation getMonthVaultAmount(int userId, int vaultId, int month, int year) {
+            if (month <= 0 || month > 12) throw new Exception("Invalid month");
+
+
+            // Get all the transactions related to the vault from the beginning of the month to the end
+            TransactionManager transactionManager = new TransactionManager(context);
+            string formattedMonth = month < 10 ? $"0{month}" : month.ToString();
+            string from = $"01/{formattedMonth}/{year}";
+            string to = $"{DateTime.DaysInMonth(year, month)}/{formattedMonth}/{year}";
+            List<OTransaction> vaultTransactions = transactionManager.getAllByDates(userId, from, to, vaultId);
+
+            // Calculate the total amount of the month
+            double amount = 0;
+            foreach (OTransaction transaction in vaultTransactions)
+            {
+                double? transAmount = VaultManager.transformAmount(transaction.amount, transaction.category.categoryType.id);
+                if (transAmount.HasValue) {
+                    amount += transAmount.Value;
+                }
+            }
+            
+            OVaultMonthlyInformation vaultInfo = new OVaultMonthlyInformation();
+            vaultInfo.month = month;
+            vaultInfo.amount = amount;
+
+            return vaultInfo;
+        }
     }
 }

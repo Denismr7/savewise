@@ -38,7 +38,7 @@ namespace Savewise.Services
             {
                 TransactionManager manager = new TransactionManager(context);
                 if (startDate != null && endDate != null) {
-                    response.transactions = manager.getAllByDates(id, startDate, endDate);
+                    response.transactions = manager.getAllByDates(id, startDate, endDate, null);
                 }
                 else {
                     response.transactions = manager.getTransactions(id, limit.Value);

@@ -80,7 +80,7 @@ namespace Savewise.Managers
         /// <summary>
         /// Returns a positive number if transaction category type is Vault Income, negative number if it's Vault Expense and null otherwise
         /// </summary>
-        private double? transformAmount(double transactionAmount, int categoryTypeId) {
+        public static double? transformAmount(double transactionAmount, int categoryTypeId) {
             switch (categoryTypeId)
             {
                 case (int)CategoryTypesId.VaultsIncomes:

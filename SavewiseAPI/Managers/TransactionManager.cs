@@ -43,7 +43,8 @@ namespace Savewise.Managers
         /// <param name="userId">User ID</param>
         /// <param name="startDate">Start date</param>
         /// <param name="endDate">End date</param>
-        public List<OTransaction> getAllByDates(int userId, string startDate, string endDate)
+        /// <param name="vaultId">Gets the transactions related to a specific vault</param>
+        public List<OTransaction> getAllByDates(int userId, string startDate, string endDate, int? vaultId)
         {
             DateTime fromDate;
             DateTime toDate;
@@ -60,15 +61,20 @@ namespace Savewise.Managers
                 throw new Exception($"ERROR: No such user. User ID: [{userId}]");
             }
 
-            List<Transaction> transactionsModel = context.Transactions.AsNoTracking()
+            IQueryable<Transaction> transactionsModel = context.Transactions.AsNoTracking()
                                                     .Where(t => t.tUserId == userId)
                                                     .Where(t => t.tDate >= fromDate && t.tDate <= toDate.AddHours(23).AddMinutes(59))
                                                     .OrderBy(t => t.tDate)
                                                     .Include(t => t.CategoryNavigation)
-                                                    .ToList();
+                                                    .ThenInclude(c => c.categoryTypeNavigation);
+
+            if (vaultId.HasValue) {
+                transactionsModel = transactionsModel.Where(t => t.tVaultId == vaultId.Value);
+            }
+
             List<OTransaction> transactions = new List<OTransaction>();
 
-            foreach (Transaction transaction in transactionsModel)
+            foreach (Transaction transaction in transactionsModel.ToList())
             {
                 transactions.Add(convert(transaction));
             }
