@@ -64,7 +64,8 @@ export default function TransactionAdmin() {
     }, [login]);
 
     const renderTransactions = (transactions: Transaction[]) => {
-        return transactions.map((transaction) => {
+        const sortedByDate = UtilService.sortTransactionByDate(transactions);
+        return sortedByDate.map((transaction) => {
             const isIncome = transaction.category.categoryType?.id === CategoryTypesId.Incomes ? true : false; 
             const symbol: string = isIncome ? "+" : "-";
             const color = isIncome ? 'incomeGreenColor' : 'regularColor';
@@ -182,8 +183,7 @@ export default function TransactionAdmin() {
         } else {
             updatedTransactions = [...transactions, savedTransaction];
         }
-        const sortedTransactions = UtilService.sortTransactionByDate(updatedTransactions);
-        setTransactions(sortedTransactions);
+        setTransactions(updatedTransactions);
     };
 
     const onConfirmDelete = () => {
@@ -193,7 +193,7 @@ export default function TransactionAdmin() {
                     if (rsp.success) {
                         handleToggleDeleteModal();
                         setTransactions(
-                            UtilService.sortTransactionByDate(transactions.filter((t) => t.id !== transactionForm.id))
+                            transactions.filter((t) => t.id !== transactionForm.id)
                         );
                         setSnackbarInfo({ severity: "success", message: `Transaction ${transactionForm.description} deleted succesfully!` });
                     } else {
