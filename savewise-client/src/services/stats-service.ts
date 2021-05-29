@@ -19,3 +19,22 @@ export function getMonthIncomeExpenses(userId: number, year: number): Promise<Mo
       response.json()
     );
 }
+
+export function getVaultMonthlyAmount(userId: number, vaultId: number, year: number) {
+    if (!userId) return Promise.reject("User id null");
+    if (!year) return Promise.reject("Year is null");
+    if (!vaultId) return Promise.reject("Vault is null");
+
+    const url = `${baseUrl}/user/${userId}/vault/${vaultId}/monthly-amount/${year}`;
+    const options: RequestInit = {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',    
+        'Access-Control-Allow-Origin':'*',
+      }
+    };
+    return fetch(url, options).then(response =>
+      response.json()
+    );
+}
