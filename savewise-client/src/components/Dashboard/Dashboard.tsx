@@ -22,6 +22,7 @@ import { MonthInformation } from '../../common/objects/stats';
 import moment from 'moment';
 import TransactionModal from '../TransactionModal/TransactionModal';
 import TransactionPanel from '../TransactionPanel/TransactionPanel';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -244,6 +245,9 @@ export default function Dashboard() {
                     Welcome back, { login.login?.name }
                     <Link to="/user" style={{ textDecoration: 'none' }}>
                         <SettingsOutlinedIcon className={styles.settingsIcon} />
+                    </Link>
+                    <Link to="/vaults" style={{ textDecoration: 'none' }}>
+                        <AccountBalanceIcon className={styles.navbarIcon} />
                     </Link>
                 </Typography>
             </Grid>
