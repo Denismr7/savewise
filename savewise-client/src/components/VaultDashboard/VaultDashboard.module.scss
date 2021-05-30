@@ -11,3 +11,26 @@
     width: 55px;
     height: 55px;
 }
+
+.componentBody {
+    height: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transactionPanelContainer {
+    width: 40%;
+}
+
+.chartContainer {
+    width: 55%;
+}
+
+.noData {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

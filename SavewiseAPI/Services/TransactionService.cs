@@ -27,9 +27,9 @@ namespace Savewise.Services
 
         }
 
-        // GET api/transactions/user/{id}?startDate=startDate?endDate=endDate?limit=limit
+        // GET api/transactions/user/{id}?startDate=startDate?endDate=endDate?limit=limit?vault=vault
         [HttpGet("user/{id}")]
-        public IActionResult GetTransactions(int id, [FromQuery] string startDate, [FromQuery] string endDate, [FromQuery] int? limit)
+        public IActionResult GetTransactions(int id, [FromQuery] string startDate, [FromQuery] string endDate, [FromQuery] int? limit, [FromQuery] int? vault)
         {
             TransactionsByDateResponse response = new TransactionsByDateResponse();
             response.status = new Status();
@@ -38,10 +38,10 @@ namespace Savewise.Services
             {
                 TransactionManager manager = new TransactionManager(context);
                 if (startDate != null && endDate != null) {
-                    response.transactions = manager.getAllByDates(id, startDate, endDate, null);
+                    response.transactions = manager.getAllByDates(id, startDate, endDate, vault);
                 }
                 else {
-                    response.transactions = manager.getTransactions(id, limit.Value);
+                    response.transactions = manager.getTransactions(id, vault, limit.Value);
                 }
                 response.status.success = true;
             }

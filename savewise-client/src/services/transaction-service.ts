@@ -4,13 +4,16 @@ import { Transaction, TransactionResponse, TransactionsResponse } from "../commo
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/transactions`;
 
-export function GetTransactions(userId: number, startDate?: string, endDate?: string, limit?: number): Promise<TransactionsResponse> {
+export function GetTransactions(userId: number, startDate?: string, endDate?: string, limit?: number, vault?: number): Promise<TransactionsResponse> {
     const url = `${baseUrl}/user/${userId}`;
-    let queries: string;
+    let queries: string = `?limit=${limit ? limit : 5}`;
     if (startDate && endDate) {
-        queries = `?startDate=${startDate}&endDate=${endDate}`;
-    } else {
-        queries = `?limit=${limit ? limit : 5}`
+        const symbol = queries ? '&' : '?';
+        queries += `${symbol}startDate=${startDate}&endDate=${endDate}`;
+    } 
+    if (vault) {
+        const symbol = queries ? '&' : '?';
+        queries += `${symbol}vault=${vault}`;
     }
     const urlWithQuery = url + queries;
 

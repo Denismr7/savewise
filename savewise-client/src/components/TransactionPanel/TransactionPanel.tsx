@@ -18,7 +18,7 @@ import { UtilService } from '../../services';
 export interface ITransactionPanelProps {
     transactions: Transaction[];
     loading: boolean;
-    onSave: Function;
+    onSave: (t: Transaction) => any;
 }
 
 export default function TransactionPanel({ transactions, loading, onSave }: ITransactionPanelProps) {

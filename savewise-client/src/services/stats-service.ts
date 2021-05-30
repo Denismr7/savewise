@@ -1,4 +1,4 @@
-import { MonthsInformationResponse } from "../common/objects/stats";
+import { MonthsInformationResponse, VaultMonthlyAmountResponse } from "../common/objects/stats";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/stats`;
@@ -20,7 +20,7 @@ export function getMonthIncomeExpenses(userId: number, year: number): Promise<Mo
     );
 }
 
-export function getVaultMonthlyAmount(userId: number, vaultId: number, year: number) {
+export function getVaultMonthlyAmount(userId: number, vaultId: number, year: number): Promise<VaultMonthlyAmountResponse> {
     if (!userId) return Promise.reject("User id null");
     if (!year) return Promise.reject("Year is null");
     if (!vaultId) return Promise.reject("Vault is null");

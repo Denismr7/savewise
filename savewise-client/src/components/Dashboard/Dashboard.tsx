@@ -163,11 +163,7 @@ export default function Dashboard() {
     };
 
     const onSave = (newTransaction: Transaction) => {
-        if (transactions.find(t => t.id === newTransaction.id)) {
-            setTransactions(transactions.map(t => t.id === newTransaction.id ? newTransaction : t));
-        } else {
-            setTransactions([...transactions, newTransaction]);
-        }
+        setTransactions([...transactions, newTransaction]);
         updateMonthsBalance(newTransaction);
         getCategories(login.login?.id);
     };

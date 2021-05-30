@@ -28,6 +28,7 @@ namespace Savewise.Managers
             transaction.userId = model.tUserId;
             transaction.category = new OCategory();
             transaction.category.id = model.tCategoryId;
+            transaction.vaultId = model.tVaultId;
             if (model.CategoryNavigation != null)
             {
                 transaction.category.categoryType = new OCategoryType();
@@ -88,21 +89,23 @@ namespace Savewise.Managers
         /// </summary>
         /// <param name="userId">User ID</param>
         /// <param name="limit">The maximum number of transactions to be recovered</param>
-        public List<OTransaction> getTransactions(int userId, int limit = 5)
+        public List<OTransaction> getTransactions(int userId, int? vaultId, int limit = 5)
         {
             if (!userExists(userId))
             {
                 throw new Exception($"ERROR: No such user. User ID: [{userId}]");
             }
-            List<Transaction> transactionsModel = context.Transactions.AsNoTracking()
+            IQueryable<Transaction> transactionsModel = context.Transactions.AsNoTracking()
                                                     .Where(t => t.tUserId == userId)
                                                     .OrderByDescending(t => t.tDate)
-                                                    .Take(limit)
-                                                    .Include(t => t.CategoryNavigation)
-                                                    .ToList();
+                                                    .Include(t => t.CategoryNavigation);
             List<OTransaction> transactions = new List<OTransaction>();
+            
+            if (vaultId.HasValue) {
+                transactionsModel = transactionsModel.Where(t => t.tVaultId == vaultId.Value);
+            }
 
-            foreach (Transaction transaction in transactionsModel)
+            foreach (Transaction transaction in transactionsModel.Take(limit).ToList())
             {
                 transactions.Add(convert(transaction));
             }
