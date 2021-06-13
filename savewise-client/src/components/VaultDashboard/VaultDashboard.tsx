@@ -1,12 +1,5 @@
 import React, { ChangeEvent, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import Paper from '@material-ui/core/Paper';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import { Link } from "react-router-dom";
-import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
-import Button from '@material-ui/core/Button';
 
 import styles from './VaultDashboard.module.scss';
 import { Vault } from '../../common/objects/vault';
@@ -20,6 +13,7 @@ import { VaultMonthlyAmount } from '../../common/objects/stats';
 import moment from 'moment';
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
 import { constants } from '../../common/objects/constants';
+import VaultDashboardHeader from '../VaultDashboardHeader/VaultDashboardHeader';
 
 
 export default function VaultDashboard() {
@@ -130,42 +124,6 @@ export default function VaultDashboard() {
         }
     }, [login, vault, setSnackbarInfo]);
 
-    const renderHeader = () => {
-        return (
-            <div className={styles.vaultDashboardHeader}>
-                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        className={styles.backButton}
-                        style={{ 'marginRight': '15px' }}
-                    >
-                        <ArrowBackIosIcon />
-                    </Button>
-                </Link>
-                <FormControl variant="outlined">
-                    <InputLabel id="vaultSelectLabel">Your vaults</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-outlined-label"
-                        id="demo-simple-select-outlined"
-                        value={vault?.id ? vault?.id : ""}
-                        onChange={handleSelectChange}
-                        label="Age"
-                        className={styles.vaultSelect}
-                    >
-                        { renderMenuItems(allVaults) }
-                    </Select>
-                </FormControl>
-            </div>
-        )
-    };
-
-    const renderMenuItems = (vaults: Vault[]) => {
-        return vaults.map(v => (
-            <MenuItem key={v.id} value={v.id}>{ v.name }</MenuItem>
-        ))
-    };
-
     const renderVaultData = () => {
         const noData = (
             <div className={styles.noData}>
@@ -188,7 +146,7 @@ export default function VaultDashboard() {
 
     return (
         <Paper className="componentBg" elevation={2}>
-            { renderHeader() }
+            <VaultDashboardHeader selectValue={vault?.id} handleChange={handleSelectChange} allVaults={allVaults} />
             {
                 vault ? 
                 renderVaultData()
