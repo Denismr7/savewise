@@ -1,12 +1,22 @@
 .componentBody {
-    height: 100%;
+    height: 60%;
+    width: 100%;
+    padding: 10px 15px;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+}
+
+.vaultData {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-evenly;
 }
 
 .transactionPanelContainer {
+    height: 100%;
     width: 40%;
 }
 

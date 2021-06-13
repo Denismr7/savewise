@@ -1,5 +1,6 @@
 import React, { ChangeEvent, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 
 import styles from './VaultDashboard.module.scss';
 import { Vault } from '../../common/objects/vault';
@@ -132,12 +133,15 @@ export default function VaultDashboard() {
         );
 
         const vaultData = (
-            <div className={styles.componentBody}>
-                    <Paper className={styles.chartContainer}>
-                        <VaultChart chartData={chartData}/>
-                    </Paper>
-                    <Paper className={styles.transactionPanelContainer}>
-                        <TransactionPanel transactions={vaultTransactions} loading={loading} onSave={handleSavedTransaction}/>
+            <div className={styles.vaultData}>
+                    <Typography align="center" variant="h4">Amount: {vault?.amount} {constants.currency}</Typography>
+                    <Paper elevation={1} className={styles.componentBody}>
+                        <div className={styles.chartContainer}>
+                            <VaultChart chartData={chartData}/>
+                        </div>
+                        <div className={styles.transactionPanelContainer}>
+                            <TransactionPanel transactions={vaultTransactions} loading={loading} onSave={handleSavedTransaction}/>
+                        </div>
                     </Paper>
             </div>
         )
