@@ -33,6 +33,10 @@ export default function VaultDashboard() {
         setVault(selectedVault);
     }
 
+    const handleDelete = () => {
+        setVault(undefined);
+    }
+
     const handleSavedTransaction = (newTransaction: Transaction) => {
         if (!newTransaction.vaultId || newTransaction.vaultId !== vault?.id) return;
 
@@ -151,7 +155,7 @@ export default function VaultDashboard() {
 
     return (
         <Paper className="componentBg" elevation={2}>
-            <VaultDashboardHeader selectValue={vault?.id} handleChange={handleSelectChange} allVaults={allVaults} />
+            <VaultDashboardHeader selectValue={vault?.id} handleChange={handleSelectChange} allVaults={allVaults} handleDelete={handleDelete} />
             {
                 vault ? 
                 renderVaultData()

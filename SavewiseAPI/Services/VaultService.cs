@@ -47,7 +47,7 @@ namespace Savewise.Services
             return Json(response);
         }
 
-        // GET api/vaults/
+        // POST api/vaults/
         [HttpPost()]
         public IActionResult SaveVault([FromBody] OVault vault)
         {
@@ -60,6 +60,31 @@ namespace Savewise.Services
                 {
                     VaultManager manager = new VaultManager(context);
                     response.vault = manager.Save(vault);
+                    response.status.success = true;
+
+                    transaction.Commit();
+                }
+            }
+            catch (Exception exception)
+            {
+                response.status.errorMessage = exception.Message;
+            }
+            return Json(response);
+        }
+
+        // DELETE api/vaults/{vaultId}
+        [HttpDelete("{vaultId}")]
+        public IActionResult DeleteVault(int vaultId)
+        {
+            ServiceResponse response = new ServiceResponse();
+            response.status = new Status();
+            response.status.success = false;
+            try
+            {
+                using (var transaction = context.Database.BeginTransaction())
+                {
+                    VaultManager manager = new VaultManager(context);
+                    manager.Delete(vaultId);
                     response.status.success = true;
 
                     transaction.Commit();

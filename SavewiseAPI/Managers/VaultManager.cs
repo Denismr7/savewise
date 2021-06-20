@@ -72,6 +72,28 @@ namespace Savewise.Managers
         }
 
         /// <summary>
+        /// Delete vault
+        /// </summary>
+        public void Delete(int vaultId) {
+            // Validations
+            Vault model = context.Vaults.FirstOrDefault(vault => vault.vId == vaultId);
+            if (model == null) {
+                throw new Exception("Vault not found");
+            }
+            if (model.vAmount != 0) {
+                throw new Exception("Amount should be 0");
+            }
+
+            // Delete all vault transactions
+            List<Transaction> vaultTransactions = context.Transactions.Where(tr => tr.tVaultId == vaultId).ToList();
+            context.Transactions.RemoveRange(vaultTransactions);
+
+            // Delete vault
+            context.Vaults.Remove(model);
+            context.SaveChanges();
+        }
+
+        /// <summary>
         /// Updates the amount of a vault when a new transaction is saved
         /// </summary>
         public void updateVaultAmount(Transaction transaction, Transaction oldTransaction, bool deletedTransaction = false) {

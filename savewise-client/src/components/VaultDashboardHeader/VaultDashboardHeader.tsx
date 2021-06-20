@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactNode, useContext, useState } from 'react';
+import React, { ChangeEvent, ReactNode, useContext, useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import Button from '@material-ui/core/Button';
@@ -7,6 +7,7 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import styles from './VaultDashboardHeader.module.scss';
 import { IVaultForm, Vault } from '../../common/objects/vault';
@@ -14,18 +15,22 @@ import CreateVaultDialog from '../CreateVaultDialog/CreateVaultDialog';
 import { VaultService } from '../../services';
 import { LoginContext } from '../../common/context/LoginContext';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
+import DeleteVaultDialog from '../DeleteVaultDialog/DeleteVaultDialog';
 
 interface VaultDashboardHeaderProps {
     selectValue?: number;
     handleChange: (event: ChangeEvent<{ name?: string | undefined; value: unknown; }>, child: ReactNode) => void;
+    handleDelete: () => void;
     allVaults: Vault[];
 }
 
-export default function VaultDashboardHeader({ selectValue, handleChange, allVaults }: VaultDashboardHeaderProps) {
+export default function VaultDashboardHeader({ selectValue, handleChange, handleDelete, allVaults }: VaultDashboardHeaderProps) {
     const { login } = useContext(LoginContext);
     const { setSnackbarInfo } = useContext(SnackbarContext);
-
-    const [showDialog, setShowDialog] = useState<boolean>(false);
+    
+    const [ showCreateDialog, setShowCreateDialog ] = useState<boolean>(false);
+    const [ showDeleteDialog, setShowDeleteDialog ] = useState<boolean>(false);
+    const [ selectedVault, setSelectedVault ] = useState<Vault | undefined>(undefined);
 
     const renderMenuItems = (vaults: Vault[]) => {
         return vaults.map(v => (
@@ -33,7 +38,14 @@ export default function VaultDashboardHeader({ selectValue, handleChange, allVau
         ))
     };
 
-    async function onCloseDialog(vaultForm?: IVaultForm) {
+    useEffect(() => {
+        setSelectedVault(allVaults.find(vault => vault.id === selectValue));
+        return () => {
+            
+        }
+    }, [allVaults, selectValue])
+
+    async function onCloseSaveDialog(vaultForm?: IVaultForm) {
         if (vaultForm) {
             const vaultToSave: Vault = {
                 name: vaultForm.name,
@@ -53,7 +65,25 @@ export default function VaultDashboardHeader({ selectValue, handleChange, allVau
             }
         }
 
-        setShowDialog(false);
+        setShowCreateDialog(false);
+    }
+
+    async function onCloseDeleteDialog(deleteVault: boolean) {
+        if (deleteVault && selectedVault?.id) {
+            try {
+                const { status } = await VaultService.deleteVault(selectedVault?.id);
+                if (status.success) {
+                    setSnackbarInfo({ severity: 'success', message: 'Vault deleted successfully' });
+                    allVaults.splice(allVaults.findIndex(vault => vault.id === selectedVault.id), 1);
+                    handleDelete();
+                } else {
+                    setSnackbarInfo({ severity: 'error', message: status.errorMessage });
+                }
+            } catch (error) {
+                setSnackbarInfo({ severity: 'error', message: error });
+            }
+        } 
+        setShowDeleteDialog(false);
     }
 
     return (
@@ -83,7 +113,7 @@ export default function VaultDashboardHeader({ selectValue, handleChange, allVau
                     </FormControl>
                 </div>
                 <Button
-                        onClick={() => setShowDialog(!showDialog)}
+                        onClick={() => setShowCreateDialog(!showCreateDialog)}
                         variant="contained"
                         color="primary"
                         className={`${styles.newVaultButton} ${styles.button}`}
@@ -91,7 +121,18 @@ export default function VaultDashboardHeader({ selectValue, handleChange, allVau
                         <AddIcon />
                         Create
                 </Button>
-                <CreateVaultDialog open={showDialog} handleClose={onCloseDialog} />
+                <Button
+                        onClick={() => setShowDeleteDialog(!showDeleteDialog)}
+                        variant="contained"
+                        color="secondary"
+                        className={`${styles.deleteVaultButton} ${styles.button}`}
+                        disabled={selectedVault?.amount !== 0}
+                    >
+                        <DeleteIcon />
+                        Delete vault
+                </Button>
+                <CreateVaultDialog open={showCreateDialog} handleClose={onCloseSaveDialog} />
+                <DeleteVaultDialog open={showDeleteDialog} handleClose={onCloseDeleteDialog}/>
             </div>
     )
 }
