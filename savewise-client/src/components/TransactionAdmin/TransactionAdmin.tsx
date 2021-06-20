@@ -10,7 +10,6 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Link } from "react-router-dom";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
-import Modal from "@material-ui/core/Modal";
 import Button from "@material-ui/core/Button";
 import styles from "./TransactionAdmin.module.scss";
 import { KeyboardDatePicker } from "@material-ui/pickers";
@@ -21,6 +20,11 @@ import { SnackbarContext } from "../../common/context/SnackbarContext";
 import { constants } from "../../common/objects/constants";
 import { CategoryTypesId } from "../../common/objects/CategoryTypesId";
 import TransactionModal from "../TransactionModal/TransactionModal";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContentText from '@material-ui/core/DialogContentText';
 
 interface SearchByDates {
     fromDate: string,
@@ -204,21 +208,6 @@ export default function TransactionAdmin() {
         }
     };
 
-    const confirmDeleteBody = (
-        <div className="modalBg">
-            <h1>Delete transaction {transactionForm.description}</h1>
-            <p>This is irreversible. Are you sure?</p>
-            <Button
-                variant="contained"
-                color="secondary"
-                type="submit"
-                onClick={onConfirmDelete}
-            >
-                Confirm
-            </Button>
-        </div>
-    );
-
     const renderHeader = () => {
         return (
             <>
@@ -253,13 +242,24 @@ export default function TransactionAdmin() {
             }
             <TransactionModal conditionToShow={openModal} transaction={selectedTransaction}
              handleVisibility={() => setOpenModal(!openModal)} handleSave={(t: Transaction) => onSave(t)} />
-            <Modal
-                open={openConfirmDelete}
-                onClose={() => handleToggleDeleteModal()}
-                aria-labelledby="delete-transaction"
-            >
-                {confirmDeleteBody}
-            </Modal>
+            <Dialog open={openConfirmDelete} onClose={() => handleToggleDeleteModal()} aria-labelledby="delete-transaction">
+                <DialogTitle id="delete-transaction-title">
+                    Delete transaction {transactionForm.description}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        This is irreversible. Are you sure?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onConfirmDelete} color="primary" variant="contained">
+                        Confirm
+                    </Button>
+                    <Button onClick={() => handleToggleDeleteModal()} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }

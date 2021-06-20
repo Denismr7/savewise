@@ -1,5 +1,4 @@
 import React, { ChangeEvent, useCallback, useContext, useEffect, useState } from 'react';
-import Modal from "@material-ui/core/Modal";
 import { CategoryService, TransactionService, UtilService, VaultService } from '../../services';
 import { Transaction, TransactionForm } from '../../common/objects/transactions';
 import TextField from "@material-ui/core/TextField";
@@ -15,6 +14,10 @@ import { LoginContext } from "../../common/context/LoginContext";
 import { GetCategoriesInput } from '../../services/category-service';
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
 import { Vault } from '../../common/objects/vault';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 export interface ITransactionModalProps {
     conditionToShow: boolean;
@@ -234,11 +237,7 @@ export default function TransactionModal({ conditionToShow, transaction, handleV
     }
 
     const modalBody = (
-        <div className="modalBg">
-            {transactionForm.id ? 
-            (<h1 className="titleColor">Edit transaction</h1>) 
-            : 
-            (<h1 className="titleColor">Create transaction</h1>)}
+        <>
             <TextField
                 id="outlined-basic"
                 onChange={handleInputChange}
@@ -294,26 +293,28 @@ export default function TransactionModal({ conditionToShow, transaction, handleV
                 style={{ marginTop: "10px" }}
                 fullWidth
             />
-            <div className="buttonGroupModal">
-                <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    onClick={onSave}
-                >
-                    Save
-                </Button>
-            </div>
-        </div>
+        </>
     );
 
     return (
-        <Modal
-                open={conditionToShow}
-                onClose={() => handleVisibility()}
-                aria-labelledby="add-transaction"
-            >
+        <Dialog open={conditionToShow} onClose={() => handleVisibility()} aria-labelledby="transaction-modal-title">
+            <DialogTitle id="transaction-modal-title">
+                {transactionForm.id ?
+                    'Edit transaction'
+                    :
+                    'Create transaction'}
+            </DialogTitle>
+            <DialogContent>
                 {modalBody}
-        </Modal>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onSave} color="primary" variant="contained">
+                    Save
+                </Button>
+                <Button onClick={handleVisibility} color="primary">
+                    Cancel
+                </Button>
+            </DialogActions>
+        </Dialog>
     )
 }
