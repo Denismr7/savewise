@@ -1,4 +1,4 @@
-import { VaultsResponse } from "../common/objects/vault";
+import { Vault, VaultResponse, VaultsResponse } from "../common/objects/vault";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 const baseUrl = `${apiUrl}/vaults`;
@@ -17,4 +17,22 @@ export function getUserVaults(userId: number): Promise<VaultsResponse> {
     return fetch(url, options).then(response =>
       response.json()
     );
+}
+
+export function saveVault(vault: Vault): Promise<VaultResponse> {
+    if (!vault) return Promise.reject("Vault null");
+
+    const url = `${baseUrl}`;
+    const body = JSON.stringify(vault);
+    const options: RequestInit = {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',    
+          'Access-Control-Allow-Origin':'*',
+        },
+        body
+    };
+
+    return fetch(url, options).then(response => response.json());
 }

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactNode, useState } from 'react';
+import React, { ChangeEvent, ReactNode, useContext, useState } from 'react';
 import { Link } from "react-router-dom";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import Button from '@material-ui/core/Button';
@@ -11,6 +11,9 @@ import AddIcon from '@material-ui/icons/Add';
 import styles from './VaultDashboardHeader.module.scss';
 import { IVaultForm, Vault } from '../../common/objects/vault';
 import CreateVaultDialog from '../CreateVaultDialog/CreateVaultDialog';
+import { VaultService } from '../../services';
+import { LoginContext } from '../../common/context/LoginContext';
+import { SnackbarContext } from '../../common/context/SnackbarContext';
 
 interface VaultDashboardHeaderProps {
     selectValue?: number;
@@ -19,6 +22,9 @@ interface VaultDashboardHeaderProps {
 }
 
 export default function VaultDashboardHeader({ selectValue, handleChange, allVaults }: VaultDashboardHeaderProps) {
+    const { login } = useContext(LoginContext);
+    const { setSnackbarInfo } = useContext(SnackbarContext);
+
     const [showDialog, setShowDialog] = useState<boolean>(false);
 
     const renderMenuItems = (vaults: Vault[]) => {
@@ -27,9 +33,24 @@ export default function VaultDashboardHeader({ selectValue, handleChange, allVau
         ))
     };
 
-    function onCloseDialog(vaultForm?: IVaultForm) {
+    async function onCloseDialog(vaultForm?: IVaultForm) {
         if (vaultForm) {
-            console.log("Form: ", vaultForm);
+            const vaultToSave: Vault = {
+                name: vaultForm.name,
+                amount: vaultForm.amount != null && vaultForm.amount >= 0 ? vaultForm.amount : 0,
+                userId: login.login?.id ?? 0
+            }
+            try {
+                const { status, vault } = await VaultService.saveVault(vaultToSave);
+                if (status.success) {
+                    allVaults.push(vault);
+                    setSnackbarInfo({ severity: 'success', message: 'Vault created successfully' });
+                } else {
+                    setSnackbarInfo({ severity: 'error', message: status.errorMessage });
+                }
+            } catch (error) {
+                setSnackbarInfo({ severity: 'error', message: error });
+            }
         }
 
         setShowDialog(false);

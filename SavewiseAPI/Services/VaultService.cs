@@ -18,6 +18,10 @@ namespace Savewise.Services
             public List<OVault> vaults { get; set; }
         }
 
+        public class VaultResponse : ServiceResponse {
+            public OVault vault { get; set; }
+        }
+
         public VaultService(SavewiseContext context): base(context)
         {
 
@@ -35,6 +39,31 @@ namespace Savewise.Services
                 VaultManager manager = new VaultManager(context);
                 response.vaults = manager.getAll(id);
                 response.status.success = true;
+            }
+            catch (Exception exception)
+            {
+                response.status.errorMessage = exception.Message;
+            }
+            return Json(response);
+        }
+
+        // GET api/vaults/
+        [HttpPost()]
+        public IActionResult SaveVault([FromBody] OVault vault)
+        {
+            VaultResponse response = new VaultResponse();
+            response.status = new Status();
+            response.status.success = false;
+            try
+            {
+                using (var transaction = context.Database.BeginTransaction())
+                {
+                    VaultManager manager = new VaultManager(context);
+                    response.vault = manager.Save(vault);
+                    response.status.success = true;
+
+                    transaction.Commit();
+                }
             }
             catch (Exception exception)
             {

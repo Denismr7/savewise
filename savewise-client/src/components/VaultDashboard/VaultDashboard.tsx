@@ -128,7 +128,8 @@ export default function VaultDashboard() {
     const renderVaultData = () => {
         const noData = (
             <div className={styles.noData}>
-                <h2>No data for this vault</h2>
+                <Typography align="center" variant="h4">Amount: {vault?.amount} {constants.currency}</Typography>
+                <h2>This vault has no transactions</h2>
             </div>
         );
 

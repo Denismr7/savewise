@@ -11,6 +11,10 @@ export interface VaultsResponse extends BasicResponse {
     vaults: Vault[];
 }
 
+export interface VaultResponse extends BasicResponse {
+    vault: Vault;
+}
+
 export interface IVaultForm {
     name: string;
     amount: number;

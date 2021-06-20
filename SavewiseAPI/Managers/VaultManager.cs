@@ -31,6 +31,47 @@ namespace Savewise.Managers
         }
 
         /// <summary>
+        /// Save vault
+        /// </summary>
+        public OVault Save(OVault vault) {
+            bool isNew = !vault.id.HasValue;
+            // Validations
+            if (vault.amount.HasValue && vault.amount.Value < 0) {
+                throw new Exception("Invalid vault amount");
+            }
+            if (!vault.userID.HasValue) {
+                throw new Exception("Vault must have an user id");
+            }
+            if (isNew && existsVaultWithSameUserAndName(vault.userID.Value, vault.name)) {
+                throw new Exception("There is a vault with the same name");
+            }
+
+            // Create or edit
+            Vault model;
+            if (isNew) {
+                model = new Vault();
+            } else {
+                model = context.Vaults.FirstOrDefault(v => v.vId == vault.id.Value);
+                if (model == null) {
+                    throw new Exception($"Vault {vault.id.Value} not found");
+                }
+            }
+            model.vName = vault.name;
+            model.vUserId = vault.userID.Value;
+            model.vAmount = vault.amount.Value;
+
+            // Save changes
+            if (isNew) {
+                context.Vaults.Add(model);
+            } else {
+                context.Vaults.Update(model);
+            }
+            context.SaveChanges();
+
+            return convert(model);
+        }
+
+        /// <summary>
         /// Updates the amount of a vault when a new transaction is saved
         /// </summary>
         public void updateVaultAmount(Transaction transaction, Transaction oldTransaction, bool deletedTransaction = false) {
@@ -109,6 +150,10 @@ namespace Savewise.Managers
             vault.name = model.vName;
 
             return vault;
+        }
+
+        private bool existsVaultWithSameUserAndName(int vaultUserId, string vaultName) {
+            return context.Vaults.AsNoTracking().FirstOrDefault(vault => vault.vUserId == vaultUserId && vault.vName == vaultName) != null;
         }
     }
 }
