@@ -33,5 +33,10 @@ namespace Savewise.Services.Objects
         /// Transaction description
         /// </summary>
         public string description { get; set; }
+
+        /// <summary>
+        /// Vault ID
+        /// </summary>
+        public int? vaultId { get; set; }
     }
 }

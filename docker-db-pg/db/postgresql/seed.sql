@@ -3,5 +3,6 @@ ALTER TABLE Users ALTER COLUMN u_id RESTART WITH 2;
 
 INSERT INTO CategoryTypes (ct_id, ct_name) VALUES (1, 'Incomes');
 INSERT INTO CategoryTypes (ct_id, ct_name) VALUES (2, 'Expenses');
-INSERT INTO CategoryTypes (ct_id, ct_name) VALUES (3, 'Investments');
-ALTER TABLE CategoryTypes ALTER COLUMN ct_id RESTART WITH 4;
+INSERT INTO CategoryTypes (ct_id, ct_name) VALUES (3, 'Vaults Incomes');
+INSERT INTO CategoryTypes (ct_id, ct_name) VALUES (4, 'Vaults Expenses');
+ALTER TABLE CategoryTypes ALTER COLUMN ct_id RESTART WITH 5;

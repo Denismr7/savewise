@@ -8,6 +8,7 @@ export interface Transaction {
     amount: number;
     date: string;
     description: string;
+    vaultId?: number;
 }
 
 export interface TransactionResponse extends BasicResponse {
@@ -16,4 +17,13 @@ export interface TransactionResponse extends BasicResponse {
 
 export interface TransactionsResponse extends BasicResponse {
     transactions: Transaction[];
+}
+
+export interface TransactionForm {
+    id?: number;
+    categoryId: number | undefined;
+    amount: number | undefined;
+    date: string;
+    description: string;
+    vaultId?: number;
 }

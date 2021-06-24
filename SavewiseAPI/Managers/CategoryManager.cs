@@ -75,7 +75,7 @@ namespace Savewise.Managers
         public double getAmount(int userId, int categoryId , string fromDate, string toDate) {
             double result = 0;
             TransactionManager transactionManager = new TransactionManager(context);
-            List<OTransaction> transactions = transactionManager.getAllByDates(userId, fromDate, toDate);
+            List<OTransaction> transactions = transactionManager.getAllByDates(userId, fromDate, toDate, null);
             List<OTransaction> categoryTransactions = transactions.Where(t => t.category.id == categoryId).ToList();
             foreach (OTransaction transaction in categoryTransactions)
             {

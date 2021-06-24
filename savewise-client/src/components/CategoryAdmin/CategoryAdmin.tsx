@@ -4,7 +4,6 @@ import { CategoryService } from "../../services";
 import { LoginContext } from '../../common/context/LoginContext';
 import Button from '@material-ui/core/Button';
 import styles from "./CategoryAdmin.module.scss";
-import Modal from '@material-ui/core/Modal';
 import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import EditIcon from '@material-ui/icons/Edit';
@@ -19,6 +18,11 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { Entity } from '../../common/objects/Entity';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContentText from '@material-ui/core/DialogContentText';
 
 interface categoryForm {
   categoryName: string,
@@ -172,12 +176,7 @@ export function CategoryAdmin() {
     }
 
   const modalBody = (
-    <div className={styles.modalBg}>
-      { selectedCategoryId ? 
-        (<h1 className="titleColor">Edit category</h1>) 
-        : 
-        (<h1 className="titleColor">Create category</h1>) 
-      }
+    <>
       <TextField 
                 id="filled-basic"
                 onChange={handleNewCategoryName} 
@@ -199,22 +198,7 @@ export function CategoryAdmin() {
           { renderCategoryTypes(categoryTypesList) }
         </Select>
       </FormControl>
-        <div className={styles.buttonGroup}>
-          <Button variant="contained" color="primary" type="submit" onClick={() => submitCategory(categoryForm, selectedCategoryId)}>
-            Save
-          </Button>
-        </div>
-    </div>
-  );
-
-  const confirmDeleteBody = (
-    <div className={styles.modalBg}>
-        <h1>Delete category { categoryForm.categoryName }</h1>
-        <p>This is irreversible. All transactions will be lost</p>
-        <Button variant="contained" color="secondary" type="submit" onClick={() => handleDeleteCategory(selectedCategoryId)}>
-            Confirm
-        </Button>
-    </div>
+    </>
   );
 
   return (
@@ -235,20 +219,44 @@ export function CategoryAdmin() {
                 {showCategories(categories)}
             </div>)
         }
-        <Modal
-            open={openModal}
-            onClose={() => handleToggleModal()}
-            aria-labelledby="add-category"
-            >
+        <Dialog open={openModal} onClose={() => handleToggleModal()} aria-labelledby="add-category">
+            <DialogTitle id="add-category-title">
+                {selectedCategoryId ?
+                    'Edit category'
+                    :
+                    'Create category'
+                }
+            </DialogTitle>
+            <DialogContent>
                 {modalBody}
-        </Modal>
-        <Modal
-            open={openConfirmDelete}
-            onClose={() => handleToggleDeleteModal()}
-            aria-labelledby="delete-category"
-            >
-                {confirmDeleteBody}
-        </Modal>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => submitCategory(categoryForm, selectedCategoryId)} color="primary" variant="contained">
+                    Save
+                </Button>
+                <Button onClick={() => handleToggleModal()} color="primary">
+                    Cancel
+                </Button>
+            </DialogActions>
+        </Dialog>
+        <Dialog open={openConfirmDelete} onClose={() => handleToggleDeleteModal()} aria-labelledby="delete-category">
+            <DialogTitle id="delete-category-title">
+                Delete category { categoryForm.categoryName }
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    This is irreversible. Are you sure?
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => handleDeleteCategory(selectedCategoryId)} color="primary" variant="contained">
+                    Confirm
+                </Button>
+                <Button onClick={() => handleToggleDeleteModal()} color="primary">
+                    Cancel
+                </Button>
+            </DialogActions>
+        </Dialog>
     </div>
   );
 }

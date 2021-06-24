@@ -17,6 +17,7 @@ import { User } from './common/objects/user';
 import TransactionAdmin from './components/TransactionAdmin/TransactionAdmin';
 import UserAdmin from './components/UserAdmin/UserAdmin';
 import SnackbarComponent from './components/Snackbar/SnackbarComponent';
+import VaultDashboard from './components/VaultDashboard/VaultDashboard';
 
 function App() {
   const {login, setLogin} = useContext(LoginContext);
@@ -45,6 +46,7 @@ function App() {
             <PrivateRoute component={Dashboard} path="/dashboard" exact conditionToRender={login.isLogged} />
             <PrivateRoute component={CategoryAdmin} path="/categories" exact conditionToRender={login.isLogged} />
             <PrivateRoute component={TransactionAdmin} path="/transactions" exact conditionToRender={login.isLogged} />
+            <PrivateRoute component={VaultDashboard} path="/vaults" exact conditionToRender={login.isLogged} />
             <Redirect from="/" to="/login" exact/>
           </Switch>
           <SnackbarComponent />

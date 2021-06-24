@@ -1,34 +1,30 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from "react";
-import { Category } from "../../common/objects/categories";
-import { Transaction } from "../../common/objects/transactions";
+import React, { useContext, useEffect, useState } from "react";
+import { Transaction, TransactionForm } from "../../common/objects/transactions";
 import { LoginContext } from "../../common/context/LoginContext";
-import { GetCategoriesInput } from "../../services/category-service";
 import {
-    CategoryService,
     TransactionService,
     UtilService,
 } from "../../services";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
 import IconButton from "@material-ui/core/IconButton";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { Link } from "react-router-dom";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
-import Modal from "@material-ui/core/Modal";
-import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import styles from "./TransactionAdmin.module.scss";
-import Select from "@material-ui/core/Select";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { Status } from "../../common/objects/response";
-import { TransactionForm } from "../../common/objects/Transaction";
 import SearchIcon from '@material-ui/icons/Search';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { SnackbarContext } from "../../common/context/SnackbarContext";
 import { constants } from "../../common/objects/constants";
 import { CategoryTypesId } from "../../common/objects/CategoryTypesId";
+import TransactionModal from "../TransactionModal/TransactionModal";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContentText from '@material-ui/core/DialogContentText';
 
 interface SearchByDates {
     fromDate: string,
@@ -40,6 +36,7 @@ export default function TransactionAdmin() {
     const { setSnackbarInfo } = useContext(SnackbarContext);
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | undefined>();
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [openConfirmDelete, setOpenConfirmDelete] = useState<boolean>(false);
     const [transactionForm, setTransactionForm] = useState<TransactionForm>({
@@ -49,27 +46,11 @@ export default function TransactionAdmin() {
         description: "",
     });
     const [loading, setLoading] = useState(true);
-    const [userCategories, setUserCategories] = useState<Category[]>([]);
     const [showSearch, setShowSearch] = useState<boolean>(false);
     const [searchForm, setSearchForm] = useState<SearchByDates>({ fromDate: UtilService.today(), toDate: UtilService.tomorrow() });
 
     useEffect(() => {
         const id: number = login.login?.id as number;
-        const categoriesOptions: GetCategoriesInput = {
-            includeAmounts: false,
-            startDate: "",
-            endDate: "",
-        };
-        CategoryService.getCategories(id, categoriesOptions)
-            .then((rsp) => {
-                if (rsp.status.success) {
-                    setUserCategories(rsp.categories);
-                } else {
-                    console.log(`Error: ${rsp.status.errorMessage}`);
-                }
-            })
-            .catch((e) => console.log(`ERROR: ${e}`));
-
         TransactionService.GetTransactions(id, undefined, undefined, 10)
             .then((rsp) => {
                 if (rsp.status.success) {
@@ -82,12 +63,13 @@ export default function TransactionAdmin() {
             .catch((e) => console.log(`ERROR: ${e}`));
 
         return () => {
-            setUserCategories([]);
+
         };
     }, [login]);
 
     const renderTransactions = (transactions: Transaction[]) => {
-        return transactions.map((transaction) => {
+        const sortedByDate = UtilService.sortTransactionByDate(transactions);
+        return sortedByDate.map((transaction) => {
             const isIncome = transaction.category.categoryType?.id === CategoryTypesId.Incomes ? true : false; 
             const symbol: string = isIncome ? "+" : "-";
             const color = isIncome ? 'incomeGreenColor' : 'regularColor';
@@ -181,23 +163,7 @@ export default function TransactionAdmin() {
     }
 
     const handleToggleModal = (transaction?: Transaction) => {
-        if (transaction) {
-            setTransactionForm({
-                id: transaction.id,
-                categoryId: transaction.category.id,
-                amount: transaction.amount,
-                date: transaction.date,
-                description: transaction.description,
-            });
-        } else {
-            setTransactionForm({
-                id: undefined,
-                categoryId: undefined,
-                amount: undefined,
-                date: UtilService.today(),
-                description: "",
-            });
-        }
+        setSelectedTransaction(transaction);
         setOpenModal(!openModal);
     };
 
@@ -214,75 +180,14 @@ export default function TransactionAdmin() {
         setOpenConfirmDelete(!openConfirmDelete);
     };
 
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.name === "amount") {
-            setTransactionForm({
-                ...transactionForm,
-                [event.target.name]: Number(event.target.value),
-            });
+    const onSave = (savedTransaction: Transaction) => {
+        let updatedTransactions: Transaction[];
+        if (transactions.find((t) => t.id === savedTransaction.id)) {
+            updatedTransactions = transactions.map((t) => t.id === savedTransaction.id ? savedTransaction : t);
         } else {
-            setTransactionForm({
-                ...transactionForm,
-                [event.target.name]: event.target.value,
-            });
+            updatedTransactions = [...transactions, savedTransaction];
         }
-    };
-
-    const handleSelectChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setTransactionForm({
-            ...transactionForm,
-            categoryId: event.target.value as number,
-        });
-    };
-
-    const handleDateChange = (date: Date | null) => {
-        setTransactionForm({
-            ...transactionForm,
-            date: date ? UtilService.formatDate(date) : "",
-        });
-    };
-
-    const renderUserCategories = (userCategories: Category[]) => {
-        if (userCategories.length) {
-            return userCategories.map((category) => {
-                return (
-                    <MenuItem key={category.id} value={category.id}>
-                        {category.name}
-                    </MenuItem>
-                );
-            });
-        }
-    };
-
-    const onSave = () => {
-        const transaction: Transaction = {
-            userId: login.login?.id as number,
-            category: userCategories.find(
-                (c) => c.id === transactionForm.categoryId
-            ) as Category,
-            amount: transactionForm.amount as number,
-            date: transactionForm.date,
-            description: transactionForm.description,
-            id: transactionForm.id,
-        };
-        TransactionService.SaveTransaction(transaction)
-            .then((rsp) => {
-                if (rsp.status.success) {
-                    handleToggleModal();
-                    let updatedTransactions: Transaction[];
-                    if (transactions.find((t) => t.id === rsp.transaction.id)) {
-                        updatedTransactions = UtilService.sortTransactionByDate(transactions.map((t) =>t.id === rsp.transaction.id ? rsp.transaction : t))
-                    } else {
-                        updatedTransactions = [...transactions, rsp.transaction];
-                    }
-                    const sortedTransactions = UtilService.sortTransactionByDate(updatedTransactions);
-                    setTransactions(sortedTransactions);
-                    setSnackbarInfo({ severity: "success", message: "Transaction saved successfully!" })
-                } else {
-                    setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
-                }
-            })
-            .catch((e) => setSnackbarInfo({ severity: "error", message: e }));
+        setTransactions(updatedTransactions);
     };
 
     const onConfirmDelete = () => {
@@ -292,7 +197,7 @@ export default function TransactionAdmin() {
                     if (rsp.success) {
                         handleToggleDeleteModal();
                         setTransactions(
-                            UtilService.sortTransactionByDate(transactions.filter((t) => t.id !== transactionForm.id))
+                            transactions.filter((t) => t.id !== transactionForm.id)
                         );
                         setSnackbarInfo({ severity: "success", message: `Transaction ${transactionForm.description} deleted succesfully!` });
                     } else {
@@ -302,90 +207,6 @@ export default function TransactionAdmin() {
                 .catch((e) => setSnackbarInfo({ severity: "error", message: e }));
         }
     };
-
-    const modalBody = (
-        <div className={styles.modalBg}>
-            {transactionForm.id ? 
-            (<h1 className="titleColor">Edit transaction</h1>) 
-            : 
-            (<h1 className="titleColor">Create transaction</h1>)}
-            <TextField
-                id="outlined-basic"
-                onChange={handleInputChange}
-                label="Transaction Name"
-                variant="outlined"
-                name="description"
-                value={transactionForm.description}
-                fullWidth
-            />
-            <TextField
-                id="outlined-basic"
-                onChange={handleInputChange}
-                label="Amount (€)"
-                variant="outlined"
-                name="amount"
-                type="number"
-                value={transactionForm.amount ? transactionForm.amount : ""}
-                style={{ marginTop: "10px" }}
-                placeholder="€"
-                fullWidth
-            />
-            <FormControl
-                style={{ marginTop: "10px" }}
-                variant="outlined"
-                fullWidth
-            >
-                <InputLabel id="category">Category</InputLabel>
-                <Select
-                    labelId="category"
-                    id="categorySelect"
-                    value={transactionForm.categoryId ? transactionForm.categoryId : ""}
-                    onChange={handleSelectChange}
-                >
-                    {renderUserCategories(userCategories)}
-                </Select>
-            </FormControl>
-            <KeyboardDatePicker
-                inputVariant="outlined"
-                margin="normal"
-                id="date-picker-dialog"
-                label="Date"
-                format="dd/MM/yyyy"
-                value={UtilService.formatStringDatePicker(transactionForm.date)}
-                onChange={handleDateChange}
-                KeyboardButtonProps={{
-                    "aria-label": "change date",
-                }}
-                style={{ marginTop: "10px" }}
-                fullWidth
-            />
-            <div className={styles.buttonGroup}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    onClick={onSave}
-                >
-                    Save
-                </Button>
-            </div>
-        </div>
-    );
-
-    const confirmDeleteBody = (
-        <div className={styles.modalBg}>
-            <h1>Delete transaction {transactionForm.description}</h1>
-            <p>This is irreversible. Are you sure?</p>
-            <Button
-                variant="contained"
-                color="secondary"
-                type="submit"
-                onClick={onConfirmDelete}
-            >
-                Confirm
-            </Button>
-        </div>
-    );
 
     const renderHeader = () => {
         return (
@@ -419,20 +240,26 @@ export default function TransactionAdmin() {
                         {renderTransactions(transactions)}
                 </div>)
             }
-            <Modal
-                open={openModal}
-                onClose={() => handleToggleModal()}
-                aria-labelledby="add-transaction"
-            >
-                {modalBody}
-            </Modal>
-            <Modal
-                open={openConfirmDelete}
-                onClose={() => handleToggleDeleteModal()}
-                aria-labelledby="delete-transaction"
-            >
-                {confirmDeleteBody}
-            </Modal>
+            <TransactionModal conditionToShow={openModal} transaction={selectedTransaction}
+             handleVisibility={() => setOpenModal(!openModal)} handleSave={(t: Transaction) => onSave(t)} />
+            <Dialog open={openConfirmDelete} onClose={() => handleToggleDeleteModal()} aria-labelledby="delete-transaction">
+                <DialogTitle id="delete-transaction-title">
+                    Delete transaction {transactionForm.description}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        This is irreversible. Are you sure?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onConfirmDelete} color="primary" variant="contained">
+                        Confirm
+                    </Button>
+                    <Button onClick={() => handleToggleDeleteModal()} color="primary">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }

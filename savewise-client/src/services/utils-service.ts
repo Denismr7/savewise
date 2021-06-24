@@ -17,6 +17,7 @@ export function lastDayMonthDate(month: number, year: number): string {
     return asString;
 }
 
+// Transforms a spanish format date string to a Date object
 export function toDate(dateAsString: string): Date {
     return moment(dateAsString, constants.dateFormats.fullDate).toDate();
 }

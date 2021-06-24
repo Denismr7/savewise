@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, ChangeEvent, useCallback } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import Grid from '@material-ui/core/Grid';
 import styles from "./Dashboard.module.scss";
 import { Typography } from '@material-ui/core';
@@ -11,16 +11,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { GetCategoriesInput } from '../../services/category-service';
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
 import { Transaction } from '../../common/objects/transactions';
-import { TransactionForm } from '../../common/objects/Transaction';
-import Modal from "@material-ui/core/Modal";
-import MenuItem from "@material-ui/core/MenuItem";
-import TextField from "@material-ui/core/TextField";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from '@material-ui/core/Select';
-import { KeyboardDatePicker } from '@material-ui/pickers';
 import IconButton from '@material-ui/core/IconButton';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
 import { constants } from '../../common/objects/constants';
@@ -29,6 +20,9 @@ import ArrowForwardIosOutlinedIcon from '@material-ui/icons/ArrowForwardIosOutli
 import MonthsBalanceChart from '../MonthsBalanceChart/MonthsBalanceChart';
 import { MonthInformation } from '../../common/objects/stats';
 import moment from 'moment';
+import TransactionModal from '../TransactionModal/TransactionModal';
+import TransactionPanel from '../TransactionPanel/TransactionPanel';
+import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -38,12 +32,6 @@ export default function Dashboard() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [transactionForm, setTransactionForm] = useState<TransactionForm>({
-        categoryId: undefined,
-        amount: undefined,
-        date: UtilService.today(),
-        description: "",
-    });
     const [currentMonth, setCurrentMonth] = useState<string>('');
     const [selectedMonthNumber, setSelectedMonthNumber] = useState<number>(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
@@ -84,7 +72,7 @@ export default function Dashboard() {
                 const toDate = UtilService.lastDayMonthDate(selectedMonthNumber, selectedYear)
                 TransactionService.GetTransactions(userId, fromDate, toDate, 10).then(rsp => {
                     if (rsp.status.success) {
-                        setTransactions( UtilService.sortTransactionByDate(rsp.transactions));
+                        setTransactions(rsp.transactions);
                         setLoading(false);
                     } else {
                         setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
@@ -174,160 +162,11 @@ export default function Dashboard() {
         } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No categories to show</Typography>);
     };
 
-    const renderTransactions = (transactions: Transaction[]) => {
-        if (transactions.length) {
-            const sortedByDate = transactions.sort((a, b) => Number(b.id) - Number(a.id));
-            return sortedByDate.map(t => {
-                const isIncome = t.category.categoryType?.id === CategoryTypesId.Incomes ? true : false; 
-                const symbol: string = isIncome ? "+" : "-";
-                const color = isIncome ? 'incomeGreenColor' : 'regularColor';
-                return (
-                    <Grid item
-                        container
-                        direction="row"
-                        justify="space-between"
-                        spacing={0}
-                        key={t.id}
-                    >
-                        <Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{t.description}</Typography>
-                        <Typography variant="h6" component="h2" style={{ display: 'inline', marginRight: '15px' }} className={color}>
-                            { symbol } { t.amount } { constants.currency }
-                        </Typography>
-                    </Grid>
-                )
-            }
-            )
-        } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No transactions to show</Typography>);
-    }
-
-    const handleToggleModal = (transaction?: Transaction) => {
-        if (transaction) {
-            setTransactionForm({
-                id: transaction.id,
-                categoryId: transaction.category.id,
-                amount: transaction.amount,
-                date: transaction.date,
-                description: transaction.description,
-            });
-        } else {
-            setTransactionForm({
-                id: undefined,
-                categoryId: undefined,
-                amount: undefined,
-                date: UtilService.today(),
-                description: ''
-            })
-        }
-        setOpenModal(!openModal);
+    const onSave = (newTransaction: Transaction) => {
+        setTransactions([...transactions, newTransaction]);
+        updateMonthsBalance(newTransaction);
+        getCategories(login.login?.id);
     };
-
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.name === 'amount') {
-            setTransactionForm({...transactionForm, [event.target.name]: Number(event.target.value)});
-        } else {
-            setTransactionForm({...transactionForm, [event.target.name]: event.target.value});
-        }
-    }
-
-    const handleSelectChange = (event: ChangeEvent<{ value: unknown }>) => {
-        setTransactionForm({...transactionForm, categoryId: event.target.value as number});
-    }
-
-    const handleDateChange = (date: Date | null) => {
-        setTransactionForm({...transactionForm, date: date ? UtilService.formatDate(date) : ''});
-    };
-
-    const renderUserCategories = (userCategories: Category[]) => {
-        if (userCategories.length) {
-          return userCategories.map(category => {
-            return (
-              <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
-            );
-          })
-        }
-    }
-
-    const onSave = () => {
-        const transaction: Transaction = {
-            userId: login.login?.id as number,
-            category: categories.find(c => c.id === transactionForm.categoryId) as Category,
-            amount: transactionForm.amount as number,
-            date: transactionForm.date,
-            description: transactionForm.description,
-            id: transactionForm.id
-        }
-        TransactionService.SaveTransaction(transaction).then(rsp => {
-            if (rsp.status.success) {
-                handleToggleModal();
-                if (transactions.find(t => t.id === rsp.transaction.id)) {
-                    setTransactions(transactions.map(t => t.id === rsp.transaction.id ? rsp.transaction : t));
-                } else {
-                    setTransactions([...transactions, rsp.transaction]);
-                }
-                updateMonthsBalance(rsp.transaction);
-                getCategories(login.login?.id);
-            } else {
-                setSnackbarInfo({ severity: "error", message: rsp.status.errorMessage });
-            }
-        }).catch(e => setSnackbarInfo({ severity: "error", message: e }));
-    }
-
-    const modalBody = (
-        <div className={styles.modalBg}>
-            <h1 className={styles.title}>Add new transaction</h1>
-            <TextField 
-                    id="outlined-basic"
-                    onChange={handleInputChange} 
-                    label="Transaction Name" 
-                    variant="outlined" 
-                    name="description"
-                    value={transactionForm.description}
-                    fullWidth
-                    />
-            <TextField 
-                    id="outlined-basic"
-                    onChange={handleInputChange} 
-                    label="Amount (€)" 
-                    variant="outlined" 
-                    name="amount"
-                    type="number"
-                    value={transactionForm.amount ? transactionForm.amount : ''}
-                    style={{ marginTop: '10px' }}
-                    fullWidth
-                    placeholder="€"
-                    />
-            <FormControl style={{ marginTop: '10px' }} fullWidth variant='outlined'>
-                <InputLabel id="category">Category</InputLabel>
-                <Select
-                labelId="category"
-                id="categorySelect"
-                value={transactionForm.categoryId ? transactionForm.categoryId : ''}
-                onChange={handleSelectChange}
-                >
-                { renderUserCategories(categories) }
-                </Select>
-            </FormControl>
-            <KeyboardDatePicker
-                inputVariant="outlined"
-                margin="normal"
-                id="date-picker-dialog"
-                label="Date"
-                format="dd/MM/yyyy"
-                value={UtilService.formatStringDatePicker(transactionForm.date)}
-                onChange={handleDateChange}
-                KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                }}
-                style={{ marginTop: '10px' }}
-                fullWidth
-            />
-            <div className={styles.buttonGroup}>
-                <Button variant="contained" color="primary" type="submit" onClick={onSave}>
-                    Save
-                </Button>
-            </div>
-        </div>
-    );
 
     const navigateMonth = (direction: "b" | "f") => {
         let month = selectedMonthNumber;
@@ -402,6 +241,9 @@ export default function Dashboard() {
                     Welcome back, { login.login?.name }
                     <Link to="/user" style={{ textDecoration: 'none' }}>
                         <SettingsOutlinedIcon className={styles.settingsIcon} />
+                    </Link>
+                    <Link to="/vaults" style={{ textDecoration: 'none' }}>
+                        <AccountBalanceIcon className={styles.navbarIcon} />
                     </Link>
                 </Typography>
             </Grid>
@@ -484,46 +326,10 @@ export default function Dashboard() {
                 </Grid>
                 <Grid item>
                     <div className={styles.panel}>
-                        <Grid container
-                            direction="column"
-                            alignItems="center"
-                            justify='space-between'
-                            style={{ height: '95%' }}
-                            >
-                                <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
-                                    Last transactions
-                                    <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => handleToggleModal()}>
-                                        <AddCircleOutlineIcon />
-                                    </IconButton>
-                                </Typography>
-                                <Grid container
-                                direction="column"
-                                style={{ height: '70%' }}
-                                spacing={3}
-                                >
-                                    { loading ? 
-                                    (<CircularProgress color="secondary" />) 
-                                    : 
-                                    (<div className={styles.itemsContainer}>
-                                        {renderTransactions(transactions)}
-                                    </div>)    
-                                }
-                                </Grid>
-                                <Link to="/transactions">
-                                    <Button variant="outlined" color="primary">
-                                        Manage
-                                    </Button>
-                                </Link>
-                            </Grid>
+                        <TransactionPanel transactions={transactions} loading={loading} onSave={onSave} ></TransactionPanel>
                     </div>
                 </Grid>
-            <Modal
-                open={openModal}
-                onClose={() => handleToggleModal()}
-                aria-labelledby="add-transaction"
-            >
-                {modalBody}
-            </Modal>
+            <TransactionModal conditionToShow={openModal} handleVisibility={() => setOpenModal(!openModal)} handleSave={(t: Transaction) => onSave(t)} />
             </Grid>
         </Grid>
     )

@@ -15,12 +15,12 @@ export default function SnackbarComponent() {
         <>
             <Snackbar open={snackbarInfo.severity === "success"} autoHideDuration={autoHideDuration} onClose={handleSnackbarClose}>
                 <Alert onClose={handleSnackbarClose} severity="success">
-                    { snackbarInfo.message }
+                    { snackbarInfo.message?.toString() }
                 </Alert>
             </Snackbar>
             <Snackbar open={snackbarInfo.severity === "error"} autoHideDuration={autoHideDuration} onClose={handleSnackbarClose}>
                 <Alert onClose={handleSnackbarClose} severity="error">
-                    { snackbarInfo.message }
+                    { snackbarInfo.message?.toString() }
                 </Alert>
             </Snackbar>
         </>

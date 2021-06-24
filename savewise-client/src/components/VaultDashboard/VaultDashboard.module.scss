@@ -1,0 +1,33 @@
+.componentBody {
+    height: 60%;
+    width: 100%;
+    padding: 10px 15px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.vaultData {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-evenly;
+}
+
+.transactionPanelContainer {
+    height: 100%;
+    width: 40%;
+}
+
+.chartContainer {
+    width: 55%;
+}
+
+.noData {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

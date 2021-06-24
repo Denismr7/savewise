@@ -1,0 +1,26 @@
+.vaultDashboardHeader {
+    display: flex;
+    align-items: center;
+}
+
+.vaultSelect {
+    margin: auto 15px;
+    width: 15rem;
+}
+
+.button {
+    height: 55px;
+}
+
+.backButton {
+    width: 55px;
+}
+
+.newVaultButton {
+    width: max-content;
+}
+
+.deleteVaultButton {
+    width: max-content;
+    margin-left: 5px !important;
+}
