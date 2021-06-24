@@ -12,7 +12,6 @@ import { GetCategoriesInput } from '../../services/category-service';
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
 import { Transaction } from '../../common/objects/transactions';
 import IconButton from '@material-ui/core/IconButton';
-import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
 import { constants } from '../../common/objects/constants';
 import ArrowBackIosOutlinedIcon from '@material-ui/icons/ArrowBackIosOutlined';
@@ -22,7 +21,7 @@ import { MonthInformation } from '../../common/objects/stats';
 import moment from 'moment';
 import TransactionModal from '../TransactionModal/TransactionModal';
 import TransactionPanel from '../TransactionPanel/TransactionPanel';
-import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import NavbarComponent from '../NavbarComponent/NavbarComponent';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -236,16 +235,13 @@ export default function Dashboard() {
             spacing={5}
             style={{ width: '99%' }}
             >
-            <Grid item>
-                <Typography variant="h2" component="h1" style={{ marginTop: '5%' }}>
-                    Welcome back, { login.login?.name }
-                    <Link to="/user" style={{ textDecoration: 'none' }}>
-                        <SettingsOutlinedIcon className={styles.settingsIcon} />
-                    </Link>
-                    <Link to="/vaults" style={{ textDecoration: 'none' }}>
-                        <AccountBalanceIcon className={styles.navbarIcon} />
-                    </Link>
-                </Typography>
+            <Grid item xs={12} md={12} lg={12} xl={12} style={{ width: '100%', paddingLeft: '5%' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginTop: '2%' }}>
+                    <NavbarComponent />
+                    <Typography variant="h2" component="h1" style={{ margin: '0 auto' }}>
+                        Welcome back, { login.login?.name }
+                    </Typography>
+                </div>
             </Grid>
             <Grid item>
                 { login.login && chartData.length && <MonthsBalanceChart userId={login.login.id} selectedYear={selectedYear} chartData={chartData} /> }
