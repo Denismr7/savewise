@@ -2,12 +2,9 @@ import React, { useContext, useEffect, useState, useCallback } from 'react';
 import Grid from '@material-ui/core/Grid';
 import styles from "./Dashboard.module.scss";
 import { Typography } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import { Link } from 'react-router-dom';
 import { LoginContext } from '../../common/context/LoginContext';
 import { CategoryService, StatsService, TransactionService, UtilService } from '../../services/';
 import { CategoriesResponse, Category } from '../../common/objects/categories';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { GetCategoriesInput } from '../../services/category-service';
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
 import { Transaction } from '../../common/objects/transactions';
@@ -22,6 +19,7 @@ import moment from 'moment';
 import TransactionModal from '../TransactionModal/TransactionModal';
 import TransactionPanel from '../TransactionPanel/TransactionPanel';
 import NavbarComponent from '../NavbarComponent/NavbarComponent';
+import DashboardPanel from '../DashboardPanel/DashboardPanel';
 
 export default function Dashboard() {
     const {login} = useContext(LoginContext);
@@ -143,23 +141,6 @@ export default function Dashboard() {
             
         }
     }, [login, selectedYear, getMonthsInformation])
-    
-    const renderExpenses = (categories: Category[]) => {
-        if (categories.length) {
-            return categories.map(category => (
-                <Grid item
-                container
-                direction="row"
-                justify="space-between"
-                spacing={0}
-                key={category.id}
-                >
-                    <Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{ category.name }</Typography>
-                    <Typography variant="h6" component="h2" style={{ display: 'inline', marginRight: '15px' }}>{ category.amount ? category.amount : 0 } €</Typography>
-                </Grid>
-            ))
-        } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No categories to show</Typography>);
-    };
 
     const onSave = (newTransaction: Transaction) => {
         setTransactions([...transactions, newTransaction]);
@@ -238,12 +219,9 @@ export default function Dashboard() {
             <Grid item xs={12} md={12} lg={12} xl={12} style={{ width: '100%', paddingLeft: '5%' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginTop: '2%' }}>
                     <NavbarComponent />
-                    <Typography variant="h2" component="h1" style={{ margin: '0 auto' }}>
-                        Welcome back, { login.login?.name }
-                    </Typography>
                 </div>
             </Grid>
-            <Grid item>
+            <Grid item className={styles.chartPanel}>
                 { login.login && chartData.length && <MonthsBalanceChart userId={login.login.id} selectedYear={selectedYear} chartData={chartData} /> }
             </Grid>
             <Grid item>
@@ -257,71 +235,13 @@ export default function Dashboard() {
             spacing={10}
             >
                 <Grid item>
-                    <div className={styles.panel}>
-                        <Grid container
-                        direction="column"
-                        alignItems="center"
-                        justify='space-between'
-                        style={{ height: '95%' }}
-                        >
-                            <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
-                                Month expenses
-                            </Typography>
-                            <Grid container
-                            direction="column"
-                            style={{ height: '70%' }}
-                            spacing={3}
-                            >
-                                { loading ? 
-                                    (<CircularProgress color="secondary" />) 
-                                    : 
-                                    (<div className={styles.itemsContainer}>
-                                        {renderExpenses(categories.filter(c => c.categoryType.id === CategoryTypesId.Expenses))}
-                                    </div>)
-                                }
-                            </Grid>
-                            <Link to="/categories">
-                                <Button variant="outlined" color="primary">
-                                    Manage
-                                </Button>
-                            </Link>
-                        </Grid>
-                    </div>
+                    <DashboardPanel panelTitle="Month expenses" panelItems={categories.filter(c => c.categoryType.id === CategoryTypesId.Expenses)} loading={loading} />
                 </Grid>
                 <Grid item>
-                    <div className={styles.panel}>
-                        <Grid container
-                        direction="column"
-                        alignItems="center"
-                        justify='space-between'
-                        style={{ height: '95%' }}
-                        >
-                            <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
-                                Month incomes
-                            </Typography>
-                            <Grid container
-                            direction="column"
-                            style={{ height: '70%' }}
-                            spacing={3}
-                            >
-                                { loading ? 
-                                    (<CircularProgress color="secondary" />) 
-                                    : 
-                                    (<div className={styles.itemsContainer}>
-                                        {renderExpenses(categories.filter(c => c.categoryType.id === CategoryTypesId.Incomes))}
-                                    </div>)
-                                }
-                            </Grid>
-                            <Link to="/categories">
-                                <Button variant="outlined" color="primary">
-                                    Manage
-                                </Button>
-                            </Link>
-                        </Grid>
-                    </div>
+                    <DashboardPanel panelTitle="Month incomes" panelItems={categories.filter(c => c.categoryType.id === CategoryTypesId.Incomes)} loading={loading}/>
                 </Grid>
                 <Grid item>
-                    <div className={styles.panel}>
+                    <div className={styles.transactionsPanel}>
                         <TransactionPanel transactions={transactions} loading={loading} onSave={onSave} ></TransactionPanel>
                     </div>
                 </Grid>

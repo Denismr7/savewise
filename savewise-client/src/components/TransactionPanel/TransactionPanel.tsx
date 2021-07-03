@@ -39,8 +39,8 @@ export default function TransactionPanel({ transactions, loading, onSave }: ITra
                         spacing={0}
                         key={t.id}
                     >
-                        <Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{t.description}</Typography>
-                        <Typography variant="h6" component="h2" style={{ display: 'inline', marginRight: '15px' }} className={color}>
+                        <Typography variant="h6" component="h2" style={{ display: 'inline', fontSize: '1rem', marginLeft: '15px' }}>{t.description}</Typography>
+                        <Typography variant="h6" component="h2" style={{ display: 'inline', fontSize: '1rem', marginRight: '15px' }} className={color}>
                             { symbol } { t.amount } { constants.currency }
                         </Typography>
                     </Grid>
@@ -58,7 +58,7 @@ export default function TransactionPanel({ transactions, loading, onSave }: ITra
                 justify='space-between'
                 style={{ height: '95%' }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
+                <Typography variant="h5" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
                     Last transactions
                         <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => setOpenModal(true)}>
                         <AddCircleOutlineIcon />

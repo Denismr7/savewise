@@ -1,15 +1,17 @@
-.transactionsPanel {
+.panel {
     width: 400px;
     height: 400px;
     border-radius: 10px;
     background-color: rgba(71, 166, 255, 0.3);
     transition: all 0.5s;
 }
-.transactionsPanel:hover {
+
+.panel:hover {
     width: 450px;
     height: 450px;
     background-color: rgba(71, 166, 255, 0.5);
 }
+
 .itemsContainer {
     width: 90%;
     height: 100%;
@@ -18,31 +20,7 @@
     overflow-y: auto;
     scrollbar-width: none;
 }
+
 .itemsContainer::-webkit-scrollbar {
     display: none;
-}
-.title {
-    color: #292929;
-}
-
-.monthController {
-    display: flex;
-}
-
-.currentMonthName {
-    width: 500px;
-    text-align: center;
-}
-
-.balanceContainer {
-    text-align: center;
-}
-
-.balanceResult {
-    margin-left: 10px;
-}
-
-.chartPanel {
-    background-color:rgba(218, 255, 9, 0.3);
-    border-radius: 10px;
 }
