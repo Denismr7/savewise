@@ -16,10 +16,9 @@
     width: 70%;
     height: 70vh;
     padding: 20px 5%;
-    border-radius: 25px;
-    background-color: #ebebeb;
-    box-shadow:  29px 29px 50px #c3c3c3,
-             -29px -29px 50px #ffffff;
+    border-radius: 10px;
+    border: 2px solid rgba(71, 166, 255, 1);
+    background-color: rgba(71, 166, 255, 0.3);
 }
 
 .componentHeader {
