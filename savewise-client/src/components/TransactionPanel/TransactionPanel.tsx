@@ -19,16 +19,24 @@ export interface ITransactionPanelProps {
     transactions: Transaction[];
     loading: boolean;
     onSave: (t: Transaction) => any;
+    parent?: string;
 }
 
-export default function TransactionPanel({ transactions, loading, onSave }: ITransactionPanelProps) {
+export default function TransactionPanel({ transactions, loading, onSave, parent }: ITransactionPanelProps) {
     const [openModal, setOpenModal] = useState<boolean>(false);
 
     const renderTransactions = (transactions: Transaction[]) => {
         if (transactions.length) {
             const sortedByDate = UtilService.sortTransactionByDate(transactions);
             return sortedByDate.map(t => {
-                const isIncome = t.category.categoryType?.id === CategoryTypesId.Incomes ? true : false; 
+                let isIncome: boolean;
+                if (parent === 'vault') {
+                    // Vault Dashboard
+                    isIncome = t.category.categoryType?.id === CategoryTypesId.VaultIncomes ? true : false;
+                } else {
+                    // Transaction Dashboard
+                    isIncome = t.category.categoryType?.id === CategoryTypesId.Incomes ? true : false;
+                }
                 const symbol: string = isIncome ? "+" : "-";
                 const color = isIncome ? 'incomeGreenColor' : 'regularColor';
                 return (
