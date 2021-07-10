@@ -254,7 +254,7 @@ export default function TransactionModal({ conditionToShow, transaction, handleV
                 variant="outlined"
                 name="amount"
                 type="number"
-                value={transactionForm.amount ? transactionForm.amount : ""}
+                value={transactionForm.amount || transactionForm.amount === 0 ? transactionForm.amount : ""}
                 style={{ marginTop: "10px" }}
                 placeholder="€"
                 fullWidth
