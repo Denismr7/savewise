@@ -55,8 +55,8 @@ export default function NavbarComponent() {
             <List style={{ width: '250px' }}>
                 {navbarItems.map((item) => (
 
-                    <Link to={item.link} style={{ textDecoration: 'none', color: 'initial' }}>
-                        <ListItem button key={item.text}>
+                    <Link to={item.link} key={item.text} style={{ textDecoration: 'none', color: 'initial' }}>
+                        <ListItem button>
                             <ListItemIcon>
                                 {item.icon}
                             </ListItemIcon>
