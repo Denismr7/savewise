@@ -27,12 +27,16 @@
     align-items: center;
 }
 
+.panelTitle {
+    border-bottom: 4px solid #6437C1;
+}
+
 .titleColor {
     color: #292929;
 }
 
 .incomeGreenColor {
-    color: #007a2b;
+    color: #007a2b !important;
 }
 
 .regularColor {

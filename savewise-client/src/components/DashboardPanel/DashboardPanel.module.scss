@@ -1,17 +1,10 @@
 .panel {
-    width: 400px;
+    width: 350px;
     height: 400px;
-    border-radius: 10px;
-    background-color: rgba(71, 166, 255, 0.3);
-    transition: all 0.5s;
+    border-radius: 20px;
+    background-color: whitesmoke;
+    padding: 10%;
 }
-
-.panel:hover {
-    width: 450px;
-    height: 450px;
-    background-color: rgba(71, 166, 255, 0.5);
-}
-
 .itemsContainer {
     width: 90%;
     height: 100%;

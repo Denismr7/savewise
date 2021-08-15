@@ -11,8 +11,8 @@ import TransactionModal from '../TransactionModal/TransactionModal';
 import { Transaction } from '../../common/objects/transactions';
 import styles from "./TransactionPanel.module.scss";
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
-import { constants } from '../../common/objects/constants';
 import { UtilService } from '../../services';
+import PanelItem from '../PanelItem/PanelItem';
 
 
 export interface ITransactionPanelProps {
@@ -40,18 +40,7 @@ export default function TransactionPanel({ transactions, loading, onSave, parent
                 const symbol: string = isIncome ? "+" : "-";
                 const color = isIncome ? 'incomeGreenColor' : 'regularColor';
                 return (
-                    <Grid item
-                        container
-                        direction="row"
-                        justify="space-between"
-                        spacing={0}
-                        key={t.id}
-                    >
-                        <Typography variant="h6" component="h2" style={{ display: 'inline', fontSize: '1rem', marginLeft: '15px' }}>{t.description}</Typography>
-                        <Typography variant="h6" component="h2" style={{ display: 'inline', fontSize: '1rem', marginRight: '15px' }} className={color}>
-                            { symbol } { t.amount } { constants.currency }
-                        </Typography>
-                    </Grid>
+                    <PanelItem item={{name: t.description, id: t.id, amount: t.amount}} symbol={symbol} incomesColor={color}/>
                 )
             }
             )
@@ -62,16 +51,17 @@ export default function TransactionPanel({ transactions, loading, onSave, parent
         <>
             <Grid container
                 direction="column"
-                alignItems="center"
                 justify='space-between'
                 style={{ height: '95%' }}
             >
-                <Typography variant="h5" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
-                    Last transactions
-                        <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => setOpenModal(true)}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="h5" component="h2" className="panelTitle">
+                        LAST TRANSACTIONS
+                    </Typography>
+                    <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => setOpenModal(true)}>
                         <AddCircleOutlineIcon />
                     </IconButton>
-                </Typography>
+                </div>
                 <Grid container
                     direction="column"
                     style={{ height: '70%' }}
