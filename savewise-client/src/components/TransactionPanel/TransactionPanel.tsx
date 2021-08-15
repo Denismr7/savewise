@@ -13,6 +13,7 @@ import styles from "./TransactionPanel.module.scss";
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
 import { UtilService } from '../../services';
 import PanelItem from '../PanelItem/PanelItem';
+import { constants } from '../../common/objects/constants';
 
 
 export interface ITransactionPanelProps {
@@ -40,7 +41,7 @@ export default function TransactionPanel({ transactions, loading, onSave, parent
                 const symbol: string = isIncome ? "+" : "-";
                 const color = isIncome ? 'incomeGreenColor' : 'regularColor';
                 return (
-                    <PanelItem item={{name: t.description, id: t.id, amount: t.amount}} symbol={symbol} incomesColor={color}/>
+                    <PanelItem key={t.id} item={{name: t.description, id: t.id, amount: t.amount}} symbol={symbol} incomesColor={color}/>
                 )
             }
             )
@@ -75,7 +76,7 @@ export default function TransactionPanel({ transactions, loading, onSave, parent
                         </div>)
                     }
                 </Grid>
-                <Link to="/transactions">
+                <Link to={constants.routes.transactions}>
                     <Button variant="outlined" color="primary">
                         Manage
                         </Button>

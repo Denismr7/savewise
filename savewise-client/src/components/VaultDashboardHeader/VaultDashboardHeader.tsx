@@ -1,6 +1,4 @@
 import React, { ChangeEvent, ReactNode, useContext, useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
-import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -88,15 +86,6 @@ export default function VaultDashboardHeader({ selectValue, handleChange, handle
 
     return (
         <div className={styles.vaultDashboardHeader}>
-                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        className={`${styles.backButton} ${styles.button}`}
-                    >
-                        <ArrowBackIosIcon />
-                    </Button>
-                </Link>
                 <div className={styles.vaultSelect}>
                     <FormControl fullWidth variant="outlined">
                         <InputLabel id="vaultSelectLabel">Your vaults</InputLabel>

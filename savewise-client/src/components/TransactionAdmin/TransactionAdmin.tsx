@@ -211,7 +211,7 @@ export default function TransactionAdmin() {
     const renderHeader = () => {
         return (
             <>
-                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+                <Link to={constants.routes.dashboard} style={{ textDecoration: 'none' }}>
                     <ArrowBackIosIcon />
                 </Link>
                 <h1 className="titleColor">Last transactions</h1>

@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import PanelItem from '../PanelItem/PanelItem';
 import { IPanelItem } from '../../common/objects/IPanelItem';
+import { constants } from '../../common/objects/constants';
 
 interface DashboardPanelProps {
     panelTitle: string,
@@ -20,7 +21,7 @@ export default function DashboardPanel({ panelTitle, panelItems, loading, button
     const itemsRenderer = (items: IPanelItem[]) => {
         if (items.length) {
             return items.map(item => (
-                <PanelItem item={item} />
+                <PanelItem key={item.id} item={item} />
             ))
         } else (<Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>No data to show</Typography>);
     };
@@ -48,7 +49,7 @@ export default function DashboardPanel({ panelTitle, panelItems, loading, button
                                     </div>)
                                 }
                             </Grid>
-                            <Link to="/categories">
+                            <Link to={constants.routes.categories}>
                                 <Button variant="outlined" color="primary">
                                     { buttonText ? buttonText : "Manage" }
                                 </Button>

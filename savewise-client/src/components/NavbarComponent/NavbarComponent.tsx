@@ -9,13 +9,8 @@ import SettingsOutlinedIcon from '@material-ui/icons/SettingsOutlined';
 import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
 import { Link } from 'react-router-dom';
 import MenuIcon from '@material-ui/icons/Menu';
-
-
-interface NavbarItem {
-    text: string,
-    icon: React.ReactElement,
-    link: string
-}
+import { INavbarItem } from "../../common/objects/INavbarItem";
+import { navbarItems } from "../../common/objects/routes";
 
 export default function NavbarComponent() {
     const [visibility, setVisiblity] = useState<boolean>(false);
@@ -33,20 +28,7 @@ export default function NavbarComponent() {
         setVisiblity(visibility);
     };
 
-    const navbarItems: NavbarItem[] = [
-        {
-            text: 'My account',
-            icon: <SettingsOutlinedIcon />,
-            link: '/user'
-        },
-        {
-            text: 'My vaults',
-            icon: <AccountBalanceIcon />,
-            link: '/vaults'
-        }
-    ]
-
-    const list = (navbarItems: NavbarItem[]) => (
+    const list = (navbarItems: INavbarItem[]) => (
         <div
             role="presentation"
             onClick={toggleDrawer(false)}

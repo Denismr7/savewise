@@ -9,6 +9,7 @@ import { LoginContext } from '../../common/context/LoginContext';
 import { Redirect, useHistory, Link } from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
+import { constants } from '../../common/objects/constants';
 
 export default function Login(): ReactElement {
     const [loginForm, setLoginForm] = useState<LoginData>({ userName: '', password: '' });
@@ -29,7 +30,7 @@ export default function Login(): ReactElement {
         if (status.success) {
             setLogin({ isLogged: true, login });
             SessionService.setLogin(login);
-            history.push("/dashboard");
+            history.push(constants.routes.dashboard);
         } else {
             setSnackbarInfo({ severity: "error", message: status.errorMessage });
         }
@@ -37,7 +38,7 @@ export default function Login(): ReactElement {
 
   if (login.isLogged) {
      return (
-         <Redirect to="/dashboard" />
+         <Redirect to={constants.routes.dashboard} />
          )
   }
 
@@ -85,7 +86,7 @@ export default function Login(): ReactElement {
                         </Button>
                     </Grid>
                     <Grid item md={12}>
-                        <Link to="/user">
+                        <Link to={constants.routes.account}>
                             <Button variant="outlined" color="default" type="button">
                                 Create account
                             </Button>
