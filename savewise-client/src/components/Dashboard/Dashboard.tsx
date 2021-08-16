@@ -18,7 +18,6 @@ import { MonthInformation } from '../../common/objects/stats';
 import moment from 'moment';
 import TransactionModal from '../TransactionModal/TransactionModal';
 import TransactionPanel from '../TransactionPanel/TransactionPanel';
-import NavbarComponent from '../NavbarComponent/NavbarComponent';
 import DashboardPanel from '../DashboardPanel/DashboardPanel';
 
 export default function Dashboard() {
@@ -140,7 +139,7 @@ export default function Dashboard() {
         return () => {
             
         }
-    }, [login, selectedYear, getMonthsInformation])
+    }, [login, selectedYear, getMonthsInformation]);
 
     const onSave = (newTransaction: Transaction) => {
         setTransactions([...transactions, newTransaction]);
@@ -216,11 +215,6 @@ export default function Dashboard() {
             spacing={5}
             style={{ width: '99%' }}
             >
-            {/* <Grid item xs={12} md={12} lg={12} xl={12} style={{ width: '100%', paddingLeft: '5%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginTop: '2%' }}>
-                    <NavbarComponent />
-                </div>
-            </Grid> */}
             <Grid item className={styles.chartPanel}>
                 { login.login && chartData.length && <MonthsBalanceChart userId={login.login.id} selectedYear={selectedYear} chartData={chartData} /> }
             </Grid>

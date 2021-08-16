@@ -51,9 +51,11 @@ export default function NavbarComponent() {
     );
     return (
         <>
-            <Button onClick={toggleDrawer(true)}>
-                <MenuIcon />
-            </Button>
+            <div style={{ height: '50px', paddingTop: '20px' }}>
+                <Button onClick={toggleDrawer(true)} style={{ height: '100%' }}>
+                    <MenuIcon />
+                </Button>
+            </div>
             <Drawer
                 anchor={'left'}
                 open={visibility}

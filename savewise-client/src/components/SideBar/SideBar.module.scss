@@ -1,5 +1,8 @@
 .sideBar {
-    width: 300px;
+    min-width: 150px;
+    width: 20%;
+    max-width: 300px;
+    margin-right: 10px;
     height: 100vh;
     border-radius: 0px 0px 0px 0px;
     background-color: whitesmoke;

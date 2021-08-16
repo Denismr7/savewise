@@ -18,5 +18,8 @@ export const constants = {
         user: "/user",
         vaults: "/vaults"
     },
+    mediaQueries: {
+        toggleSideBarBreakpoint: 750,
+    },
     currency: "€"
 }
