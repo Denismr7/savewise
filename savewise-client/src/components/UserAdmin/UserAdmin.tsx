@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import { useHistory } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import styles from "./UserAdmin.module.scss";
 import TextField from '@material-ui/core/TextField';
@@ -8,7 +7,6 @@ import { LoginContext } from '../../common/context/LoginContext';
 import { UserService } from '../../services';
 import { User } from '../../common/objects/user';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
-import { constants } from '../../common/objects/constants';
 
 interface IUserForm {
     name?: string;

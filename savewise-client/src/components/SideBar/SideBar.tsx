@@ -7,8 +7,8 @@ import styles from './SideBar.module.scss';
 export default function SideBar() {
 
     function renderItems(navBarItems: INavbarItem[]) {
-        return navBarItems.map(item =>
-            <SideBarItem item={item} />
+        return navBarItems.map((item, index) =>
+            <SideBarItem key={index} item={item} />
             );
     }
 
