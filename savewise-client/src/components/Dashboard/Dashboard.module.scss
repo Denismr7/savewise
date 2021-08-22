@@ -1,15 +1,9 @@
-@keyframes rotate {
-    from {transform: rotate(0deg);}
-    to {transform: rotate(360deg);}
-}
-
-.panel {
+.transactionsPanel {
     width: 400px;
-    height: 500px;
-    border-radius: 25px;
-    background-color: #ebebeb;
-    box-shadow:  16px 16px 32px #cecece,
-             -16px -16px 32px #e8e8e8;
+    height: 400px;
+    border-radius: 20px;
+    background-color: whitesmoke;
+    padding: 10%;
 }
 .itemsContainer {
     width: 90%;
@@ -17,19 +11,13 @@
     margin: 0 auto;
     overflow-x: hidden;
     overflow-y: auto;
+    scrollbar-width: none;
+}
+.itemsContainer::-webkit-scrollbar {
+    display: none;
 }
 .title {
     color: #292929;
-}
-
-.settingsIcon, .navbarIcon {
-    margin-bottom: 20px;
-    margin-left: 5px;
-}
-
-.settingsIcon:hover {
-    animation: rotate 2s;
-    animation-iteration-count: infinite;
 }
 
 .monthController {
@@ -47,4 +35,9 @@
 
 .balanceResult {
     margin-left: 10px;
+}
+
+.chartPanel {
+    background-color:rgb(255, 255, 255);
+    border-radius: 10px;
 }

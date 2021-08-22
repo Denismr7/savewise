@@ -1,0 +1,19 @@
+.panel {
+    width: 350px;
+    height: 400px;
+    border-radius: 20px;
+    background-color: whitesmoke;
+    padding: 10%;
+}
+.itemsContainer {
+    width: 90%;
+    height: 100%;
+    margin: 0 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.itemsContainer::-webkit-scrollbar {
+    display: none;
+}

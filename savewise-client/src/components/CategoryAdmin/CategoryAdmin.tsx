@@ -23,6 +23,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContentText from '@material-ui/core/DialogContentText';
+import { constants } from '../../common/objects/constants';
 
 interface categoryForm {
   categoryName: string,
@@ -204,7 +205,7 @@ export function CategoryAdmin() {
   return (
     <div className="componentBg">
         <div className="componentHeader">
-            <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+            <Link to={constants.routes.dashboard} style={{ textDecoration: 'none' }}>
                 <ArrowBackIosIcon />
             </Link>
             <h1 className="titleColor">Your categories</h1>

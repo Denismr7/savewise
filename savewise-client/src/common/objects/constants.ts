@@ -9,5 +9,17 @@ export const constants = {
         incomesBgColor: "rgba(68, 242, 103, 0.5)",
         expensesBgColor: "rgba(255, 61, 102, 0.5)"
     },
+    routes: {
+        account: "/account",
+        categories: "/dashboard/categories",
+        dashboard: "/dashboard",
+        login: "/login",
+        transactions: "/dashboard/transactions",
+        user: "/user",
+        vaults: "/vaults"
+    },
+    mediaQueries: {
+        toggleSideBarBreakpoint: 750,
+    },
     currency: "€"
 }

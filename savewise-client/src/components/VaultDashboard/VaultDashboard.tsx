@@ -42,6 +42,18 @@ export default function VaultDashboard() {
 
         setVaultTransactions([...vaultTransactions, newTransaction]);
         updateChartData(newTransaction);
+        updateVaultAmount(newTransaction);
+    }
+
+    const updateVaultAmount = (newTransaction: Transaction) => {
+        const isExpense = newTransaction.category.categoryType.id === CategoryTypesId.VaultExpenses ? true : false;
+        const updatedVault = vault as Vault;
+        if (isExpense) {
+            updatedVault.amount = vault!.amount - newTransaction.amount;
+        } else {
+            updatedVault.amount = vault!.amount + newTransaction.amount;
+        }
+        setVault(updatedVault);
     }
 
     const getChartData = useCallback(
@@ -145,7 +157,7 @@ export default function VaultDashboard() {
                             <VaultChart chartData={chartData}/>
                         </div>
                         <div className={styles.transactionPanelContainer}>
-                            <TransactionPanel transactions={vaultTransactions} loading={loading} onSave={handleSavedTransaction}/>
+                            <TransactionPanel transactions={vaultTransactions} loading={loading} onSave={handleSavedTransaction} parent="vault"/>
                         </div>
                     </Paper>
             </div>

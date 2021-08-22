@@ -8,6 +8,7 @@ import { LoginContext } from '../../common/context/LoginContext';
 import { UserService } from '../../services';
 import { User } from '../../common/objects/user';
 import { SnackbarContext } from '../../common/context/SnackbarContext';
+import { constants } from '../../common/objects/constants';
 
 interface IUserForm {
     name?: string;
@@ -104,9 +105,6 @@ export default function UserAdmin() {
     return (
         <div className="componentBg">
             <div className="componentHeader">
-                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
-                    <ArrowBackIosIcon />
-                </Link>
                 <h1 className={`${styles.marginAuto} componentHeaderTitle`}>
                     { editMode ? 'Your account' : 'Create account' }
                 </h1>

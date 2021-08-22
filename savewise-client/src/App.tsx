@@ -18,6 +18,7 @@ import TransactionAdmin from './components/TransactionAdmin/TransactionAdmin';
 import UserAdmin from './components/UserAdmin/UserAdmin';
 import SnackbarComponent from './components/Snackbar/SnackbarComponent';
 import VaultDashboard from './components/VaultDashboard/VaultDashboard';
+import { constants } from './common/objects/constants';
 
 function App() {
   const {login, setLogin} = useContext(LoginContext);
@@ -35,7 +36,7 @@ function App() {
       <Router>
         <div className="App">
           <Switch>
-            <Route path="/login" exact>
+            <Route path={constants.routes.login} exact>
               <div className="centered">
                 <Login />
               </div>
@@ -43,11 +44,12 @@ function App() {
             <Route path="/user" exact>
                 <UserAdmin />
             </Route>
-            <PrivateRoute component={Dashboard} path="/dashboard" exact conditionToRender={login.isLogged} />
-            <PrivateRoute component={CategoryAdmin} path="/categories" exact conditionToRender={login.isLogged} />
-            <PrivateRoute component={TransactionAdmin} path="/transactions" exact conditionToRender={login.isLogged} />
-            <PrivateRoute component={VaultDashboard} path="/vaults" exact conditionToRender={login.isLogged} />
-            <Redirect from="/" to="/login" exact/>
+            <PrivateRoute component={UserAdmin} path={constants.routes.account} exact conditionToRender={login.isLogged} />
+            <PrivateRoute component={Dashboard} path={constants.routes.dashboard} exact conditionToRender={login.isLogged} />
+            <PrivateRoute component={CategoryAdmin} path={constants.routes.categories} exact conditionToRender={login.isLogged} />
+            <PrivateRoute component={TransactionAdmin} path={constants.routes.transactions} exact conditionToRender={login.isLogged} />
+            <PrivateRoute component={VaultDashboard} path={constants.routes.vaults} exact conditionToRender={login.isLogged} />
+            <Redirect from="/" to={constants.routes.login} exact/>
           </Switch>
           <SnackbarComponent />
         </div>

@@ -11,39 +11,37 @@ import TransactionModal from '../TransactionModal/TransactionModal';
 import { Transaction } from '../../common/objects/transactions';
 import styles from "./TransactionPanel.module.scss";
 import { CategoryTypesId } from '../../common/objects/CategoryTypesId';
-import { constants } from '../../common/objects/constants';
 import { UtilService } from '../../services';
+import PanelItem from '../PanelItem/PanelItem';
+import { constants } from '../../common/objects/constants';
 
 
 export interface ITransactionPanelProps {
     transactions: Transaction[];
     loading: boolean;
     onSave: (t: Transaction) => any;
+    parent?: string;
 }
 
-export default function TransactionPanel({ transactions, loading, onSave }: ITransactionPanelProps) {
+export default function TransactionPanel({ transactions, loading, onSave, parent }: ITransactionPanelProps) {
     const [openModal, setOpenModal] = useState<boolean>(false);
 
     const renderTransactions = (transactions: Transaction[]) => {
         if (transactions.length) {
             const sortedByDate = UtilService.sortTransactionByDate(transactions);
             return sortedByDate.map(t => {
-                const isIncome = t.category.categoryType?.id === CategoryTypesId.Incomes ? true : false; 
+                let isIncome: boolean;
+                if (parent === 'vault') {
+                    // Vault Dashboard
+                    isIncome = t.category.categoryType?.id === CategoryTypesId.VaultIncomes ? true : false;
+                } else {
+                    // Transaction Dashboard
+                    isIncome = t.category.categoryType?.id === CategoryTypesId.Incomes ? true : false;
+                }
                 const symbol: string = isIncome ? "+" : "-";
                 const color = isIncome ? 'incomeGreenColor' : 'regularColor';
                 return (
-                    <Grid item
-                        container
-                        direction="row"
-                        justify="space-between"
-                        spacing={0}
-                        key={t.id}
-                    >
-                        <Typography variant="h6" component="h2" style={{ display: 'inline', marginLeft: '15px' }}>{t.description}</Typography>
-                        <Typography variant="h6" component="h2" style={{ display: 'inline', marginRight: '15px' }} className={color}>
-                            { symbol } { t.amount } { constants.currency }
-                        </Typography>
-                    </Grid>
+                    <PanelItem key={t.id} item={{name: t.description, id: t.id, amount: t.amount}} symbol={symbol} incomesColor={color}/>
                 )
             }
             )
@@ -54,16 +52,17 @@ export default function TransactionPanel({ transactions, loading, onSave }: ITra
         <>
             <Grid container
                 direction="column"
-                alignItems="center"
                 justify='space-between'
                 style={{ height: '95%' }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px', marginBottom: '20px' }} component="h2">
-                    Last transactions
-                        <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => setOpenModal(true)}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography variant="h5" component="h2" className="panelTitle">
+                        LAST TRANSACTIONS
+                    </Typography>
+                    <IconButton color="primary" aria-label="add transaction" component="span" onClick={() => setOpenModal(true)}>
                         <AddCircleOutlineIcon />
                     </IconButton>
-                </Typography>
+                </div>
                 <Grid container
                     direction="column"
                     style={{ height: '70%' }}
@@ -77,7 +76,7 @@ export default function TransactionPanel({ transactions, loading, onSave }: ITra
                         </div>)
                     }
                 </Grid>
-                <Link to="/transactions">
+                <Link to={constants.routes.transactions}>
                     <Button variant="outlined" color="primary">
                         Manage
                         </Button>

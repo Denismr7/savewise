@@ -1,0 +1,20 @@
+.sideBarItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: transparent;
+    border: 2px solid #391f6d;
+    padding: 15px 15px;
+    border-radius: 10px 10px 10px 10px;
+    width: 90%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.active, .sideBarItem:hover {
+    background-color: #391f6d;
+    color: whitesmoke;
+}
