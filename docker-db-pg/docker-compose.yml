@@ -7,8 +7,8 @@ services:
       POSTGRES_USER : savew
       POSTGRES_DB: savew
       POSTGRES_PASSWORD: savew
-    container_name: savew-pg
+    container_name: savew
     volumes:
-      - ${PWD}/pg-scripts:/docker-entrypoint-initdb.d/
+      - ${PWD}/savewisedb:/docker-entrypoint-initdb.d/
     ports:
       - 5500:5432

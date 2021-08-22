@@ -1,9 +1,8 @@
 #!/bin/bash
-echo "Creating pg-scripts..."
-rm -f pg-scripts/*.sql
-cp ./db/postgresql/build.sql pg-scripts/build.sql
-cp ./db/postgresql/seed.sql pg-scripts/seed.sql
-cp ./db/postgresql/testing.sql pg-scripts/testing.sql
+echo "Creating database..."
+rm -f savewisedb/*.sql
+cp ./db/postgresql/build.sql savewisedb/build.sql
+cp ./db/postgresql/seed.sql savewisedb/seed.sql
 if [[ -z $1 ]]; then
     docker-compose -f docker-compose.yml up
 else
