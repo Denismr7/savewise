@@ -4,6 +4,7 @@ using Savewise.Models;
 using Savewise.Services.Objects;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,7 +50,11 @@ namespace Savewise.Managers
         {
             DateTime fromDate;
             DateTime toDate;
-            if (!DateTime.TryParse(startDate, out fromDate) || !DateTime.TryParse(endDate, out toDate))
+            if (!DateTime.TryParseExact(startDate, "d'/'M'/'yyyy",
+                           CultureInfo.InvariantCulture,
+                           DateTimeStyles.None, out fromDate) || !DateTime.TryParseExact(endDate, "d'/'M'/'yyyy",
+                           CultureInfo.InvariantCulture,
+                           DateTimeStyles.None, out toDate))
             {
                 throw new Exception("ERROR: Invalid dates");
             }
@@ -151,7 +156,7 @@ namespace Savewise.Managers
             }
             model.tAmount = transaction.amount;
             model.tCategoryId = transaction.category.id.Value;
-            model.tDate = DateTime.Parse(transaction.date);
+            model.tDate = DateTime.ParseExact(transaction.date, "d'/'M'/'yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None);
             model.tDescription = transaction.description;
             model.tUserId = transaction.userId;
             model.tVaultId = transaction.vaultId;
